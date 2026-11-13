@@ -1,0 +1,12 @@
+{
+  "name": "confessions-video",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "@fontsource/noto-serif-sc": "^5.2.0",
+    "@fontsource/noto-sans-sc": "^5.2.0",
+    "@fontsource/cormorant-garamond": "^5.2.0",
+    "lxgw-wenkai-webfont": "^1.7.0"
+  }
+}

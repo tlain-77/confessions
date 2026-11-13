@@ -1,0 +1,4 @@
+# downloaded voice models, npm packages and render output are reproducible — keep them out of git
+models/
+node_modules/
+out/
