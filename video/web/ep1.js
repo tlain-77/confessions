@@ -135,7 +135,7 @@
     tl.set(p + ' i', { opacity: 1 }, e - 0.05); tl.fromTo(p + ' i', { scaleX: 0 }, { scaleX: 1, duration: 0.32, ease: 'power3.out', immediateRender: false }, e - 0.05);
     tl.to(p + ' span', { opacity: 0.45, duration: 0.4 }, e);
   });
-  const tBo = tB3 - 0.1;
+  const tBo = Math.max(tB3 - 0.1, tName - 0.55);
   OUT('.pill', tBo, { d: 0.45, st: 0.06 });
   tl.to('.a-block', { opacity: 0, filter: 'blur(10px)', duration: 0.5, ease: 'power2.in' }, tBo); tl.set('#sA', { autoAlpha: 0 }, tBo + 0.55);
   tl.fromTo('.b-latin', { opacity: 0, letterSpacing: '1em' }, { opacity: 1, letterSpacing: '0.5em', duration: 1.8, ease: 'power3.out', immediateRender: false }, tName - 0.4);
@@ -202,7 +202,7 @@
   // =====================================================================================
   // F · 书里写着（大意）
   // =====================================================================================
-  const tF = at('我年轻的时候是这么祷告的'), tF2 = at('主啊请让我圣洁'), tF3 = at('但别太快'), tW = at('他还解释了是为什么');
+  const tF = at('我年轻的时候是这么祷告的'), tF2 = at('主啊请让我圣洁'), tF3 = at('但别太快'), tW = at('他还解释了为什么');
   OUT('.e-left', tF - 0.6, { d: 0.45, y: -14 });
   tl.to('#pg1', { x: 0, scale: 1.08, rotationY: -2, rotationX: 2, duration: 1.0, ease: 'power3.inOut' }, tF - 0.65);
   tl.to('.pg-a', { opacity: 0, duration: 0.35 }, tF - 0.65);
@@ -211,7 +211,7 @@
   ink('.pg-b .q3', tF2, tF3 - tF2 - 0.3);
   ink('.pg-b .q4 .split', tF3, 0.7);
   DRAW('.pg-b .q4 .ul path', tF3 + 0.7, 0.5);
-  tl.fromTo('.pg-why', { opacity: 0, scale: 1.6, rotation: -14 }, { opacity: 1, scale: 1, rotation: -5, duration: 0.6, ease: 'back.out(2)', immediateRender: false }, at('是为什么') - 0.1);
+  tl.fromTo('.pg-why', { opacity: 0, scale: 1.6, rotation: -14 }, { opacity: 1, scale: 1, rotation: -5, duration: 0.6, ease: 'back.out(2)', immediateRender: false }, at2('他还解释了为什么', '为什么') - 0.1);
   DRAW('.pg-arrow path', tW + 1.0, 0.6);
   ink('.pg-notes .n1', at('我怕你答应得太快'), 1.1);
   ink('.pg-notes .n2', at('一下子把我这个毛病都治好了'), 1.5);
@@ -302,7 +302,7 @@
   const tJ = at('当时我想看一下这个人写的忏悔录'), tJw = at2('当时我想看一下这个人写的忏悔录', '这个人写的'), tJ2 = at('竟然这么多'), tJ3 = at('他竟然有这么多的东西需要忏悔'), tJ5 = at('他究竟想忏悔些什么东西'), tJ6 = at('那当然我是成为基督徒之后');
   sceneOut('#sI', tJ - 0.7, 0.6);
   show('#sJ', tJ - 0.3);
-  tl.fromTo('#sJ .j-cover', { opacity: 0, y: 70, rotationY: -38, scale: 0.9 }, { opacity: 1, y: 0, rotationY: -8, scale: 1, duration: 1.2, ease: 'power3.out', immediateRender: false }, tJw - 0.3);
+  tl.fromTo('#sJ .j-cover', { opacity: 0, y: 70, rotationY: -38, scale: 0.9 }, { opacity: 1, y: 0, rotationY: -8, scale: 1, duration: 1.2, ease: 'power3.out', immediateRender: false }, Math.min(tJw - 0.3, tJ + 0.15));
   const tTow = tJ2 - 0.55;
   tl.to('#sJ .j-cover', { opacity: 0, scale: 0.92, duration: 0.4, ease: 'power2.in' }, tTow - 0.1);
   $$('.slab').forEach((s, i) => tl.fromTo(s, { opacity: 0, y: -70, rotation: i % 2 ? 5 : -5 }, { opacity: 1, y: 0, rotation: slabJit[i], duration: 0.42, ease: 'back.out(1.7)', immediateRender: false }, tTow + i * 0.115));
@@ -320,7 +320,7 @@
   // K · 翻开第一页
   // =====================================================================================
   const tK = at('然后我翻开它的第一页'), tK1 = at('主啊你是伟大的'), eK2 = en('你理应受一切的赞美'), tK4 = at('这个和忏悔有什么关系'), tK5 = at('然后我硬着头皮读了后面'),
-    tK7 = at('一个人在那里跟神对话'), tK9 = at('我是先该呼求你'), tK9b = at('还是先认识你'), tK10 = at('你充满天地'), tK10b = at('那天地装得下你吗'), tK11 = at('然后我就觉得这有点晦涩'), tK12 = at('就慢慢地就没有读下去了');
+    tK7 = at('一个人在那里跟神对话'), tK9 = at('我是先该呼求你'), tK9b = at('还是先认识你'), tK10 = at('你充满天地'), tK10b = at('那天地装得下你吗'), tK11 = at('然后我就觉得这有点晦涩'), tK12 = at('就慢慢地没有再读下去了');
   sceneOut('#sJ', tK - 0.7, 0.6);
   show('#sK', tK - 0.2);
   light(tK - 0.5, { light: 0.58, rays: 0.45 }, 1.4);
@@ -436,7 +436,7 @@
   // =====================================================================================
   // O · 他是从哪儿走过来的（地图）；好不容易才说出口的一句话
   // =====================================================================================
-  const tO = at('所以我们在读忏悔录这本书的时候'), tO4 = at('他是从哪儿走过来的'), tO5 = at('那么开头那句'), tO5b = at2('那么开头那句你是伟大的', '你是伟大的'), tO6b = at('客套的话'),
+  const tO = at('所以在读忏悔录这本书之前'), tO4 = at('他是从哪儿走过来的'), tO5 = at('那么开头那句'), tO5b = at2('那么开头那句你是伟大的', '你是伟大的'), tO6b = at('客套的话'),
     tO7 = at('如果等你知道他的故事了'), tO9 = at('那么你就会有不同的理解'), tO11 = at('好不容易'), eO = en('才能说出口的一句话');
   sceneOut('#sN', tO - 0.9, 0.7);
   show('#sO', tO - 0.2);
@@ -448,7 +448,8 @@
   // 路线：塔加斯特 → 迦太基 → 罗马 → 米兰 → 希波
   const tR = tO + 1.5, cityIn = (k, t) => { tl.fromTo(cityEls[k], { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.out', immediateRender: false }, t);
     tl.fromTo($('.cg', cityEls[k]), { attr: { r: 8 } }, { attr: { r: 34 }, duration: 0.9, ease: 'power2.out', immediateRender: false }, t); };
-  const LEG = [[0.5, 0.95], [1.6, 1.25], [3.0, 1.05], [4.25, 2.1]];             // 每一段：出发时刻（相对 tR）、用时
+  const LK = Math.min(1, (tO5 - 0.5 - tR) / 6.35);                            // 讲话变紧凑后，路线动画按比例加快，赶在下一句前画完
+  const LEG = [[0.5, 0.95], [1.6, 1.25], [3.0, 1.05], [4.25, 2.1]].map(([s, d]) => [s * LK, d * LK]);   // 每一段：出发时刻（相对 tR）、用时
   cityIn('thagaste', tR);
   LEG.forEach(([s, d], i) => { DRAW(segEls[i], tR + s, d, { ease: 'power1.inOut', o: i === 3 ? 0.85 : 1 }); cityIn(SEG[i][1], tR + s + d - 0.15); });
   // 开头那句"你是伟大的"

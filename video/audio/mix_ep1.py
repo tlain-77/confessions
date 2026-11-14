@@ -20,7 +20,7 @@ def voice(freq, amp, rate, ph0, pan):
     return out * (amp * (0.72 + 0.28 * np.sin(2 * np.pi * rate * t + ph0)))[:, None] / 3
 
 tPray, tName, tPage, tMe, tTitle = at('不要现在'), at('奥古斯丁'), at('在周士良先生的译本里'), at('这不就是我吗'), at('这本书叫忏悔录')
-tP2, tShut, tHist, tSaint, tReal, tMap, tGold, tEnd = EP['off'][1], at('然后我就觉得这有点晦涩'), at('但是我在了解教会历史的时候'), at('圣奥古斯丁'), at('很真实'), at('所以我们在读忏悔录'), at('那么你就会有不同的理解'), EP['subs'][-1]['e']
+tP2, tShut, tHist, tSaint, tReal, tMap, tGold, tEnd = EP['off'][1], at('然后我就觉得这有点晦涩'), at('但是我在了解教会历史的时候'), at('圣奥古斯丁'), at('很真实'), at('所以在读忏悔录'), at('那么你就会有不同的理解'), EP['subs'][-1]['e']
 # 和声：D 持续音上，上面三个声部在 D(add9) 和 G/D 之间慢慢换
 B = env([(0, 0), (tName - 1, 0), (tName + 2, 1), (tPage, 1), (tPage + 3, 0), (tMe + 2, 0), (tMe + 6, 1), (tTitle - 1.5, 1), (tTitle + 1, 0), (tP2 + 12, 0), (tP2 + 16, 1), (tP2 + 34, 1), (tP2 + 38, 0),
          (tShut, 0), (tShut + 4, 1), (tHist + 6, 1), (tSaint, 0), (tReal - 3, 0), (tReal + 6, 1), (tMap - 2, 1), (tMap + 2, 0), (T, 0)])
@@ -44,7 +44,7 @@ def reverb(x, secs, wet, lp=4200):
 music = sosfilt(butter(2, 3200, 'low', fs=SR, output='sos'), reverb(music, 3.2, 0.5), axis=0)
 v = np.zeros(N)
 for i, off in enumerate(EP['off']):
-    x, sr = sf.read(f'rec/part{i + 1}_clean.wav', dtype='float64'); assert sr == SR
+    x, sr = sf.read(f"rec/part{i + 1}{EP.get('suffix', '')}.wav" if EP.get('suffix') else f'rec/part{i + 1}_clean.wav', dtype='float64'); assert sr == SR
     a = int(off * SR); m = min(len(x), N - a); v[a:a + m] += x[:m]
 vs = reverb(np.stack([v, v], 1), 0.7, 0.05, lp=6000)
 def rms_db(x):
