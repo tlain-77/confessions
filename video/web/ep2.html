@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>忏悔录 · 逐句精读 · 奥古斯丁这个人</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/300.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/900.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/300.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/500-italic.css">
+<link rel="stylesheet" href="/node_modules/lxgw-wenkai-webfont/lxgwwenkai-regular.css">
+<link rel="stylesheet" href="ep1.css">
+<link rel="stylesheet" href="ep2.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+  <svg id="map" viewBox="0 0 1920 1080">
+    <defs><radialGradient id="cityGlow"><stop offset="0" stop-color="#ffe2a8" stop-opacity=".7"/><stop offset="1" stop-color="#ffe2a8" stop-opacity="0"/></radialGradient></defs>
+    <g id="mapzoom"><path id="land"/><text class="sea" x="1310" y="655">地 中 海</text><g id="route"></g><g id="cities"></g></g>
+  </svg>
+
+  <div id="scenes">
+    <!-- 片头 -->
+    <section class="scene" id="s00">
+      <div class="op-k">第 一 讲</div>
+      <div class="op-t split">奥古斯丁这个人</div>
+      <div class="op-l">AURELIUS　AUGUSTINUS　·　354 — 430</div>
+    </section>
+
+    <!-- 地图上的说明 -->
+    <section class="scene" id="sMap">
+      <div class="mp-card mc1"><em class="mp-yr">354</em><div class="mp-t">塔加斯特</div><div class="mp-s">北非小城 · 今阿尔及利亚</div><div class="mp-tag">罗马帝国 · 说拉丁语</div></div>
+      <div class="mp-card mc2"><em class="mp-yr">17<span>岁</span></em><div class="mp-t">迦太基</div><div class="mp-s">北非最大的城市</div><div class="mp-tag">小镇青年 · 第一次进大城市</div></div>
+      <div class="mp-card mc3"><em class="mp-yr">29<span>岁</span></em><div class="mp-t">去罗马发展</div><div class="mp-s">后来到了米兰</div><div class="mp-tag">遇见了后来带他信主的人</div></div>
+      <div class="mp-card mc4"><em class="mp-yr">两年后</em><div class="mp-t">莫妮卡追到米兰</div><div class="mp-s">自己坐船，横渡地中海</div><div class="mp-tag stamp-in">北非式母亲</div></div>
+      <div class="mp-card mc5"><em class="mp-yr">她</em><div class="mp-t">被送回了非洲</div><div class="mp-s">跟了他十几年</div><div class="mp-tag">儿子留下</div></div>
+    </section>
+
+    <!-- 家 -->
+    <section class="scene" id="s02">
+      <div class="fam-h">他家：<span class="split">不算穷，也绝对谈不上富</span></div>
+      <div class="pcard f"><div class="pc-ic">父</div><div class="pc-n">父亲</div>
+        <div class="chips"><b>城里有个小职位</b><b>有几亩地</b><b>不信主</b><b>脾气不太好</b></div></div>
+      <div class="pcard m"><div class="pc-ic">母</div><div class="pc-n">母亲 <em>莫妮卡</em></div><div class="pc-la">MONICA</div>
+        <div class="chips"><b class="g">基督徒</b></div><div class="pc-note"><i>★</i><span>后面要反复提到</span></div></div>
+    </section>
+
+    <!-- 指望 -->
+    <section class="scene" id="s03">
+      <div class="hp-k">全 家 的 指 望</div>
+      <div class="chain"><div class="nd n1">读书</div><i class="ar a1"></i><div class="nd n2">学修辞</div><i class="ar a2"></i><div class="nd n3">当律师<br>当官</div><i class="ar a3"></i><div class="nd n4">出人头地</div></div>
+      <div class="stamp st1">小镇做题家</div>
+    </section>
+
+    <!-- 钱断了 -->
+    <section class="scene" id="s04">
+      <div class="coins"></div>
+      <div class="cn-l"><div class="cn-a"><em>16</em><span>岁</span></div><div class="cn-b split">钱断了</div><div class="cn-c split">停学，在家待了一年</div></div>
+      <div class="boy"><b>聪明</b><b>精力旺盛</b><b>闲了一年</b></div>
+      <div class="cn-q split">会出什么事……</div>
+    </section>
+
+    <!-- 梨 -->
+    <section class="scene" id="s05">
+      <svg class="tree" viewBox="0 0 1920 1080">
+        <circle class="moon" cx="1540" cy="190" r="56"/>
+        <path class="trunk" d="M1180 1000 C 1170 860, 1200 760, 1150 640 M1160 700 C 1080 640, 1020 600, 960 590 M1165 680 C 1240 620, 1310 600, 1380 560 M1150 640 C 1140 560, 1170 500, 1160 430" pathLength="1"/>
+        <g class="pears"></g>
+      </svg>
+      <div class="pr-l">
+        <div class="pr-k">十 六 岁 · 半 夜</div>
+        <div class="pr-t split">偷梨</div>
+        <div class="pr-rows">
+          <div class="pr-r r1"><b>好吃？</b><span>不好吃 —— “我家有更好的”</span><i>✕</i></div>
+          <div class="pr-r r2"><b>吃了？</b><span>咬了两口，剩下的扔给猪</span><i>✕</i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 大半卷 -->
+    <section class="scene" id="s06">
+      <div class="bk2"><div class="bk2-h">忏悔录 · 卷二</div><div class="bk2-pages"></div><div class="bk2-c">大半卷 · 分析这几个梨</div></div>
+      <div class="zhi split">至于吗？</div>
+    </section>
+
+    <!-- 图什么 -->
+    <section class="scene" id="s07">
+      <div class="wq-k"><span class="pearx">梨</span><span class="split">揪着不放的，不是梨</span></div>
+      <div class="wq-t split">我当时到底图什么？</div>
+      <div class="wq-rows">
+        <div class="wq-r q1"><span>我饿了？</span><i>✕</i></div>
+        <div class="wq-r q2"><span>梨好吃？</span><i>✕</i></div>
+        <div class="wq-r q3"><span class="split">这事不让干</span><i class="ok">✓</i></div>
+      </div>
+      <div class="wq-big"><span class="split">我喜欢的是</span><b class="split">犯规本身</b></div>
+    </section>
+
+    <!-- 朋友 -->
+    <section class="scene" id="s08">
+      <div class="fr-col c1"><svg viewBox="0 0 400 300"><circle cx="200" cy="150" r="22"/></svg><div class="fr-t">只有我一个人</div><div class="fr-r">绝对不会去</div></div>
+      <div class="fr-col c2"><svg viewBox="0 0 400 300" class="crowd"></svg><div class="fr-t">那帮朋友在</div><div class="fr-r g">去了</div></div>
+      <div class="bubble"><span class="split">走，干一票！</span></div>
+      <div class="fr-cap split">你不去，多丢人。</div>
+    </section>
+
+    <!-- 你的梨 -->
+    <section class="scene" id="s09">
+      <div class="yp-k split">读到这儿，就笑不出来了</div>
+      <div class="yp-t"><span class="split">你自己的</span><b>「梨」</b></div>
+      <div class="yp-sub split">那些你做了、其实并不想要的事</div>
+      <div class="yp-rows"><b>因为不许</b><b>因为刺激</b><b>因为大家都在做</b></div>
+    </section>
+
+    <!-- 纸片引文（多处复用） -->
+    <section class="scene" id="sQ">
+      <div class="qcard"><div class="qc-h"><span class="qc-src"></span><span>大意</span></div><div class="qc-t"></div></div>
+    </section>
+
+    <!-- 她 -->
+    <section class="scene" id="s12">
+      <div class="her"><div class="her-ic">她</div>
+        <div class="her-rows"><div class="hr h1"><b>同居</b><span>没有结婚</span></div><div class="hr h2"><b>十几年</b><span>跟着他</span></div><div class="hr h3"><b>一个儿子</b><span>给他生的</span></div>
+          <div class="hr h4"><b>名字</b><span class="blank"><i></i></span></div></div>
+        <div class="her-note">整本《忏悔录》里，他没有写她的名字</div>
+        <div class="her-end">结局很难看 · 等会儿讲</div></div>
+    </section>
+
+    <!-- 西塞罗 -->
+    <section class="scene" id="s13">
+      <div class="ci-age"><em>19</em><span>岁</span></div>
+      <div class="ci-bk b1"><div class="cb-t">西塞罗</div><div class="cb-l">CICERO</div></div>
+      <svg class="ci-svg" viewBox="0 0 1920 1080"><path class="ci-a" d="M760 520 C 860 440, 1000 440, 1100 520" pathLength="1"/></svg>
+      <div class="ci-wis"><span class="split">追求智慧</span><em>不能只为了赚钱出名</em></div>
+      <div class="ci-bk b2"><div class="cb-t">圣经</div><div class="cb-l">他妈信的那本书</div></div>
+      <div class="ci-put split">翻了几页，放下了。</div>
+      <div class="stamp st2">太土</div>
+      <div class="ci-why"><span class="split">修辞学高材生</span><span class="split">嫌圣经没文采</span></div>
+    </section>
+
+    <!-- 摩尼教 -->
+    <section class="scene" id="s14">
+      <svg class="mn-svg" viewBox="0 0 1920 1080"><defs><clipPath id="half"><rect x="0" y="0" width="1920" height="1080"/></clipPath></defs>
+        <circle class="mn-l" cx="560" cy="520" r="230"/><path class="mn-d" d="M560 290 A 230 230 0 0 1 560 750 Z"/><circle class="mn-o" cx="560" cy="520" r="230" pathLength="1"/></svg>
+      <div class="mn-lab"><span class="lt">光明</span><span class="dk">黑暗</span></div>
+      <div class="mn-t"><span class="split">摩尼教</span><em>一待九年</em></div>
+      <div class="mn-say">
+        <div class="ms m1"><span class="split">你犯罪，不是“你”在犯罪</span></div>
+        <div class="ms m2"><span class="split">是你里面另有一股黑暗的力量</span></div>
+        <div class="ms m3"><b class="split">你本人是无辜的。</b></div>
+      </div>
+      <div class="mn-comf split">——这个说法，让他很舒服</div>
+    </section>
+
+    <!-- 借口 -->
+    <section class="scene" id="s15">
+      <div class="ex-k split">今天，我们天天在说，只是换了词</div>
+      <div class="ex-rows">
+        <div class="ex-r e1"><span class="nm">不是我的问题</span><i></i><span class="ex">是我的原生家庭</span></div>
+        <div class="ex-r e2"><span class="nm">不是我脾气差</span><i></i><span class="ex">是我最近压力大</span></div>
+        <div class="ex-r e3"><span class="nm">不是我不亲近神</span><i></i><span class="ex">是我这段时间状态不好</span></div>
+      </div>
+    </section>
+
+    <!-- 莫妮卡的眼泪 -->
+    <section class="scene" id="s16">
+      <div class="mo"><div class="mo-ic">莫妮卡</div><div class="mo-s">这些年 · <b class="split">哭，祷告</b></div></div>
+      <svg class="tears" viewBox="0 0 1920 1080"></svg>
+      <div class="bish"><div class="bi-h">她去找一位主教</div><div class="bi-r split">“现在劝没用，他听不进去。你为他祷告就好。”</div><div class="bi-n">——莫妮卡不走，继续哭着求</div></div>
+    </section>
+
+    <!-- 海港之夜 -->
+    <section class="scene" id="s17">
+      <svg class="sea-svg" viewBox="0 0 1920 1080">
+        <circle class="sea-moon" cx="1420" cy="250" r="46"/>
+        <rect class="sea-water" x="0" y="640" width="1920" height="440"/>
+        <path class="sea-hz" d="M0 640 L1920 640" pathLength="1"/>
+        <g class="ship"><path class="hull" d="M-90 0 L90 0 L64 30 L-64 30 Z"/><path class="mast" d="M0 0 L0 -150"/><path class="sail" d="M4 -142 L4 -18 L84 -18 Z"/><path class="sail2" d="M-4 -128 L-4 -18 L-70 -18 Z"/></g>
+        <g class="shore"><path d="M0 800 L520 800 L560 1080 L0 1080 Z"/><path class="chapel" d="M150 800 L150 700 L210 650 L270 700 L270 800 Z M210 650 L210 610 M196 624 L224 624"/></g>
+        <g class="monica"><circle cx="420" cy="738" r="15"/><path d="M420 754 L404 800 L436 800 Z"/></g>
+        <g class="lights"></g>
+      </svg>
+      <div class="sea-age"><em>29</em><span>岁</span><b>去罗马发展</b></div>
+      <div class="sea-bub b1"><span class="split">我上船送个朋友，</span><span class="split">你先去小教堂歇一晚。</span></div>
+      <div class="sea-gone split">第二天早上，船已经开了。</div>
+      <div class="sea-pray"><span class="split">“别让他走。”</span></div>
+      <div class="sea-no split">神没有答应。</div>
+    </section>
+
+    <!-- 两个祷告 -->
+    <section class="scene" id="s18">
+      <div class="tp-col c1"><div class="tp-h">她当时求的</div><div class="tp-t split">别让他走</div><div class="tp-r">没有答应</div></div>
+      <div class="tp-col c2"><div class="tp-h">她一直在求的</div><div class="tp-t split">让他归向你</div><div class="tp-r g">成全了</div></div>
+      <i class="tp-mid"></i>
+      <div class="tp-keep"><svg viewBox="0 0 40 56"><path d="M4 2 L36 2 L36 54 L20 42 L4 54 Z"/></svg><span class="split">这句话，先放在心里</span></div>
+    </section>
+
+    <!-- 教授 -->
+    <section class="scene" id="s20">
+      <div class="pf-age"><em>30</em><span>岁</span></div>
+      <div class="pf-badge"><div class="pb-k">米 兰</div><div class="pb-t split">修辞学教授</div></div>
+      <div class="pf-chips"><b>皇帝住的地方</b><b>官方任命</b><b>给皇帝和高官写颂词</b></div>
+      <svg class="pf-svg" viewBox="0 0 1920 1080"><path class="pf-path" d="M260 900 C 600 880, 900 700, 1180 420" pathLength="1"/><circle class="pf-a" cx="260" cy="900" r="10"/><circle class="pf-b" cx="1180" cy="420" r="12"/></svg>
+      <div class="pf-from">北非小城 · 凑钱读书的孩子</div>
+      <div class="pf-to">帝国的中心</div>
+      <div class="pf-dad split">他爸当年到处借钱，想看到的就是这一天。</div>
+    </section>
+
+    <!-- 快乐吗 + 颂词 -->
+    <section class="scene" id="s21">
+      <div class="hq split">那他快乐吗？</div>
+      <div class="scroll"><div class="sc-h">颂 词</div>
+        <div class="sc-l">陛下英明，泽被四方……</div><div class="sc-l">功业之盛，旷古未有……</div><div class="sc-l">万民仰望，如沐春风……</div>
+        <div class="stamp st3">谎话</div></div>
+      <div class="sc-n"><span class="split">台下鼓掌的人，</span><span class="split">也知道那是谎话。</span></div>
+    </section>
+
+    <!-- 乞丐 -->
+    <section class="scene" id="s22">
+      <div class="bg-h">米兰的一条街</div>
+      <div class="bg-col c1"><div class="bg-who">乞丐</div><div class="bg-how">讨到几个钱，喝了点酒</div><div class="bg-bar"><i></i></div><div class="bg-st">快乐 · 已经到手</div><div class="bg-x">不是真的</div></div>
+      <div class="bg-col c2"><div class="bg-who">我们</div><div class="bg-how">背着很重的野心往上爬</div><div class="bg-bar"><i></i></div><div class="bg-st">快乐 · 还没到</div><div class="bg-x">比他的还假</div></div>
+      <div class="metro"><svg viewBox="0 0 1200 120"><path class="mt-l" d="M20 60 L1180 60" pathLength="1"/></svg><div class="mt-t"><span class="split">这是周一早上的地铁</span></div></div>
+    </section>
+
+    <!-- 婚事 -->
+    <section class="scene" id="s23">
+      <div class="mr-h split">要往上走，得有一门体面的亲事</div>
+      <div class="mr-cards"><div class="mr-c a"><b>好人家的女儿</b><span>年纪太小，还得等两年</span></div><div class="mr-c b"><b>跟了他十几年的女人</b><span class="ob">成了“障碍”</span></div></div>
+      <div class="mr-last"><div class="split">“可我等不了那两年，</div><div class="split">我又找了一个。”</div></div>
+      <div class="mr-note split">他没给自己找任何借口，就这么写下来了。</div>
+    </section>
+
+    <!-- 安波罗修 -->
+    <section class="scene" id="s24">
+      <div class="am"><div class="am-k">米兰主教</div><div class="am-t split">安波罗修</div><div class="am-l">AMBROSIUS · 当时有名的讲道人</div></div>
+      <div class="meter"><div class="mt-h">他去听的是</div><div class="mt-row"><span class="mt-a">口才</span><div class="mt-bar"><i></i></div><span class="mt-b">内容</span></div><div class="mt-n">“同行嘛，听听这位名嘴什么水平”</div></div>
+      <div class="wall"></div>
+      <div class="am-true"><i>✓</i><span class="split">基督教是真的</span></div>
+    </section>
+
+    <!-- 动不了 / 赖床 -->
+    <section class="scene" id="s25">
+      <div class="mv split">可是他动不了。</div>
+      <div class="clock"><svg viewBox="0 0 300 300"><circle class="ck-f" cx="150" cy="160" r="110"/><path class="ck-h" d="M150 160 L150 95"/><path class="ck-m" d="M150 160 L205 160"/><circle cx="72" cy="52" r="30" class="ck-b"/><circle cx="228" cy="52" r="30" class="ck-b"/></svg></div>
+      <div class="snz"><div class="sz z1">“马上。”</div><div class="sz z2">“马上。”</div><div class="sz z3">“再等一会儿。”</div></div>
+      <div class="lng"><div class="lg-t">“一会儿”</div><div class="lg-bar"><i></i></div></div>
+      <div class="dl"><div class="split">道理都懂，</div><div class="split gold">就是做不到。</div></div>
+      <div class="dl-n">——这句话的公元四世纪版本，是奥古斯丁写的</div>
+    </section>
+
+    <!-- 花园 -->
+    <section class="scene" id="s26">
+      <div class="gd-k"><em>386</em><span>年夏 · 31 岁 · 米兰</span></div>
+      <div class="gd-ant"><b>安东尼</b><span>埃及的修士 · 两个宫廷官员读了他的传记，当场辞官</span></div>
+      <svg class="fig" viewBox="0 0 1920 1080">
+        <path class="fg-t" d="M1380 1010 C 1370 900, 1400 820, 1370 720 C 1350 650, 1300 620, 1240 600 M1372 740 C 1430 680, 1500 660, 1580 650 M1370 720 C 1380 640, 1400 580, 1390 520" pathLength="1"/>
+        <g class="fg-leaves"></g>
+      </svg>
+      <div class="gd-shout"><span class="split">没读过书的人，起来把天国夺走了；</span><span class="split">我们这些有学问的，还在泥里打滚！</span></div>
+      <div class="gd-qs"><div class="gq g1">还要多久？</div><div class="gq g2">明天吗？</div><div class="gq g3">又是明天？</div><div class="gq g4">为什么不是现在？</div></div>
+    </section>
+
+    <!-- 拿着，读吧 -->
+    <section class="scene" id="s27">
+      <div class="tl-echo"><div class="te e1">拿着，读吧！</div><div class="te e2">拿着，读吧！</div><div class="te e3">拿着，读吧！</div></div>
+      <div class="tl-la">TOLLE　LEGE</div>
+      <div class="page" id="pgR"><div class="pg-head"><span>罗马书 13:13–14</span><span>保罗书信</span></div>
+        <div class="rm split">不可荒宴醉酒，不可好色邪荡，不可争竞嫉妒；</div>
+        <div class="rm split">总要披戴主耶稣基督，</div>
+        <div class="rm split">不要为肉体安排，去放纵私欲。</div></div>
+      <div class="tl-done"><span class="split">所有的犹豫，</span><b class="split">都散了。</b></div>
+      <div class="tl-keep split">这个下午，请你记住。</div>
+    </section>
+
+    <!-- 后来 -->
+    <section class="scene" id="s28">
+      <div class="lt-k">后 来</div>
+      <svg class="lt-svg" viewBox="0 0 1920 1080"><line class="lt-base" x1="200" y1="760" x2="1720" y2="760"/><line class="lt-gold" x1="200" y1="760" x2="1720" y2="760" pathLength="1"/></svg>
+      <div class="ev e1"><em>387</em><b>受洗</b><span>安波罗修施洗 · 32 岁</span></div>
+      <div class="ev e2"><em>387</em><b>莫妮卡去世</b><span>罗马的港口</span></div>
+      <div class="ev e3"><em>388</em><b>回到非洲</b><span>读书 · 祷告 · 写东西</span></div>
+      <div class="ev e4"><em>391</em><b>希波 · 牧师</b><span>被会众“抓”上去的</span></div>
+      <div class="ev e5"><em>396</em><b>希波主教</b><span>一直做到去世</span></div>
+      <div class="ev e6"><em>430</em><b>去世</b><span>三十多年</span></div>
+      <div class="lt-q"><div class="qq split">“神给我的，</div><div class="qq split">比我求的还多。”</div><div class="qa">—— 莫妮卡</div></div>
+      <svg class="crowd2" viewBox="0 0 1920 1080"></svg>
+      <div class="lt-say"><span class="split">“我们教会需要一位牧师。”</span></div>
+      <div class="lt-cry"><span class="split">他哭了。</span><em class="split">人家以为他是嫌职位小。</em></div>
+    </section>
+
+    <!-- 片尾 -->
+    <section class="scene" id="sZ2">
+      <div class="z-k">下 一 讲</div>
+      <div class="z-t split">他在什么处境下写的</div>
+      <div class="z-s">忏悔录 · 逐句精读</div>
+    </section>
+  </div>
+
+  <canvas id="fg" width="1920" height="1080"></canvas>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+  <div id="chrome">
+    <div class="ch-l"><i></i><span>忏悔录 · 逐句精读</span></div>
+    <div class="ch-r"><span class="sec"></span></div>
+    <div id="sub"><span></span></div>
+    <div id="prog"><i></i></div>
+  </div>
+  <div id="black"></div>
+</div>
+<script src="/node_modules/gsap/dist/gsap.min.js"></script>
+<script src="ep2_data.js"></script>
+<script src="map.js"></script>
+<script src="bg.js"></script>
+<script src="ep2.js"></script>
+</body>
+</html>
