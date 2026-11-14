@@ -13,12 +13,12 @@ export function serve(port = 0) {
     }).listen(port, '127.0.0.1', () => res({ server: s, port: s.address().port }));
   });
 }
-export async function openPage(browser, port, log = false, query = '') {
+export async function openPage(browser, port, log = false, query = '', pageName = process.env.PAGE || 'index.html') {
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
   page.on('pageerror', e => console.error('PAGE ERROR', e.message));
   if (log) page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') console.error('console', m.type(), m.text()); });
-  await page.goto(`http://127.0.0.1:${port}/web/index.html${query}`);
+  await page.goto(`http://127.0.0.1:${port}/web/${pageName}${query}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }

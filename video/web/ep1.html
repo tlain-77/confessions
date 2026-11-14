@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>忏悔录 · 逐句精读 · 第一讲</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/300.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/900.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/300.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/500-italic.css">
+<link rel="stylesheet" href="/node_modules/lxgw-wenkai-webfont/lxgwwenkai-regular.css">
+<link rel="stylesheet" href="ep1.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+
+  <!-- 地图：放在最底层，最后一场才亮起来 -->
+  <svg id="map" viewBox="0 0 1920 1080">
+    <defs>
+      <radialGradient id="cityGlow"><stop offset="0" stop-color="#ffe2a8" stop-opacity=".7"/><stop offset="1" stop-color="#ffe2a8" stop-opacity="0"/></radialGradient>
+    </defs>
+    <path id="land"/>
+    <text class="sea" x="1310" y="655">地 中 海</text>
+    <g id="route"></g>
+    <g id="cities"></g>
+  </svg>
+
+  <div id="scenes">
+
+    <!-- A · 冷开场：那句祷告 -->
+    <section class="scene" id="sA">
+      <div class="a-block">
+        <div class="a-mark">“</div>
+        <div class="a-l1 split">主啊，求你让我变得更好。</div>
+        <div class="a-l2 split">但是，先别急——</div>
+        <div class="a-l3"><span>不要现在。</span></div>
+      </div>
+    </section>
+
+    <!-- B · 谁写的 -->
+    <section class="scene" id="sB">
+      <div class="b-nots">
+        <div class="pill p1"><span>我编的</span><i></i></div>
+        <div class="pill p2"><span>段子手写的</span><i></i></div>
+      </div>
+      <div class="b-who">
+        <div class="b-latin">AURELIUS　AUGUSTINUS</div>
+        <div class="b-name split">奥古斯丁</div>
+        <div class="b-years"><em class="yr">2026</em><span class="dash">—</span><em class="yr2">430</em></div>
+        <div class="b-ago split">一千六百年前的人</div>
+      </div>
+    </section>
+
+    <!-- C · 两个年龄 -->
+    <section class="scene" id="sC">
+      <svg class="c-svg" viewBox="0 0 1920 1080">
+        <line class="c-base" x1="260" y1="600" x2="1660" y2="600"/>
+        <line class="c-gold" x1="555" y1="600" x2="1052" y2="600" pathLength="1"/>
+        <line class="c-tick" x1="260" y1="588" x2="260" y2="612"/><line class="c-tick" x1="1660" y1="588" x2="1660" y2="612"/>
+        <circle class="c-glow g1" cx="555" cy="600" r="30"/><circle class="c-dot d1" cx="555" cy="600" r="9"/>
+        <circle class="c-glow g2" cx="555" cy="600" r="30"/><circle class="c-dot d2" cx="555" cy="600" r="10"/>
+      </svg>
+      <div class="c-end e0">354</div><div class="c-end e1">430</div>
+      <div class="c-stop s1">
+        <div class="c-age split">十几岁</div>
+        <div class="c-what"><span class="kai">“……但不要现在。”</span><b>这样祷告</b></div>
+      </div>
+      <div class="c-run"><em class="age">16</em><span>岁</span></div>
+      <div class="c-stop s2">
+        <div class="c-age gold split">四十三岁</div>
+        <div class="c-what"><b class="role">主教</b><span class="pub split">把这句话原样写进书里，公开发表</span></div>
+      </div>
+    </section>
+
+    <!-- D–G · 书页 -->
+    <section class="scene" id="sD">
+      <div class="e-left">
+        <div class="e-kick">这是什么概念？</div>
+        <div class="e-l e1 split">一个主教</div>
+        <div class="e-l e2 split">上任没两年</div>
+        <div class="e-l e3 split">出了一本书</div>
+        <div class="e-s split">书里写着：</div>
+      </div>
+      <div class="page" id="pg1">
+        <div class="pg-a">
+          <div class="pg-head"><span>忏悔录 · 卷八</span><span>周士良 译</span></div>
+          <div class="pg-q q1 split">“请你赏赐我纯洁和节制，</div>
+          <div class="pg-q q2"><span class="split">但不要立即赏给。”</span>
+            <svg class="ul" viewBox="0 0 560 20" preserveAspectRatio="none"><path d="M4 10 C 90 3, 170 16, 260 9 S 440 4, 556 11" pathLength="1"/></svg></div>
+          <div class="pg-foot">—— 奥古斯丁</div>
+        </div>
+        <div class="pg-b">
+          <div class="pg-lead split">我年轻的时候，是这么祷告的：</div>
+          <div class="pg-q q3 split">“主啊，请让我圣洁，</div>
+          <div class="pg-q q4"><span class="split">但别太快。”</span>
+            <svg class="ul" viewBox="0 0 330 20" preserveAspectRatio="none"><path d="M4 11 C 60 4, 120 15, 180 8 S 280 5, 326 10" pathLength="1"/></svg></div>
+          <div class="pg-why">为什么？</div>
+          <svg class="pg-arrow" viewBox="0 0 120 150"><path d="M100 6 C 30 20, 14 70, 26 136 M8 112 L26 138 L50 118" pathLength="1"/></svg>
+          <div class="pg-notes">
+            <div class="n n1 split">我怕你答应得太快，</div>
+            <div class="n n2 split">一下子把我这个毛病治好了。</div>
+            <div class="n n3"><span class="split">这个毛病，我还想再留一阵。</span>
+              <svg class="ul" viewBox="0 0 600 20" preserveAspectRatio="none"><path d="M4 10 C 100 3, 200 16, 300 9 S 500 4, 596 11" pathLength="1"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="g-me">
+        <div class="g-1 split">有点不对。</div>
+        <div class="g-2"><span class="split">这不就是</span><b class="wo"><i class="ring"></i><span class="split">我</span></b><span class="split">吗？</span></div>
+      </div>
+    </section>
+
+    <!-- H · 同一个句式 -->
+    <section class="scene" id="sH">
+      <div class="h-heads"><div class="hh hl">想 变 好</div><div class="hh hm"></div><div class="hh hr">但 不 是 现 在</div></div>
+      <i class="h-line"></i>
+      <div class="h-rows">
+        <div class="row r0"><div class="who">奥古斯丁</div><div class="lt split">让我圣洁</div><div class="but">但</div><div class="rt split">别太快</div></div>
+        <div class="row r1"><div class="who">我</div><div class="lt split">我想减肥</div><div class="but">但</div><div class="rt split">下周开始</div></div>
+        <div class="row r2"><div class="who">我</div><div class="lt split">别再刷手机了</div><div class="but">但</div><div class="rt split">等我把这个视频看完</div></div>
+        <div class="row r3"><div class="who">我</div><div class="lt split">我就怎样怎样</div><div class="but">但</div><div class="rt split">等把这个东西做好</div></div>
+      </div>
+      <div class="h-cap split">同一个句式</div>
+    </section>
+
+    <!-- T · 片名 -->
+    <section class="scene" id="sT">
+      <div class="t-latin">CONFESSIONES</div>
+      <div class="t-title"><span class="ch">忏</span><span class="ch">悔</span><span class="ch">录</span></div>
+      <div class="t-sweep">忏悔录</div>
+      <div class="t-rule"><i class="l"></i><b></b><i class="r"></i></div>
+      <div class="t-meta">奥古斯丁　著　·　周士良　译</div>
+      <div class="t-ep"><span class="zj">逐句精读<i></i></span><span class="sep">｜</span><span>第一讲</span></div>
+    </section>
+
+    <!-- I · 买的人多，读完的人少 -->
+    <section class="scene" id="sI">
+      <div class="i-grid"></div>
+      <div class="i-legend"><span class="lg a"><i></i><b class="la">买的人</b></span><span class="lg b"><i></i><b>读完的人</b></span></div>
+      <div class="i-me"><svg viewBox="0 0 90 70"><path d="M84 62 C 60 58, 34 44, 14 14 M10 38 L13 12 L36 22" pathLength="1"/></svg><span>我，也没读完</span></div>
+      <div class="i-q split">我是怎么买到这本书的？</div>
+    </section>
+
+    <!-- J · 十三卷 -->
+    <section class="scene" id="sJ">
+      <div class="j-cover"><div class="cv-t">忏悔录</div><div class="cv-l">CONFESSIONES</div><div class="cv-a">奥古斯丁</div></div>
+      <div class="j-tower"></div>
+      <div class="j-count"><em class="num">1</em><span>卷</span></div>
+      <div class="j-so split">这么多东西要忏悔？</div>
+      <div class="j-q"><div class="split">他究竟想</div><div><span class="split">忏悔些什么</span><b class="qm">？</b></div></div>
+      <div class="j-aside split">（成为基督徒之后，才了解到这本书）</div>
+    </section>
+
+    <!-- K · 翻开第一页 -->
+    <section class="scene" id="sK">
+      <div class="page" id="pg2">
+        <div class="pg-head"><span>忏悔录 · 卷一</span><span>一</span></div>
+        <div class="k-clip"><div class="k-scroll">
+          <div class="k-big b1 split">“主，<u>你</u>是伟大的，<u>你</u>应受一切赞美；</div>
+          <div class="k-big b2 split"><u>你</u>有无上的能力、无限的智慧。”</div>
+          <p class="k-p">一个人，受造物中渺小的一分子，愿意赞颂<u>你</u>；这人遍体带着死亡，遍体带着罪恶的证据，遍体证明“<u>你</u>拒绝骄傲的人”。</p>
+          <p class="k-p">但这人，受造物中渺小的一分子，愿意赞颂<u>你</u>。</p>
+          <p class="k-p"><u>你</u>鼓动他乐于赞颂<u>你</u>，因为<u>你</u>造我们是为了<u>你</u>，我们的心如不安息在<u>你</u>怀中，便不会安宁。</p>
+          <p class="k-p">主啊，请使我得知并理解<mark class="m1">是否应先向<u>你</u>呼吁而后赞颂<u>你</u>，或是先认识<u>你</u>然后向<u>你</u>呼吁</mark>。但谁能不认识<u>你</u>而向<u>你</u>呼吁？因为不认识<u>你</u>而呼吁，可能并不是向<u>你</u>呼吁。</p>
+          <p class="k-p">……<mark class="m2">既然<u>你</u>充塞天地，天地能包容<u>你</u>吗？</mark>……</p>
+        </div></div>
+        <div class="k-note"><span class="split">这和“忏悔”</span><span class="split">有什么关系？？</span>
+          <svg viewBox="0 0 150 90"><path d="M140 70 C 100 74, 50 60, 16 20 M12 46 L14 18 L40 28" pathLength="1"/></svg></div>
+        <div class="k-prog"><i></i><span>读到这里</span></div>
+      </div>
+      <div class="k-talk"><span class="who2">一个人</span><svg viewBox="0 0 200 30"><path d="M4 15 L190 15 M176 5 L192 15 L176 25" pathLength="1"/></svg><span class="who2 gold-t">神</span><em>全书都在对“你”说话</em></div>
+      <div class="k-qs">
+        <div class="kq q1"><b>？</b><div class="lab">他问</div><div class="tx split">先呼求你，</div><div class="tx split">还是先认识你？</div></div>
+        <div class="kq q2"><b>？</b><div class="lab">他又问</div><div class="tx split">你充满天地，</div><div class="tx split">天地装得下你吗？</div></div>
+      </div>
+      <div class="k-shut">
+        <div class="j-cover small"><div class="cv-t">忏悔录</div><div class="cv-l">CONFESSIONES</div><div class="cv-a">奥古斯丁</div><i class="ribbon"></i></div>
+        <div class="k-shut-t"><div class="split">有点晦涩。</div><div class="split kai">慢慢地，就没有读下去了。</div></div>
+      </div>
+    </section>
+
+    <!-- L · 两千年 -->
+    <section class="scene" id="sL">
+      <div class="l-kick">教 会 历 史</div>
+      <svg class="l-svg" viewBox="0 0 1920 1080">
+        <line class="l-base" x1="180" y1="640" x2="1740" y2="640"/>
+        <line class="l-gold" x1="180" y1="640" x2="1740" y2="640" pathLength="1"/>
+        <g class="l-ticks"></g>
+        <g class="l-arcs"></g>
+        <circle class="l-run-glow" cx="180" cy="640" r="26"/><circle class="l-run" cx="180" cy="640" r="8"/>
+        <rect class="l-span" x="452" y="632" width="60" height="16" rx="8"/>
+        <circle class="l-halo" cx="482" cy="640" r="60"/>
+      </svg>
+      <div class="l-lab a">耶稣降生</div><div class="l-lab b">今天</div>
+      <div class="l-year"><span>公元</span><em class="ly">1</em></div>
+      <div class="l-who">
+        <div class="l-name"><b class="sheng">圣</b><span class="split">奥古斯丁</span></div>
+        <div class="l-sub"><span class="la2">SANCTUS　AUGUSTINUS</span><span class="yy">354 — 430</span></div>
+      </div>
+      <div class="l-cant split">绕不开的一个人</div>
+    </section>
+
+    <!-- M · 先了解这个人 / 代入他的视角 -->
+    <section class="scene" id="sM">
+      <div class="m-kick split">先花点时间，了解这个人</div>
+      <div class="m-cards">
+        <div class="card c1"><b>一</b><div class="split">他是谁</div></div>
+        <div class="card c2"><b>二</b><div class="split">他经历了什么</div></div>
+        <div class="card c3"><b>三</b><div><span class="split">在什么情况下</span><span class="split">写了这本书</span></div></div>
+      </div>
+      <div class="m-lens">
+        <div class="lz-blur">主，你是伟大的，你应受一切赞美。</div>
+        <div class="lz-sharp">主，你是伟大的，你应受一切赞美。</div>
+        <div class="lz-ring"><i></i><span>他的视角</span></div>
+      </div>
+    </section>
+
+    <!-- N · 很真实 -->
+    <section class="scene" id="sN">
+      <div class="n-kick">其 次</div>
+      <div class="n-big"><span class="ch">真</span><span class="ch">实</span></div>
+      <div class="n-cap split">他这本书，很真实。</div>
+      <div class="n-cols">
+        <div class="n-col l"><div class="n-when"><em>397</em><span>年</span></div><div class="n-tag">一千六百年前</div>
+          <div class="chip old c1">“让我圣洁，但别太快。”</div><div class="chip old c2">“请你赏赐我纯洁和节制，<br>但不要立即赏给。”</div></div>
+        <svg class="n-bridge" viewBox="0 0 1920 1080">
+          <path class="br0" d="M560 330 L1360 330" pathLength="1"/>
+          <path class="br1" d="M770 560 C 900 540, 1020 540, 1150 560" pathLength="1"/>
+          <path class="br2" d="M770 740 C 900 760, 1020 760, 1150 740" pathLength="1"/>
+        </svg>
+        <div class="n-mid split">息息相关</div>
+        <div class="n-col r"><div class="n-when"><em>今天</em></div><div class="n-tag">我们的生活</div>
+          <div class="chip new c1">“我想减肥，下周开始。”</div><div class="chip new c2">“别再刷手机了，<br>但等我把这个视频看完。”</div></div>
+      </div>
+      <div class="n-still split">放到今天，依旧适用。</div>
+    </section>
+
+    <!-- O · 他是从哪儿走过来的 -->
+    <section class="scene" id="sO">
+      <div class="o-cap"><div class="o-k">读这本书之前</div><div class="o-t split">他是从哪儿走过来的</div></div>
+      <div class="o-line">
+        <div class="o-tag t1">客套话？</div>
+        <div class="o-q"><span class="q-gray">“主，你是伟大的。”</span><span class="q-gold">“主，你是伟大的。”</span></div>
+        <div class="o-tag2 split">好不容易，才说出口的一句话</div>
+      </div>
+    </section>
+
+    <!-- Z · 片尾 -->
+    <section class="scene" id="sZ">
+      <div class="z-k">下 一 讲</div>
+      <div class="z-t split">奥古斯丁这个人</div>
+      <div class="z-s">忏悔录 · 逐句精读</div>
+    </section>
+  </div>
+
+  <canvas id="fg" width="1920" height="1080"></canvas>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+
+  <div id="chrome">
+    <div class="ch-l"><i></i><span>忏悔录 · 逐句精读</span></div>
+    <div class="ch-r"><span class="r-a">第一讲 · 开头</span><span class="r-b">第一讲 · 这本书不好读</span><span class="r-c">第一讲 · 先认识这个人</span></div>
+    <div id="sub"><span></span></div>
+    <div id="prog"><i></i></div>
+  </div>
+  <div id="black"></div>
+</div>
+
+<script src="/node_modules/gsap/dist/gsap.min.js"></script>
+<script src="ep1_data.js"></script>
+<script src="map.js"></script>
+<script src="bg.js"></script>
+<script src="ep1.js"></script>
+</body>
+</html>
