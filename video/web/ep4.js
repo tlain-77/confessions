@@ -143,6 +143,9 @@
   { const a = T('c193') - 0.1, b = EP.total - 6.6; scene('#u17', a, b); light(a, { light: 0.6, rays: 0.55 });
     on('.end3', a); $$('.e').forEach((x, i) => IN(x, T(['c194', 'c195', 'c197'][i]) - 0.1, { x: -30, y: 0, d: 0.7 }));
     fade('.end3', T('c198') + 0.4);
+    on('.ask', a); type('.ask', W('c199', '神在圈外面'), 2.2, { d: 0.6 }); on('.ask2', a); type('.ask2 > span', W('c200', '主啊'), 1.0, { d: 0.6 });
+    gsap.set('.ask2 .x', { scaleX: 0 }); tl.to('.ask2 .x', { scaleX: 1, duration: 0.4, ease: 'power2.inOut' }, W('c200', '你快来') + 0.15);
+    fade(['.ask', '.ask2'], T('c201'));
     on('.last', a); type('.ls-a', W('c201', '主啊你一直都在'), 1.2, { d: 0.7 }); type('.ls-b', T('c202'), D('c202') * 0.8, { d: 0.7 }); flash(W('c201', '一直都在'), 960, 420, 0.5);
     fade('.last', T('c203'));
     on('.nxt', a); IN('.nx-k', T('c203'), { d: 0.6, y: 10 }); type('.nx-t', W('c203', '我的天主'), 1.5, { d: 0.7 }); type('.nx-l', T('c204'), D('c204') * 0.6); }
