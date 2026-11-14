@@ -30,7 +30,7 @@
   // 两千年时间线：刻度和"绕不开"的弧线
   const LX = y => 180 + y * 0.77, ticks = $('.l-ticks'), arcs = $('.l-arcs');
   [1, 500, 1000, 1500, 2000].forEach(y => { svgEl('line', { x1: LX(y), y1: 630, x2: LX(y), y2: 650 }, ticks); svgEl('text', { x: LX(y), y: 700 }, ticks).textContent = y; });
-  [700, 1100, 1517, 1850, 2026].forEach(y => { const a = LX(392), b = LX(y), d = (b - a) * 0.34; svgEl('path', { d: `M${a} 640 Q ${(a + b) / 2} ${640 + d * 2} ${b} 640`, pathLength: 1 }, arcs); });
+  [700, 1100, 1517, 1850, 2026].forEach(y => { const a = LX(392), b = LX(y), d = (b - a) * 0.16; svgEl('path', { d: `M${a} 640 Q ${(a + b) / 2} ${640 + d * 2} ${b} 640`, pathLength: 1 }, arcs); });
   // 地图：海岸线、路线、城市
   $('#land').setAttribute('d', MAP.land);
   const P = MAP.pts, route = $('#route'), cities = $('#cities');
@@ -80,7 +80,7 @@
     '#pg2', '.k-note path', '.k-prog', '.k-talk', '.k-talk path', '.kq', '.k-shut .j-cover',
     '.l-kick', '.l-base', '.l-gold', '.l-ticks line', '.l-ticks text', '.l-arcs path', '.l-run', '.l-run-glow', '.l-span', '.l-halo', '.l-lab', '.l-year', '.l-name .sheng', '.l-sub .la2', '.l-sub .yy',
     '.card', '.lz-blur', '.lz-sharp', '.lz-ring', '.n-kick', '.n-when', '.n-tag', '.chip', '.n-bridge path',
-    '#map', '.rt', '.pulse', '.city', '.o-k', '.o-tag', '.q-gray', '.q-gold', '.z-k', '.z-s', '.ch-l', '.ch-r span'], { opacity: 0 });
+    '#map', '#map .rt', '.pulse', '.city', '.o-k', '.o-tag', '.q-gray', '.q-gold', '.z-k', '.z-s', '.ch-l', '.ch-r span'], { opacity: 0 });
   gsap.set('.t-title .ch', { opacity: 0 });
   gsap.set(chars('.k-big'), { opacity: 0.3 });
   gsap.set($$('.k-p'), { opacity: 1 });
@@ -338,7 +338,7 @@
   tl.to('.k-prog', { opacity: 1, duration: 0.5 }, tK5 + 0.2);
   tl.fromTo('.k-prog i', { height: '3%' }, { height: '12%', duration: tK7 - tK5 - 0.2, ease: 'sine.inOut', immediateRender: false }, tK5 + 0.2);
   // 一个人在那里跟神对话：全书都在对"你"说话
-  tl.to($$('.k-scroll u'), { backgroundColor: 'rgba(162,58,34,.92)', color: '#fff3e0', duration: 0.3, stagger: 0.045 }, tK7 + 0.25);
+  tl.to($$('.k-scroll u'), { backgroundColor: 'rgba(162,58,34,.2)', color: '#a23a22', duration: 0.3, stagger: 0.045 }, tK7 + 0.25);
   IN('.k-talk', tK7 + 0.3, { d: 0.8, y: 14 }); DRAW('.k-talk path', tK7 + 0.7, 0.6);
   // 这些问题，有点读不懂
   const tQ = tK9 - 1.0;
