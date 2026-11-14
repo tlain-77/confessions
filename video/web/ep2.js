@@ -123,7 +123,7 @@
   // 2 · 家（c003–c006）
   { const a = T('c003') - 0.1, b = T('c007') - 0.1; scene('#s02', a, b); light(a, { light: 0.6, rays: 0.5, fx: 960 });
     type('.fam-h', a + 0.1, 1.2); IN('.fam-h', a, { d: 0.6, y: 10 });
-    IN('.pcard.f', T('c004') - 0.2, { y: 40 }); $$('.pcard.f .chips b').forEach((b2, i) => IN(b2, W('c004', ['小职位', '几亩地', '不信主', '脾气'][i]) - 0.1, { d: 0.5, y: 14 }));
+    IN('.pcard.f', T('c004') - 0.2, { y: 40 }); $$('.pcard.f .chips b').forEach((b2, i) => IN(b2, W('c004', ['小职位', '几亩', '不信主', '脾气'][i]) - 0.1, { d: 0.5, y: 14 }));
     IN('.pcard.m', T('c005') - 0.2, { y: 40 }); IN('.pcard.m .chips b', W('c005', '基督徒') - 0.1, { d: 0.6, y: 14 });
     tl.to('.pcard.f', { opacity: 0.45, duration: 0.8 }, T('c005')); IN('.pc-note', T('c006'), { d: 0.7, y: 10 }); flash(T('c006') + 0.3, 1380, 470, 0.4); }
 

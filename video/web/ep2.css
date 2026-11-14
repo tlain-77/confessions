@@ -327,7 +327,7 @@
 .lt-gold{stroke:var(--gold);stroke-width:3;filter:drop-shadow(0 0 6px rgba(236,190,110,.8))}
 .ev{position:absolute;top:620px;width:240px;margin-left:-120px;text-align:center}
 .ev em{display:block;font-family:var(--latin);font-size:46px;color:var(--gold);font-variant-numeric:lining-nums}
-.ev b{display:block;margin-top:70px;font-size:40px;font-weight:900;white-space:nowrap}
+.ev b{display:block;margin-top:96px;font-size:40px;font-weight:900;white-space:nowrap}
 .ev span{display:block;margin-top:10px;font-size:26px;color:var(--paper2);white-space:nowrap}
 .ev::before{content:'';position:absolute;left:50%;top:132px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:#fff4d6;box-shadow:0 0 16px rgba(255,226,160,.9)}
 .lt-q{position:absolute;left:0;right:0;top:250px;text-align:center}
