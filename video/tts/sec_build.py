@@ -1,12 +1,12 @@
 """把第三节稿子切成句子，生成合成清单 tts/s03.json"""
 import re, json, sys
 raw = open(sys.argv[1], encoding='utf-8').read()
-CN = {'354': '三百五十四', '397': '三百九十七', '43': '四十三', '145': '一百四十五', '147': '一百四十七', '十一章三十六节': '十一章三十六节'}
+CN = {'354': '三百五十四', '397': '三百九十七', '43': '四十三', '145': '一百四十五', '147': '一百四十七', '十一章三十六节': '十一章三十六节', 'ad te': '阿德忒'}
 def say_of(s):
     s = re.sub(r'【[^】]*】', '', s)
     s = re.sub(r'^>\s*', '', s.strip()); s = re.sub(r'^(原文|大意)：', '', s)
     for k, v in CN.items(): s = s.replace(k, v)
-    s = s.replace('“', '').replace('”', '').replace('"', '').replace('《', '').replace('》', '').replace(' ', '')
+    s = s.replace('“', '').replace('”', '').replace('"', '').replace("'", '').replace('‘', '').replace('’', '').replace('《', '').replace('》', '').replace(' ', '')
     return s.strip()
 cues, sec, n = [], None, 0
 for block in raw.split('\n\n'):
