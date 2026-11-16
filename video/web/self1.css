@@ -1,0 +1,97 @@
+/* 本人录制第一讲：在 ep1.css 基础上新增的分镜 */
+
+/* H：只剩两行“我”的例子，整体往下挪一点 */
+#sH .h-rows{top:320px}
+#sH .h-cap{top:760px}
+#sH .h-line{height:460px;top:280px}
+#sH .h-heads{top:220px}
+
+/* K：以为会看到的那句 */
+.k-exp{position:absolute;left:84px;right:84px;top:118px;height:120px;z-index:3}
+.k-exp em{display:block;font-family:var(--sans);font-weight:300;font-size:24px;letter-spacing:.4em;color:#8b7552;margin-bottom:8px}
+.k-exp span{font-family:var(--kai);font-size:54px;color:#6a5a44;white-space:nowrap}
+.k-exp i{position:absolute;left:-10px;top:84px;width:830px;height:4px;border-radius:2px;background:#c4552f;transform-origin:0 50%}
+.k-why{position:absolute;inset:0}
+.kw{position:absolute;white-space:nowrap;font-weight:700;letter-spacing:.03em}
+.kw.w1{left:200px;top:250px;font-size:76px}
+.kw.w2{left:380px;top:470px;font-size:56px;font-weight:500;color:var(--paper2)}
+.kw.w3{left:260px;top:650px;font-size:84px}
+.kw.w3 .ch{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* P */
+.p-q{position:absolute;left:0;right:0;top:450px;text-align:center;font-weight:700;font-size:100px;letter-spacing:.05em;white-space:nowrap}
+
+/* Q：每个阶段追求的东西 */
+.q-kick{position:absolute;left:0;right:0;top:150px;text-align:center;font-family:var(--kai);font-size:52px;color:var(--paper2);white-space:nowrap}
+.q-cols{position:absolute;left:210px;top:300px;width:1500px;display:grid;grid-template-columns:520px 520px 460px}
+.q-col{text-align:center}
+.q-h{font-family:var(--sans);font-weight:300;font-size:32px;letter-spacing:.4em;padding-left:.4em;color:var(--gold);padding-bottom:26px;margin:0 70px 34px;border-bottom:1px solid rgba(226,189,118,.35)}
+.q-w{font-weight:700;font-size:62px;line-height:1.72;letter-spacing:.06em;white-space:nowrap}
+.q-qm{font-size:170px;line-height:1.2;font-weight:900;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.q-arrow{position:absolute;left:210px;top:262px;width:1500px;height:40px}
+.q-arrow path{stroke:rgba(226,189,118,.55);stroke-width:2}
+.q-change{position:absolute;left:0;right:0;top:850px;text-align:center;font-family:var(--kai);font-size:58px;color:#f3d594;white-space:nowrap}
+
+/* R：理由，还是借口 */
+.r-q{position:absolute;left:0;right:0;top:150px;text-align:center;font-weight:900;font-size:92px;letter-spacing:.04em;white-space:nowrap}
+.r-list,.r-list2{position:absolute;top:360px}
+.r-list{left:250px}
+.r-list2{left:1110px}
+.r-i{display:flex;align-items:center;gap:30px;height:120px;font-weight:500;font-size:58px;white-space:nowrap}
+.r-i i{width:14px;height:14px;background:var(--gold);transform:rotate(45deg);flex:none}
+.r-list2 .r-i i{background:var(--coral)}
+.r-tag{position:absolute;left:250px;top:770px;height:110px;font-weight:900;font-size:76px;letter-spacing:.1em;white-space:nowrap}
+.r-tag span{position:absolute;left:0;top:0;padding:6px 34px;border-radius:8px}
+.r-tag .t-a{border:2px solid rgba(226,189,118,.7);color:var(--gold)}
+.r-tag .t-b{left:330px;border:2px solid var(--coral);color:var(--coral)}
+.r-tag .x{position:absolute;left:-8px;top:52px;width:250px;height:6px;border-radius:3px;background:var(--coral);transform-origin:0 50%}
+
+/* S：什么时候是个头 */
+.s-loop{position:absolute;left:660px;top:170px;width:600px;height:600px}
+.s-ring{fill:none;stroke:rgba(226,189,118,.38);stroke-width:2;stroke-dasharray:6 12}
+.s-run{fill:#fff4d6;filter:drop-shadow(0 0 12px rgba(255,220,150,1))}
+.s-center{position:absolute;left:0;right:0;top:424px;text-align:center;font-weight:900;font-size:72px;letter-spacing:.04em;white-space:nowrap}
+.s-w{position:absolute;font-family:var(--kai);font-size:62px;color:var(--paper2);white-space:nowrap}
+.s-w.w1{left:300px;top:270px}
+.s-w.w2{left:1390px;top:300px}
+.s-w.w3{left:1310px;top:620px}
+.s-rest{position:absolute;left:0;right:0;top:800px;text-align:center;font-size:56px;font-weight:500;white-space:nowrap}
+.s-rest b{font-weight:900;font-size:84px;margin:0 .15em;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s-rest b .ch{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* U：变化 */
+.u-bg{position:absolute;left:0;right:0;top:120px;text-align:center;font-weight:900;font-size:700px;line-height:1;color:rgba(226,189,118,.06)}
+.u-l{position:absolute;left:0;right:0;top:470px;text-align:center;font-weight:700;font-size:76px;letter-spacing:.04em;white-space:nowrap}
+.u-l.l4{font-weight:400;font-size:66px;color:var(--paper2);top:610px}
+.u-l.l7>span{display:block;line-height:1.5}
+.u-l.l7{top:420px}
+.u-l.l7>span:last-child .ch{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.u-quote{position:absolute;left:0;right:0;top:380px;text-align:center}
+.u-qt{font-family:var(--kai);font-size:74px;color:var(--paper);white-space:nowrap}
+.u-qs{margin-top:44px;font-family:var(--sans);font-weight:300;font-size:36px;letter-spacing:.4em;padding-left:.4em;color:var(--gold)}
+.u-flow{position:absolute;inset:0;overflow:hidden}
+.u-flow i{position:absolute;height:2px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(226,189,118,.55),transparent)}
+
+/* V：不变 */
+.v-k{position:absolute;left:0;right:0;top:160px;text-align:center;font-family:var(--sans);font-weight:300;font-size:32px;letter-spacing:.6em;padding-left:.6em;color:var(--gold);white-space:nowrap}
+.v-big{position:absolute;left:0;right:0;top:230px;text-align:center;font-weight:900;font-size:330px;line-height:1.1;letter-spacing:.14em;padding-left:.14em;white-space:nowrap;transform-origin:50% 40%}
+.v-big .ch{background:linear-gradient(180deg,#fffaf0 0%,#f3d595 40%,#c2924a 80%,#96692a 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.v-cap{position:absolute;left:0;right:0;top:680px;text-align:center;font-size:60px;font-weight:500;letter-spacing:.1em;padding-left:.1em;white-space:nowrap}
+.v-found{position:absolute;left:180px;top:560px;width:1560px;display:grid;grid-template-columns:repeat(3,1fr);gap:60px}
+.vf{text-align:center;padding:40px 0 46px;border:1px solid rgba(226,189,118,.45);border-radius:10px;background:linear-gradient(160deg,rgba(255,240,205,.09),rgba(255,240,205,.015))}
+.vf em{display:block;font-family:var(--sans);font-weight:300;font-size:28px;letter-spacing:.4em;padding-left:.4em;color:var(--paper2);margin-bottom:18px}
+.vf b{font-weight:900;font-size:84px;letter-spacing:.06em;white-space:nowrap}
+.vf b .ch{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* W：很真实 */
+.w-cols{position:absolute;inset:0}
+.w-col{position:absolute;top:240px;width:700px;text-align:center}
+.w-col.l{left:170px}.w-col.r{left:1050px}
+.w-h{font-family:var(--sans);font-weight:300;font-size:34px;letter-spacing:.4em;padding-left:.4em;color:var(--paper2);margin-bottom:30px}
+.w-chip{position:relative;margin:36px auto 0;width:max-content;padding:20px 36px;border:1px solid rgba(241,232,214,.3);border-radius:8px;font-family:var(--sans);font-size:40px;color:var(--paper);white-space:nowrap}
+.w-pap{margin:36px auto 0;width:max-content;padding:20px 40px;border-radius:8px;background:var(--sheet);color:var(--inkc);font-weight:700;font-size:44px;box-shadow:0 16px 44px rgba(0,0,0,.55);white-space:nowrap}
+.w-pap.c1{transform:rotate(-1.2deg)}.w-pap.c2{transform:rotate(.8deg)}.w-pap.c3{transform:rotate(-.6deg)}
+.w-us{position:absolute;left:0;right:0;top:790px;text-align:center;font-family:var(--kai);font-size:56px;color:#f3d594;white-space:nowrap}
+.w-how{position:absolute;left:0;right:0;top:400px;text-align:center}
+.w-how>span{display:block;font-weight:900;font-size:86px;letter-spacing:.03em;white-space:nowrap}
+.w-how em{display:block;margin-top:40px;font-family:var(--sans);font-weight:300;font-size:38px;letter-spacing:.3em;color:var(--gold);white-space:nowrap}
