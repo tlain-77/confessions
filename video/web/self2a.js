@@ -290,7 +290,7 @@
     tl.fromTo('.c1 .bg-st', { scale: 1 }, { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1, immediateRender: false }, W('c086', '已经到手'));
     stamp('.c1 .bg-x', W('c088', '不是真的')); tl.set('.c1 .bg-x', { rotation: -5 }, W('c088', '不是真的') + 0.5); stamp('.c2 .bg-x', W('c089', '比他的还假')); tl.set('.c2 .bg-x', { rotation: -5 }, W('c089', '比他的还假') + 0.5);
     tl.to(['.bg-col'], { y: -90, opacity: 0.55, duration: 0.8 }, T('c090') - 0.2);
-    tl.set('.metro', { opacity: 1 }, a); DRAW('.mt-l', W('c091', '周一早上') - 0.6, 1.0); type('.mt-t .split', W('c091', '这是周一'), 1.0, { d: 0.6 }); }
+    tl.set('.metro', { opacity: 1 }, W('c091', '周一早上') - 0.7); DRAW('.mt-l', W('c091', '周一早上') - 0.6, 1.0); type('.mt-t .split', W('c091', '这是周一'), 1.0, { d: 0.6 }); }
 
   // 25 · 婚事（c092–c094），她被送回非洲（c095–c096），心被撕开（c097），又找了一个（c098–c100）
   { const a = T('c092') - 0.1, b = T('c095') - 0.1; scene('#s23', a, b);
@@ -299,7 +299,7 @@
   { const a = T('c095') - 0.2, b = T('c097') - 0.1; mapOn(a, b);
     tl.set('#mapzoom', { attr: { transform: `translate(${1250 - 1.35 * 1040} ${560 - 1.35 * 500}) scale(1.35)` } }, a); ['carthage', 'rome', 'milan'].forEach(k => tl.set(cityEls[k], { opacity: 1 }, a));
     [R.tc, R.cr, R.rm, R.mo].forEach(r => tl.set(r, { opacity: 0 }, a));
-    card('.mc5', a, b); DRAW(R.her, W('c096', '她被送回') - 0.3, 2.0, { o: 0.9 }); IN('.mc5 .mp-tag', W('c096', '儿子留下') - 0.1, { d: 0.6, y: 10 }); }
+    tl.to(cityEls.thagaste, { opacity: 0, duration: 0.4 }, a); tl.set(cityEls.thagaste, { opacity: 1 }, b); card('.mc5', a, b); DRAW(R.her, W('c096', '她被送回') - 0.3, 2.0, { o: 0.9 }); IN('.mc5 .mp-tag', W('c096', '儿子留下') - 0.1, { d: 0.6, y: 10 }); }
   quote('q97', T('c097') - 0.1, T('c098') - 0.1);
   { const a = T('c098') - 0.1, b = T('c101') - 0.1; scene('#s23', a, b); tl.set(['.mr-h', '.mr-cards'], { opacity: 0 }, a);
     tl.set('.mr-last', { opacity: 1 }, a); type('.mr-last > div:nth-child(1)', W('c099', '可我等不了'), 1.2, { d: 0.6 }); type('.mr-last > div:nth-child(2)', W('c099', '我又找了'), 1.0, { d: 0.6 });
