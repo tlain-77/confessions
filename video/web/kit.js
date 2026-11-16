@@ -60,6 +60,7 @@ window.kit = async function () {
       const tot = parts.reduce((a, p) => a + p.length, 0); let t0 = c.start;
       parts.forEach(p => { const d = c.dur * p.length / tot; subs.push({ s: t0, e: t0 + d, t: p }); t0 += d; });
     }
+    if (EP.subs) { subs.length = 0; EP.subs.forEach(s => subs.push({ s: s.s, e: s.e, t: s.t.replace(/[“”"]/g, '') })); }   // 本人录制：字幕按实际说的话
     subs.forEach(s => s.t = s.t.replace(/[，。：；、]$/, ''));
     const subEl = $('#sub span'), prog = $('#prog i');
     const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };

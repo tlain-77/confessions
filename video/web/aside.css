@@ -1,0 +1,24 @@
+#main{position:absolute;inset:0}
+#asides{position:absolute;inset:0;pointer-events:none}
+.ax{position:absolute;inset:0;visibility:hidden}
+.ax-k{position:absolute;left:0;right:0;top:170px;text-align:center;font-family:var(--sans);font-weight:300;font-size:32px;letter-spacing:.5em;padding-left:.5em;color:var(--gold)}
+.ax-body{position:absolute;left:0;right:0;top:300px;text-align:center}
+.ax-l{font-weight:700;font-size:72px;line-height:1.55;letter-spacing:.03em;white-space:nowrap}
+.ax-l.big{font-weight:900;font-size:96px}
+.ax-l.kai{font-family:var(--kai);font-weight:400;font-size:66px;color:var(--paper)}
+.ax-l.sm{font-family:var(--sans);font-weight:300;font-size:40px;color:var(--paper2);letter-spacing:.12em;margin-top:10px}
+.ax-l.gold{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ax-l.coral{color:var(--coral)}
+.ax-foot{position:absolute;left:0;right:0;top:830px;text-align:center;font-family:var(--kai);font-size:50px;color:#f3d594;white-space:nowrap}
+/* 两栏对比（西塞罗 / 圣经） */
+.ax-cols{position:absolute;left:110px;right:110px;top:236px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.ax-col{padding:36px 46px 40px;border-radius:10px}
+.ax-col.l{border:1px solid rgba(241,232,214,.22);background:linear-gradient(160deg,rgba(255,240,205,.05),rgba(255,240,205,0))}
+.ax-col.r{background:var(--sheet);box-shadow:0 18px 50px rgba(0,0,0,.55)}
+.ax-h{font-family:var(--sans);font-weight:300;font-size:30px;letter-spacing:.4em;color:var(--gold);margin-bottom:22px}
+.ax-col.r .ax-h{color:#8b6a36}
+.ax-cols .ax-l{font-size:34px;font-weight:500;line-height:1.6;white-space:normal;margin-bottom:14px;letter-spacing:.02em}
+.ax-col.l .ax-l{font-family:var(--serif);color:var(--paper)}
+.ax-col.r .ax-l{font-family:var(--kai);font-weight:400;font-size:38px;color:var(--inkc)}
+.ax-cols .ax-l.src{font-family:var(--sans);font-weight:300;font-size:22px;letter-spacing:.2em;margin:-8px 0 20px;color:var(--paper3)}
+.ax-col.r .ax-l.src{color:#8b6a36}
