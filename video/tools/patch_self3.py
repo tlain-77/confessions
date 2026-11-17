@@ -64,8 +64,11 @@ fl.append(f'[{ia}:a]afade=t=in:d=0.15,afade=t=out:st={round(TOT - 1.2, 2)}:d=1.2
 FG = ';'.join(fl)
 VB = int(405e6 * 8 / TOT / 1000 - 128 - 6)              # 成片压在 405 MB 左右（发送上限 400 MiB ≈ 419 MB）
 X = ['-c:v', 'libx264', '-preset', 'slow', '-b:v', f'{VB}k', '-maxrate', '7M', '-bufsize', '14M', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-x264-params', 'aq-mode=3']
-print(f'{len(pieces)} pieces; video {VB} kbps; pass 1…', flush=True)
-subprocess.run(['ffmpeg', '-v', 'error', '-y'] + args[:-2] + ['-filter_complex', FGV, '-map', '[v]'] + X + ['-pass', '1', '-passlogfile', f'{CK6}/p', '-an', '-f', 'null', '/dev/null'], check=True)
+if os.environ.get('SKIP_PASS1') and os.path.exists(f'{CK6}/p-0.log.mbtree'):   # 第一遍跑完了、第二遍被打断（容器重启）时，直接从第二遍接着来
+    print(f'{len(pieces)} pieces; video {VB} kbps; reusing pass-1 stats', flush=True)
+else:
+    print(f'{len(pieces)} pieces; video {VB} kbps; pass 1…', flush=True)
+    subprocess.run(['ffmpeg', '-v', 'error', '-y'] + args[:-2] + ['-filter_complex', FGV, '-map', '[v]'] + X + ['-pass', '1', '-passlogfile', f'{CK6}/p', '-an', '-f', 'null', '/dev/null'], check=True)
 print('pass 2…', flush=True)
 subprocess.run(['ffmpeg', '-v', 'error', '-y'] + args + ['-filter_complex', FG, '-map', '[v]', '-map', '[a]'] + X + ['-pass', '2', '-passlogfile', f'{CK6}/p',
                '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000', '-shortest', '-movflags', '+faststart', OUT + '.tmp.mp4'], check=True)
