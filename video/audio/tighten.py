@@ -16,15 +16,22 @@ def remap0(t):
         if t >= b: r += b - a
         elif t > a: r += t - a
     return t - r
+# 拼接：剪口处做 12 ms 交叉淡化，避免爆音。淡化用的是剪掉那段最后的 12 ms（本来就要扔的），
+# 所以拼出来的长度正好等于原长减去剪掉的时长，和下面的时间重新映射一致。
+# （以前是拿下一段开头的 12 ms 来叠，每个剪口都多吃掉 12 ms，时间映射却没算——剪得越多，字幕越比声音晚，二百多个剪口到片尾晚三秒多。）
+FADE = 0.012
+def splice(x, cuts):
+    f = int(FADE * sr); w = np.linspace(0, 1, f); out = []; pos = 0
+    def add(s, e):
+        seg = x[s:e].copy()
+        if out and s >= f and len(out[-1]) > f: out[-1][-f:] = out[-1][-f:] * (1 - w) + x[s - f:s] * w
+        out.append(seg)
+    for a, b in cuts:
+        add(pos, int(round(a * sr))); pos = int(round(b * sr))
+    add(pos, len(x))
+    return np.concatenate(out)
 if hard:
-    f0 = int(0.012 * sr); parts = []; pos = 0
-    for a, b in hard:
-        parts.append(x[pos:int(a * sr)].copy()); pos = int(b * sr)
-    parts.append(x[pos:].copy())
-    y0 = parts[0]
-    for q in parts[1:]:
-        w = np.linspace(0, 1, f0); y0[-f0:] = y0[-f0:] * (1 - w) + q[:f0] * w; y0 = np.concatenate([y0, q[f0:]])
-    x = y0
+    x = splice(x, hard)
 hop = int(0.01 * sr); win = int(0.03 * sr); n = (len(x) - win) // hop
 db = np.array([20 * np.log10(np.sqrt(np.mean(x[i * hop:i * hop + win] ** 2)) + 1e-9) for i in range(n)])
 p10, p90 = np.percentile(db, [10, 90]); thr = max(p10 + 10, p90 - 30)
@@ -48,20 +55,7 @@ for a, b in runs:
     if L >= MIN:
         keep = target(L); m = (a + b) / 2
         cuts.append((m - (L - keep) / 2, m + (L - keep) / 2))
-# 拼接：每个剪口两侧 12 ms 交叉淡化，避免爆音
-fade = int(0.012 * sr); out = []; pos = 0
-for a, b in cuts:
-    ia, ib = int(a * sr), int(b * sr)
-    seg = x[pos:ia].copy()
-    if out and len(seg) > fade and len(out[-1]) > fade:
-        prev = out[-1]; w = np.linspace(0, 1, fade)
-        prev[-fade:] = prev[-fade:] * (1 - w) + seg[:fade] * w; seg = seg[fade:]
-    out.append(seg); pos = ib
-seg = x[pos:].copy()
-if out and len(seg) > fade and len(out[-1]) > fade:
-    w = np.linspace(0, 1, fade); out[-1][-fade:] = out[-1][-fade:] * (1 - w) + seg[:fade] * w; seg = seg[fade:]
-out.append(seg)
-y = np.concatenate(out)
+y = splice(x, cuts)
 sf.write(f'rec/part{p}_tight.wav', y, sr)
 
 def remap(t):                                                          # 原始时间 → 剪辑后时间
