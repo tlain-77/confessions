@@ -5,3 +5,5 @@ video/rec/part4.wav
 video/rec/part4_*.wav
 video/rec/self2a_voice.wav
 video/rec/self2b_voice.wav
+# 渲染/编码时先写的半成品（写完才改成正式文件名），不要提交
+*.tmp.mp4
