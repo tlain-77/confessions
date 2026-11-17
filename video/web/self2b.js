@@ -42,7 +42,7 @@
   // 5 · 对着人写 / 对着神写
   { const a = T('c016') - 0.1, b = T('c020') - 0.1; scene('#t5', a, b);
     IN('.tw.c1', T('c017'), { y: 30 }); $$('.tw-l').forEach((l, i) => IN(l, W('c017', ['这句怎么说', '那件事'][i]) - 0.1, { d: 0.5, y: 8 }));
-    on('.tw-mid', T('c018') - 0.2); IN('.tw.c2', T('c018') - 0.1, { y: 30 }); tl.to('.tw.c1', { opacity: 0.45, duration: 0.6 }, T('c018'));
+    tl.fromTo('.tw-mid', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.out', immediateRender: false }, T('c018') - 0.2); IN('.tw.c2', T('c018') - 0.1, { y: 30 }); tl.to('.tw.c1', { opacity: 0.45, duration: 0.6 }, T('c018'));
     big('.tw-big', W('c019', '说实话') - 0.15, { st: 0.1 }); flash(W('c019', '说实话'), 1380, 560, 0.45); }
   // 6 · 见证的结构 / 忏悔录的结构
   { const a = T('c020') - 0.1, b = T('c027') - 0.1; scene('#t6', a, b); light(a, { light: 0.5, rays: 0.4 });
