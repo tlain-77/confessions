@@ -25,6 +25,6 @@ ffmpeg -v error -y -i $CK/all_self2a.mp4 -i $CK/all_self2b.mp4 -i out/self2a_mix
 [3:a]atrim=start=0.4,asetpts=PTS-STARTPTS,afade=t=in:d=0.3[ab];\
 [aa][ab]concat=n=2:v=0:a=1,afade=t=out:st=$(calc "$TOT - 1.2"):d=1.2[a]" \
   -map "[v]" -map "[a]" -c:v libx264 -preset slow -crf 20 -maxrate 8M -bufsize 16M -pix_fmt yuv420p -profile:v high -x264-params aq-mode=3 \
-  -c:a aac -b:a 192k -ar 48000 -movflags +faststart "$OUT"
+  -c:a aac -b:a 128k -ar 48000 -movflags +faststart "$OUT"
 ls -la "$OUT"; ffprobe -v error -show_entries format=duration,size -of csv=p=0 "$OUT"
 echo ALLDONE
