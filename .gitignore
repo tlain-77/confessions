@@ -7,3 +7,8 @@ video/rec/self2a_voice.wav
 video/rec/self2b_voice.wav
 # 渲染/编码时先写的半成品（写完才改成正式文件名），不要提交
 *.tmp.mp4
+video/rec/part5.wav
+video/rec/part5_clean.wav
+video/rec/part5_df18.wav
+video/rec/part5_tight.wav
+video/rec/self3_voice.wav
