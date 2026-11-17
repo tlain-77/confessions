@@ -3,7 +3,7 @@
 import fs from 'node:fs'; import { execFileSync } from 'node:child_process'; import { chromium, serve, openPage } from './lib.mjs';
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const fps = +arg('fps', 60), workers = +arg('workers', 4), audio = arg('audio', 'out/sample_mix.wav'), out = arg('out', 'out/sample.mp4'), crf = arg('crf', '17');
-const dir = 'out/frames'; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+const dir = process.env.FRAMES_DIR || 'out/frames'; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });   // FRAMES_DIR：同时跑两个渲染时各用各的帧目录
 const { server, port } = await serve(); const browser = await chromium.launch();   // one browser per worker below: screenshots don't parallelize inside one
 const query = arg('query', '');
 const probe = await openPage(browser, port, true, query); const dur = await probe.evaluate('window.DURATION'); await probe.close();

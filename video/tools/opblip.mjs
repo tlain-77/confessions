@@ -33,7 +33,7 @@ const res = await page.evaluate(([a, b]) => {
     if (SHAPES.has(el.tagName)) return true;
     if ([...el.childNodes].some(n => n.nodeType === 3 && n.data.trim())) return true;
     if (cs.backgroundImage !== 'none' || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) || parseFloat(cs.borderTopWidth) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderBottomWidth) > 0) return true;
-    return [...el.children].some(paints);
+    return [...el.children].some(c => paints(c));
   };
   const K = 8, H = targets.map(() => []), out = [];
   for (let s = 0; s < a; s += 0.25) window.seek(s);

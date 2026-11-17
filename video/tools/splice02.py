@@ -21,7 +21,7 @@ def segs(page, rng):
     for a, b in rng:
         f = f'{CK4}/{page}_{a}_{b}.mp4'
         if not os.path.exists(f):
-            subprocess.run(f'PAGE={page}.html node render.mjs --fps 30 --workers 4 --crf 14 --from {a / 30!r} --to {b / 30!r} --audio none --out {f}.tmp.mp4 2>&1 | grep -v "^  \\|warning"', shell=True, check=True)
+            subprocess.run(f'FRAMES_DIR=out/frames_02 PAGE={page}.html node render.mjs --fps 30 --workers 4 --crf 14 --from {a / 30!r} --to {b / 30!r} --audio none --out {f}.tmp.mp4 2>&1 | grep -v "^  \\|warning"', shell=True, check=True)
             os.replace(f + '.tmp.mp4', f)
         n = frames(f); assert n == b - a, (f, n, b - a)
         out.append((a, b, f))
