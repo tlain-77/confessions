@@ -32,9 +32,14 @@
     const line = l => `<div class="ax-l ${l.cls || ''}">${l.t}</div>`;
     // 原画面每次换场的时刻（scene()/show() 都是 tl.set(场景, {autoAlpha: 1})）
     const sw = tl.getChildren(true, true, false).filter(tw => tw.duration() === 0 && tw.vars.autoAlpha === 1 && tw.targets().some(e => e.classList && e.classList.contains('scene'))).map(tw => tw.startTime());
+    // 两张卡片前后脚（前一张收起到后一张出来不到 1.6 秒）：中间不把原画面放出来，卡片直接接卡片，
+    // 不然原画面会在两张卡片之间露出来零点几秒又藏回去——画面闪一下
+    const JOIN = 1.6, byA = [...list].sort((p, q) => p.a - q.a);
+    const prevOf = new Map(byA.map((x, i) => [x, byA[i - 1]])), nextOf = new Map(byA.map((x, i) => [x, byA[i + 1]]));
     for (const a of list) {
+      const pv = prevOf.get(a), nx = nextOf.get(a), joinPrev = !!pv && a.a - pv.b < JOIN, joinNext = !!nx && nx.a - a.b < JOIN;
       // 卡片收起时，如果原画面马上（或刚刚）换场，就等新场景已经换上再把原画面放出来，免得旧场景闪一下
-      const late = sw.filter(t => t > a.b - 0.35 && t < a.b + 1.0); const B = late.length ? Math.max(...late) + 0.12 : a.b;
+      const late = sw.filter(t => t > a.b - 0.35 && t < a.b + 1.0); const B = joinNext ? a.b : late.length ? Math.max(...late) + 0.12 : a.b;
       // 卡片出现前，如果原画面刚好换场，就在换场之前先把原画面收起来，免得新场景露一下头
       const early = sw.filter(t => t > a.a - 0.9 && t < a.a + 0.2); const A0 = early.length ? Math.min(a.a - 0.45, Math.min(...early) - 0.62) : a.a - 0.45;
       const sec = document.createElement('section'); sec.className = 'ax ' + (a.cls || '') + (a.img ? ` has-img fit-${a.img.fit || 'cover'} side-${a.img.side || 'l'}` : '');
@@ -54,9 +59,8 @@
         const cap = sec.querySelector('.ax-cap'); if (cap) cap.style.cssText = `top:${top + h + 26}px;` + (R ? 'right:150px;text-align:right' : 'left:150px;text-align:left;right:auto');
       }
       tl.set(sec, { autoAlpha: 0 }, 0); tl.set(sec.querySelectorAll('.ax-k,.ax-l,.ax-h,.ax-foot,.ax-cap'), { opacity: 0 }, 0);
-      tl.to(main, { opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power2.in' }, A0);
-      tl.set(main, { visibility: 'hidden' }, Math.max(A0 + 0.62, a.a + 0.2)); tl.set(main, { visibility: 'visible' }, B - 0.05);
-      tl.to(main, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, B);
+      if (!joinPrev) { tl.to(main, { opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power2.in' }, A0); tl.set(main, { visibility: 'hidden' }, Math.max(A0 + 0.62, a.a + 0.2)); }
+      if (!joinNext) { tl.set(main, { visibility: 'visible' }, B - 0.05); tl.to(main, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, B); }
       tl.to(sec, { autoAlpha: 1, duration: 0.2 }, a.a - 0.1);
       if (im && im.fit !== 'frame') {
         const pic = sec.querySelector('.ax-pic'), img = pic.querySelector('img');
@@ -135,7 +139,7 @@ window.fixClash = function (tl) {
   for (const tw of kids) {
     const d = tw.duration(), v = tw.vars || {};
     if (!(d > 0) || v.stagger || !('opacity' in v || 'autoAlpha' in v)) continue;
-    const a = abs(tw), r = { a, b: a + d, auto: 'autoAlpha' in v, from: !!v.startAt };
+    const s0 = v.startAt || {}, a = abs(tw), r = { a, b: a + d, auto: 'autoAlpha' in v, from: !!v.startAt, zero: s0.opacity === 0 || s0.autoAlpha === 0 };
     for (const el of tw.targets()) if (el instanceof Element) { if (!runs.has(el)) runs.set(el, []); runs.get(el).push(r); }
   }
   let n = 0;
@@ -146,7 +150,11 @@ window.fixClash = function (tl) {
     const t = abs(tw), needAuto = keys.includes('autoAlpha'); if (t < 0.01) continue;
     const els = tw.targets().filter(e => e instanceof Element);
     const covered = el => (runs.get(el) || []).some(r => (needAuto ? r.auto : true) && t < r.b - 1e-4 && (r.a < t - 1e-4 || (r.from && r.a <= t + 1e-4)));
-    if (els.length && els.length === tw.targets().length && els.every(covered)) { tw.kill(); n++; }
+    // 还有一种：刚把它整个显示出来，半秒之内它自己的“从 0 淡入”就开始了（比如卡片里的字先开始打、把卡片先亮了出来）——
+    // 这个 set 只会让它先整个露一下，再被淡入打回 0 重新出来；删掉它，它就老老实实从 0 淡入
+    const shown = keys.every(k => +v[k] > 0);
+    const preFade = el => shown && (runs.get(el) || []).some(r => r.zero && r.a > t - 1e-4 && r.a - t < 0.5);
+    if (els.length && els.length === tw.targets().length && els.every(el => covered(el) || preFade(el))) { tw.kill(); n++; }
   }
   window.FIXED_CLASH = n;
 };
