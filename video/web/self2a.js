@@ -259,7 +259,7 @@
   quote('q66', T('c066') - 0.1, T('c067') - 0.1, 0, after('你当时没有', T('c066')) - 0.1, '很多年以后，他回头写这一夜，写了一句我每次读都要停下来的话——');
   { const a = T('c067') - 0.1, b = T('c069') - 0.1; scene('#s18', a, b);
     IN('.tp-col.c1', a + 0.05, { y: 30 }); tl.set('.tp-col .tp-t', { opacity: 1 }, a); type('.tp-col.c1 .tp-t', W('c067', '别让他走'), 0.7, { d: 0.6 });
-    tl.set('.tp-mid', { opacity: 1 }, a); IN('.tp-col.c2', T('c068') - 0.1, { y: 30 }); type('.tp-col.c2 .tp-t', W('c068', '让他归向你'), 0.8, { d: 0.6 });
+    tl.fromTo('.tp-mid', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.out', immediateRender: false }, a); IN('.tp-col.c2', T('c068') - 0.1, { y: 30 }); type('.tp-col.c2 .tp-t', W('c068', '让他归向你'), 0.8, { d: 0.6 });
     tl.to('.tp-col.c1', { opacity: 0.4, duration: 0.6 }, W('c068', '让他归向你')); flash(W('c068', '归向你'), 1370, 450, 0.45); }
   // 20 · 地图：去了意大利（c069–c070）
   { const a = T('c069') - 0.2, b = T('c071') - 0.1; mapOn(a, b);
