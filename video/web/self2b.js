@@ -20,13 +20,14 @@
     $$('.st').forEach((s, i) => IN(s, W('c002', ['四十三岁', '信主十一年', '当主教'][i]) - 0.1, { d: 0.6, y: 20 })); }
   // 2 · 会众的眼光
   { const a = T('c003') - 0.1, b = T('c007') - 0.1; scene('#t2', a, b); light(a, { light: 0.5, rays: 0.4 });
-    IN('.bp', T('c004') - 0.2, { s: 0.9, y: 0 }); $$('.bp-c b').forEach((x, i) => IN(x, W('c004', ['名气很大', '口才极好'][i]) - 0.1, { d: 0.5, y: 10 }));
-    $$('.rum').forEach((r, i) => IN(r, W('c005', ['以前是摩尼教', '在迦太基', '还有个儿子'][i]) - 0.1, { d: 0.7, y: 20, blur: 6 }));
+    { const w = document.createElement('div'); w.className = 't2-you'; w.textContent = '假如你是希波教会的一个普通会友——'; $('#t2').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, T('c003') + 0.2, { d: 0.8, y: 14 }); tl.to(w, { opacity: 0.4, duration: 0.6 }, T('c004') - 0.2); tl.to(w, { opacity: 0, duration: 0.5 }, atP(window.EPD, '以前他是信') - 0.6); }
+    IN('.bp', T('c004') - 0.2, { s: 0.9, y: 0 }); $$('.bp-c b').forEach((x, i) => IN(x, atP(window.EPD, ['名气特别大', '口才也特别好'][i]) - 0.1, { d: 0.5, y: 10 }));
+    $$('.rum').forEach((r, i) => IN(r, atP(window.EPD, ['以前他是信', '迦太基那年', '还据说有个儿子'][i]) - 0.1, { d: 0.7, y: 20, blur: 6 }));
     tl.to('.bp', { opacity: 0.6, duration: 0.6 }, T('c006')); IN('.obj', W('c006', '老主教') - 0.1, { x: 30, y: 0 }); }
   // 3 · 声明
   { const a = T('c007') - 0.1, b = T('c010') - 0.1; scene('#t3', a, b);
     big('.you', a + 0.05, { st: 0.05, d: 0.8 }); tl.to('.you', { y: -40, scale: 0.7, opacity: 0.6, duration: 0.8 }, T('c008') - 0.3);
-    IN('.decl', T('c008'), { y: 60, d: 1.0, blur: 6 }); $$('.dc-l').forEach((l, i) => IN(l, W('c009', ['年轻时', '感谢神', '未来的事奉'][i]) - 0.1, { d: 0.5, y: 6, blur: 3 }));
+    IN('.decl', T('c008'), { y: 60, d: 1.0, blur: 6 }); $$('.dc-l').forEach((l, i) => IN(l, atP(window.EPD, ['年少的时候', '神的恩典', '未来的侍奉'][i]) - 0.1, { d: 0.5, y: 6, blur: 3 }));
     IN('.decl-n', T('c008') + 0.4, { d: 0.6, y: 10 }); }
   // 4 · 十三卷，写给神的
   { const a = T('c010') - 0.1, b = T('c016') - 0.1; scene('#t4', a, b); light(a, { light: 0.6, rays: 0.5 });

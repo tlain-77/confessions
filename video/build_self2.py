@@ -12,7 +12,7 @@ def cue_times(cues, lo, hi):
     for a, b, n in sm.get_matching_blocks():
         if n >= 2:
             for j in range(n): hit[b + j] = idx[a + j]
-    out = []
+    out = []; CT.clear()
     for k, c in enumerate(cues):
         h = sorted(A[hit[j]][1] for j, f in enumerate(F) if f[0] == k and j in hit)
         cl = [[h[0]]] if h else []                                  # 按 3 秒以上的空档分簇，取字最多的一簇（避免零星误配把一句拉得很长）
@@ -21,18 +21,35 @@ def cue_times(cues, lo, hi):
             else: cl[-1].append(t)
         best = max(cl, key=lambda c: (len(c), c[0])) if cl else []
         out.append([best[0], best[-1] + 0.3] if len(best) >= 2 else None)
+        js = [j for j, f in enumerate(F) if f[0] == k]                  # 这一句每个字：对上了就用录音时刻（限在最佳簇附近），没对上的按前后插值
+        ts = [A[hit[j]][1] if j in hit and best and best[0] - 0.5 <= A[hit[j]][1] <= best[-1] + 0.5 else None for j in js]
+        CT.append(ts)
+    USED.update(hit.values())
     for k in range(len(out)):                                       # 没说到的句子：夹在前后两句中间，给一个很短的时长
         if out[k] is None:
             p = next((out[j][1] for j in range(k - 1, -1, -1) if out[j]), lo); n = next((out[j][0] for j in range(k + 1, len(out)) if out[j]), hi)
             out[k] = [p + 0.01, max(p + 0.05, min(n - 0.01, p + 0.6))]
+    for k in range(len(out)):                                        # 逐字时刻插值
+        ts = CT[k]; s0, e0 = out[k]; e0 -= 0.3 if e0 - s0 > 0.4 else 0
+        kn = [(i, t) for i, t in enumerate(ts) if t is not None]
+        if not kn: CT[k] = [round(s0 + (e0 - s0) * i / max(1, len(ts)), 3) for i in range(len(ts))]; continue
+        r = []
+        for i in range(len(ts)):
+            if ts[i] is not None: r.append(ts[i]); continue
+            pv = max((x for x in kn if x[0] < i), default=None); nx = min((x for x in kn if x[0] > i), default=None)
+            if pv and nx: r.append(pv[1] + (nx[1] - pv[1]) * (i - pv[0]) / (nx[0] - pv[0]))
+            elif pv: r.append(pv[1] + 0.22 * (i - pv[0]))
+            else: r.append(nx[1] - 0.22 * (nx[0] - i))
+        CT[k] = [round(x, 3) for x in r]
     return out
+CT = []; USED = set()
 def build(name, var, sfile, lo, hi, lead, tail):
     spec = json.load(open(f'tts/{sfile}.json', encoding='utf-8'))
     tm = cue_times(spec['cues'], lo, hi)
     first = min(t for c, t in A if t >= lo); off = round(lead - first, 3)
     cues = []
-    for c, (s, e) in zip(spec['cues'], tm):
-        cues.append(dict(id=c['id'], sec=c['sec'], sub=c['sub'], say=c['say'], start=round(s + off, 3), end=round(e + off, 3), dur=round(e - s, 3)))
+    for c, (s, e), ct in zip(spec['cues'], tm, CT):
+        cues.append(dict(id=c['id'], sec=c['sec'], sub=c['sub'], say=c['say'], start=round(s + off, 3), end=round(e + off, 3), dur=round(e - s, 3), ct=[round(x + off, 3) for x in ct]))
     subs = [dict(s=round(l['start'] + off, 3), e=round(l['end'] + off, 3), t=l['text']) for l in al['lines'] if lo <= l['start'] < hi]
     last = max(s['e'] for s in subs); total = round(last + tail, 2)
     chars = [[c, round(t + off, 3)] for c, t in A if lo <= t < hi]

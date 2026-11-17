@@ -7,7 +7,7 @@
   const han = s => [...s].filter(ch => /[一-鿿0-9]/.test(ch)).join('');
   const T = id => C[id].start, E = id => C[id].end;
   // 一句话里某个词出现的时刻（按这一句的语速等比例估算）
-  const W = (id, phrase, nth = 0) => { const c = C[id], s = han(c.say), p = han(phrase); let i = -1; for (let k = 0; k <= nth; k++) i = s.indexOf(p, i + 1); if (i < 0) throw new Error(id + ' 里找不到：' + phrase); return c.start + c.dur * i / s.length; };
+  const W = (id, phrase, nth = 0) => { const c = C[id], s = han(c.say), p = han(phrase); let i = -1; for (let k = 0; k <= nth; k++) i = s.indexOf(p, i + 1); if (i < 0) throw new Error(id + ' 里找不到：' + phrase); return c.ct ? c.ct[i] : c.start + c.dur * i / s.length; };
   const WE = (id, phrase) => { const c = C[id], s = han(c.say), p = han(phrase), i = s.indexOf(p); return c.start + c.dur * (i + p.length) / s.length + 0.15; };
 
   let SCALE = 1;
@@ -170,7 +170,7 @@
   // 8 · 朋友（c022–c023）
   { const a = T('c022') - 0.1, b = T('c024') - 0.1; scene('#s08', a, b);
     IN('.fr-col.c1', W('c022', '只有我一个人') - 0.15, { y: 30 }); IN('.fr-col.c2', W('c023', '那帮朋友') - 0.15, { y: 30 });
-    tl.set('.bubble', { opacity: 1 }, a); tl.fromTo('.bubble', { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2.2)', immediateRender: false, transformOrigin: '20% 100%' }, W('c023', '走干一票') - 0.15); type('.bubble .split', W('c023', '走干一票'), 0.7, { d: 0.4, y: 6 });
+    tl.set('.bubble', { opacity: 1, scale: 0 }, a); tl.fromTo('.bubble', { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2.2)', immediateRender: false, transformOrigin: '20% 100%' }, W('c023', '走干一票') - 0.15); type('.bubble .split', W('c023', '走干一票'), 0.7, { d: 0.4, y: 6 });
     type('.fr-cap', W('c023', '你不去'), 1.0); }
 
   // 9 · 你的梨（c024–c026）
@@ -187,9 +187,12 @@
     card('.mc2', a, b); IN('.mc2 .mp-tag', T('c028'), { d: 0.7, y: 10 }); }
 
   // 引文卡：一个个出现
-  const quote = (id, a, b, hlAt) => { scene('#sQ', a, b); IN('#' + id, a, { y: 60, d: 1.0, blur: 6 }); const cs = chars('#' + id + ' .qc-t'); IN(cs, a + 0.4, { st: Math.max(0.6, b - a - 1.8) * 0.7 / cs.length, d: 0.5, y: 6, blur: 4 }); OUT('#' + id, b - 0.6, { d: 0.5 }); };
+  // 引文：卡片在 a 出现；字从 ta（录音里真正念到引文的时刻）开始一个个出来
+  const RS = EP.chars.map(c => c[0]).join(''), after = (p, t) => { let i = -1; while ((i = RS.indexOf(p, i + 1)) >= 0) if (EP.chars[i][1] >= t) return EP.chars[i][1]; throw new Error('录音里找不到：' + p); };
+  const quote = (id, a, b, hlAt, ta, lead) => { scene('#sQ', a, b); IN('#' + id, a, { y: 60, d: 1.0, blur: 6 }); const cs = chars('#' + id + ' .qc-t'), t0 = ta ?? a + 0.4;
+    if (lead) { const l = document.createElement('div'); l.className = 'qc-lead'; l.textContent = lead; $('#' + id).appendChild(l); tl.set(l, { opacity: 0 }, 0); IN(l, a + 0.7, { d: 0.9, y: 10, blur: 4 }); tl.to(l, { opacity: 0, duration: 0.4 }, t0 - 0.45); } IN(cs, t0, { st: Math.max(0.6, b - t0 - 1.4) * 0.7 / cs.length, d: 0.5, y: 6, blur: 4 }); OUT('#' + id, b - 0.6, { d: 0.5 }); };
   // 11 · 爱上了恋爱（c029）
-  quote('q29', T('c029') - 0.1, T('c030') - 0.1);
+  quote('q29', T('c029') - 0.1, T('c030') - 0.1, 0, after('大意是', T('c029')) + 0.7, '他后来回忆那段日子，说过一句特别准的话——');
 
   // 12 · 她（c030–c033）
   { const a = T('c030') - 0.1, b = T('c034') - 0.1; scene('#s12', a, b); tl.set('.her', { opacity: 1 }, a);
@@ -222,7 +225,7 @@
 
   // 15 · 借口（c046–c050）
   { const a = T('c046') - 0.1, b = T('c051') - 0.1; scene('#s15', a, b);
-    type('.ex-k', T('c047'), 1.6); IN('.ex-k', a, { d: 0.6 }); tl.set('.ex-rows', { opacity: 1 }, a);
+    type('.ex-k', T('c046') + 0.1, 3.4); IN('.ex-k', a, { d: 0.6 }); tl.set('.ex-rows', { opacity: 1 }, a);
     [['c048', 'e1'], ['c049', 'e2'], ['c050', 'e3']].forEach(([id, e]) => { tl.set('.ex-r.' + e, { opacity: 1 }, a); IN('.ex-r.' + e + ' .nm', T(id) - 0.1, { x: -30, y: 0, d: 0.6 }); tl.fromTo('.ex-r.' + e + ' i', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, immediateRender: false }, W(id, '是') - 0.2); IN('.ex-r.' + e + ' .ex', W(id, '是') , { x: -20, y: 0, d: 0.6 }); }); }
 
   // 16 · 莫妮卡（c051–c056）
@@ -235,14 +238,14 @@
   tl.to(ST2, { tears: 0, duration: 0.6 }, T('c054') - 0.5);
 
   // 17 · 不会灭亡（c057–c058）
-  quote('q58', T('c057') - 0.1, T('c059') - 0.1); flash(W('c058', '这样的儿子'), 960, 560, 0.4);
+  quote('q58', T('c057') - 0.1, T('c059') - 0.1, 0, after('大意是', T('c057')) + 0.7, '主教招架不住了，说了一句后来很有名的话——'); flash(W('c058', '这样的儿子'), 960, 560, 0.4);
 
   // 18 · 海港之夜（c059–c065）
   { const a = T('c059') - 0.1, b = T('c066') - 0.1; scene('#s17', a, b); light(a, { light: 0.3, rays: 0.05, fx: 1420, fy: 0 });
     tl.set('.sea-svg', { opacity: 1 }, a); ['.sea-water', '.sea-moon', '.shore', '.lights'].forEach((s2, i) => IN(s2, a + i * 0.15, { y: 0, d: 1.0 })); DRAW('.sea-hz', a, 1.4);
     tl.set('.ship', { opacity: 1 }, a); tl.set('.ship', { attr: { transform: 'translate(760 640)' } }, a);
     IN('.sea-age', a + 0.1, { d: 0.7 });
-    tl.set('.sea-bub', { opacity: 1 }, a); tl.fromTo('.sea-bub', { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false, transformOrigin: '10% 100%' }, W('c061', '我上船') - 0.15);
+    tl.set('.sea-bub', { opacity: 1, scale: 0 }, a); tl.fromTo('.sea-bub', { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false, transformOrigin: '10% 100%' }, W('c061', '我上船') - 0.15);
     $$('.sea-bub > span').forEach((s2, i) => type(s2, W('c061', ['我上船', '你先去'][i]), 1.2, { d: 0.4, y: 6 }));
     tl.to('.sea-bub', { opacity: 0, duration: 0.4 }, T('c062') - 0.3); tl.to('.sea-age', { opacity: 0, duration: 0.4 }, T('c062') - 0.3);
     tl.to('.ship', { attr: { transform: 'translate(1500 640) scale(0.25)' }, duration: C['c062'].dur + 1.5, ease: 'power1.in' }, T('c062') - 0.2);
@@ -252,7 +255,7 @@
     tl.set('.sea-no', { opacity: 1 }, a); big('.sea-no', T('c065') - 0.05, { st: 0.1, d: 0.8 }); }
 
   // 19 · 回头写这一夜（c066）+ 两个祷告（c067–c070）
-  quote('q66', T('c066') - 0.1, T('c067') - 0.1);
+  quote('q66', T('c066') - 0.1, T('c067') - 0.1, 0, after('你当时没有', T('c066')) - 0.1, '很多年以后，他回头写这一夜，写了一句我每次读都要停下来的话——');
   { const a = T('c067') - 0.1, b = T('c069') - 0.1; scene('#s18', a, b);
     IN('.tp-col.c1', a + 0.05, { y: 30 }); tl.set('.tp-col .tp-t', { opacity: 1 }, a); type('.tp-col.c1 .tp-t', W('c067', '别让他走'), 0.7, { d: 0.6 });
     tl.set('.tp-mid', { opacity: 1 }, a); IN('.tp-col.c2', T('c068') - 0.1, { y: 30 }); type('.tp-col.c2 .tp-t', W('c068', '让他归向你'), 0.8, { d: 0.6 });
@@ -302,6 +305,7 @@
     tl.to(cityEls.thagaste, { opacity: 0, duration: 0.4 }, a); tl.set(cityEls.thagaste, { opacity: 1 }, b); card('.mc5', a, b); DRAW(R.her, W('c096', '她被送回') - 0.3, 2.0, { o: 0.9 }); IN('.mc5 .mp-tag', W('c096', '儿子留下') - 0.1, { d: 0.6, y: 10 }); }
   quote('q97', T('c097') - 0.1, T('c098') - 0.1);
   { const a = T('c098') - 0.1, b = T('c101') - 0.1; scene('#s23', a, b); tl.set(['.mr-h', '.mr-cards'], { opacity: 0 }, a);
+    { const pre = document.createElement('div'); pre.className = 'mr-pre'; pre.textContent = '然后，下一句他写的是——'; $('#s23').appendChild(pre); tl.set(pre, { opacity: 0 }, 0); IN(pre, a + 0.1, { d: 0.7, y: 14 }); tl.to(pre, { opacity: 0.45, duration: 0.6 }, W('c099', '可我等不了') - 0.2); }
     tl.set('.mr-last', { opacity: 1 }, a); type('.mr-last > div:nth-child(1)', W('c099', '可我等不了'), 1.2, { d: 0.6 }); type('.mr-last > div:nth-child(2)', W('c099', '我又找了'), 1.0, { d: 0.6 });
     tl.set('.mr-note', { opacity: 1 }, a); type('.mr-note', T('c100'), 1.6); }
 
@@ -328,6 +332,7 @@
     IN('.gd-k', a + 0.1, { d: 0.8 }); IN('.gd-ant', W('c115', '安东尼') - 0.2, { y: 20 });
     tl.set('.fig', { opacity: 1 }, a); DRAW('.fg-t', T('c120') - 0.3, 1.4); tl.fromTo('.fg-leaves ellipse', { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.02, transformOrigin: '50% 50%', immediateRender: false }, T('c120') + 0.4);
     tl.to(['.gd-ant'], { opacity: 0, duration: 0.5 }, T('c117') - 0.4);
+    { const w = document.createElement('div'); w.className = 'gd-what'; w.textContent = '“我们这是怎么了？”'; $('#s26').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, T('c117') + 0.3, { y: 20, d: 0.8 }); tl.to(w, { opacity: 0.4, duration: 0.5 }, T('c118') - 0.2); tl.to(w, { opacity: 0, duration: 0.5 }, T('c120') - 0.3); }
     tl.set('.gd-shout', { opacity: 1 }, a); $$('.gd-shout > span').forEach((s2, i) => { tl.set(s2, { opacity: 1 }, a); type(s2, T(['c118', 'c119'][i]), C[['c118', 'c119'][i]].dur * 0.8, { d: 0.5 }); });
     tl.to(['.gd-shout', '.gd-k'], { opacity: 0, duration: 0.5 }, T('c120') - 0.3);
     tl.set('.gd-qs', { opacity: 1 }, a); [['.g1', 'c121', '还要多久'], ['.g2', 'c122', '明天吗'], ['.g3', 'c122', '又是明天'], ['.g4', 'c122', '为什么不是现在']].forEach(([g, id, w]) => IN('.gq' + g, W(id, w) - 0.1, { x: -30, y: 0, d: 0.6 }));

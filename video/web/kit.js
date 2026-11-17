@@ -6,7 +6,7 @@ window.kit = async function () {
   const C = {}; EP.cues.forEach(c => C[c.id] = c);
   const han = s => [...s].filter(ch => /[一-鿿0-9]/.test(ch)).join('');
   const T = id => C[id].start, E = id => C[id].end, D = id => C[id].dur;
-  const W = (id, phrase, nth = 0) => { const c = C[id], s = han(c.say), p = han(phrase); let i = -1; for (let k = 0; k <= nth; k++) i = s.indexOf(p, i + 1); if (i < 0) throw new Error(id + ' 里找不到：' + phrase); return c.start + c.dur * i / s.length; };
+  const W = (id, phrase, nth = 0) => { const c = C[id], s = han(c.say), p = han(phrase); let i = -1; for (let k = 0; k <= nth; k++) i = s.indexOf(p, i + 1); if (i < 0) throw new Error(id + ' 里找不到：' + phrase); return c.ct ? c.ct[i] : c.start + c.dur * i / s.length; };
   let SCALE = 1;
   function fit() { SCALE = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `scale(${SCALE})`; stage.style.left = (innerWidth - 1920 * SCALE) / 2 + 'px'; stage.style.top = (innerHeight - 1080 * SCALE) / 2 + 'px'; }
   fit(); addEventListener('resize', fit);
