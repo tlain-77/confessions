@@ -78,6 +78,11 @@
     }
   };
 
+  // 整屏光效：一道光扫过 + 一阵金尘，不挡原来的画面。list: [{at, d, o, dust}]
+  window.makeFx = function (tl, list) {
+    const host = document.getElementById('asides');
+    for (const f of list) { sweep(tl, host, f.at, f.d ?? 2.8, f.o ?? 0.45); if (f.dust !== false) dust(tl, host, f.at, f.at + (f.len ?? 6), f.at, f.n ?? 34, f.box); }
+  };
   window.makeBackdrops = function (tl, list) {
     let host = document.getElementById('backdrops');
     if (!host) { host = document.createElement('div'); host.id = 'backdrops'; const m = document.getElementById('main'); m.parentNode.insertBefore(host, m); }

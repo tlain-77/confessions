@@ -553,6 +553,8 @@
   tl.to('#black', { opacity: 1, duration: 1.0, ease: 'power1.in' }, EP.total - 1.15);
   tl.set({}, {}, EP.total);
 
+  if (window.ASIDES) window.ASIDES(tl);
+
   // ---------- 字幕 ----------
   const subs = EP.subs.slice(2).map(s => ({ s: s.s, e: s.e, t: s.t.replace(/[，。：]$/, '') }));      // 开场三句就是画面上的大字，不重复打字幕
   const subEl = $('#sub span'), prog = $('#prog i');

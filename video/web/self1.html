@@ -16,11 +16,13 @@
 <link rel="stylesheet" href="/node_modules/lxgw-wenkai-webfont/lxgwwenkai-regular.css">
 <link rel="stylesheet" href="ep1.css">
 <link rel="stylesheet" href="self1.css">
+<link rel="stylesheet" href="aside.css">
 </head>
 <body>
 <div id="stage">
   <canvas id="bg" width="1920" height="1080"></canvas>
 
+  <div id="main">
   <!-- 地图：放在最底层，最后一场才亮起来 -->
   <svg id="map" viewBox="0 0 1920 1080">
     <defs>
@@ -314,6 +316,8 @@
       <div class="z-s">忏悔录 · 逐句精读</div>
     </section>
   </div>
+  </div>
+  <div id="asides"></div>
 
   <canvas id="fg" width="1920" height="1080"></canvas>
   <div id="vignette"></div>
@@ -332,6 +336,8 @@
 <script src="self1_data.js"></script>
 <script src="map.js"></script>
 <script src="bg.js"></script>
+<script src="aside.js"></script>
+<script src="self1_ax.js"></script>
 <script src="self1.js"></script>
 </body>
 </html>

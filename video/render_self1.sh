@@ -2,7 +2,7 @@
 # 本人录制第一讲：渲染画面，再两遍编码压到 100 MB 以内
 cd "$(dirname "$0")"; set -e
 mkdir -p out/chunks_self1 "../本人录制"
-[ -f out/chunks_self1/all.mp4 ] || { PAGE=self1.html node render.mjs --fps 60 --workers 3 --crf 16 --audio none --out out/chunks_self1/all.tmp.mp4 2>&1 | grep -v "^  \|warning"; mv out/chunks_self1/all.tmp.mp4 out/chunks_self1/all.mp4; }
+[ -f out/chunks_self1/all.mp4 ] || { PAGE=self1.html node render.mjs --fps 30 --workers 4 --crf 14 --audio none --out out/chunks_self1/all.tmp.mp4 2>&1 | grep -v "^  \|warning"; mv out/chunks_self1/all.tmp.mp4 out/chunks_self1/all.mp4; }
 rm -rf out/frames
 D=$(python3 -c "import json;print(json.load(open('out/self1_data.json'))['total'])")
 VB=$(python3 -c "print(min(6000, int(95e6*8/$D/1000 - 128 - 8)))"); echo "video kbps $VB"
