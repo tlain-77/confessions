@@ -19,6 +19,7 @@ window.ASIDES = tl => { const D = window.EPD, P = (p, n) => atP(D, p, n);
     { sel: '.th', p: '主耶稣说' },
     { sel: '.cv', p: '加尔文写' },
     { sel: '.cv .cv-t', p: '圣经以外引用最多' },
+    { sel: '.cv .cv-t b', p: '就是奥古斯丁' },          // “奥古斯丁”这个答案等说到再亮出来
     { txt: '文字很漂亮', p: '文字还行' },
     { txt: '老译本的翻译习惯', p: '这是翻译习惯' },
   ]);
