@@ -21,3 +21,10 @@
 .ax-l.poem{font-size:86px;letter-spacing:.14em;line-height:1.7}
 /* 旁白卡 · 小时候 */
 .naruto .ax-body{top:280px}
+/* 第七句：“请使我”——呼求、相信，都是神使他 */
+.shi2{position:absolute;left:0;right:0;top:560px;display:flex;justify-content:center;gap:110px}
+.shi2>div{text-align:center}
+.shi2 b{display:block;font-size:64px;font-weight:900;color:var(--paper)}
+.shi2 span{display:block;margin-top:12px;font-family:var(--kai);font-size:46px;color:#f3d594}
+/* 第七句 · 两样：这一场只讲“圣子的人性”，“布道者的工作”留到下一场开头再出 */
+#w31 .tw.b{display:none}
