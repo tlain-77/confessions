@@ -22,7 +22,7 @@ def cue_times(cues, lo, hi):
         best = max(cl, key=lambda c: (len(c), c[0])) if cl else []
         out.append([best[0], best[-1] + 0.3] if len(best) >= 2 else None)
         js = [j for j, f in enumerate(F) if f[0] == k]                  # 这一句每个字：对上了就用录音时刻（限在最佳簇附近），没对上的按前后插值
-        ts = [A[hit[j]][1] if j in hit and best and best[0] - 0.5 <= A[hit[j]][1] <= best[-1] + 0.5 else None for j in js]
+        ts = [A[hit[j]][1] if j in hit and best and best[0] - 3 <= A[hit[j]][1] <= best[-1] + 15 else None for j in js]   # 一句话被即兴发挥隔成两段时，后一段也要用上
         CT.append(ts)
     USED.update(hit.values())
     for k in range(len(out)):                                       # 没说到的句子：夹在前后两句中间，给一个很短的时长
@@ -37,12 +37,27 @@ def cue_times(cues, lo, hi):
         for i in range(len(ts)):
             if ts[i] is not None: r.append(ts[i]); continue
             pv = max((x for x in kn if x[0] < i), default=None); nx = min((x for x in kn if x[0] > i), default=None)
-            if pv and nx: r.append(pv[1] + (nx[1] - pv[1]) * (i - pv[0]) / (nx[0] - pv[0]))
+            if pv and nx:                                              # 两个对上的字之间：没有长空档就照常插值；
+                lin = pv[1] + (nx[1] - pv[1]) * (i - pv[0]) / (nx[0] - pv[0])   # 中间夹着一段即兴发挥（长空档）时，按正常语速贴着最近的那个字放，
+                if nx[1] - pv[1] <= 0.3 * (nx[0] - pv[0]) + 0.3: r.append(lin)     # 不然字会被摊到空档里，画面就比声音早
+                elif i - pv[0] <= nx[0] - i: r.append(min(lin, pv[1] + 0.22 * (i - pv[0])))
+                else: r.append(max(lin, nx[1] - 0.22 * (nx[0] - i)))
             elif pv: r.append(pv[1] + 0.22 * (i - pv[0]))
             else: r.append(nx[1] - 0.22 * (nx[0] - i))
         CT[k] = [round(x, 3) for x in r]
     return out
 CT = []; USED = set()
+# 字幕不要比开口早：停顿之后的一句，按人声能量找真正开口的时刻（对齐偶尔会把第一个字放到停顿里）
+import wave, numpy as np
+_w = wave.open('rec/part4_tight.wav'); _sr = _w.getframerate(); _ch = _w.getnchannels()
+_x = np.frombuffer(_w.readframes(_w.getnframes()), np.int16).astype(np.float32); _x = (_x.reshape(-1, _ch).mean(1) if _ch > 1 else _x) / 32768
+_hop = _sr // 100; _db = 20 * np.log10(np.sqrt(np.convolve(_x ** 2, np.ones(_hop * 2) / (_hop * 2), 'same')[::_hop]) + 1e-6)
+def onset(t):
+    k = int(t * 100); pre = _db[max(0, k - 25):k]
+    if len(pre) < 20 or pre.max() > -36: return t                              # 开口前 0.25 秒不安静（连着说），不动
+    thr = max(-42, np.percentile(pre, 30) + 12)
+    seg = _db[k:k + 150]; i = next((i for i in range(len(seg)) if seg[i] > thr), 0)
+    return t + max(0, i / 100 - 0.08) if i / 100 > 0.25 else t
 def build(name, var, sfile, lo, hi, lead, tail):
     spec = json.load(open(f'tts/{sfile}.json', encoding='utf-8'))
     tm = cue_times(spec['cues'], lo, hi)
@@ -50,7 +65,7 @@ def build(name, var, sfile, lo, hi, lead, tail):
     cues = []
     for c, (s, e), ct in zip(spec['cues'], tm, CT):
         cues.append(dict(id=c['id'], sec=c['sec'], sub=c['sub'], say=c['say'], start=round(s + off, 3), end=round(e + off, 3), dur=round(e - s, 3), ct=[round(x + off, 3) for x in ct]))
-    subs = [dict(s=round(l['start'] + off, 3), e=round(l['end'] + off, 3), t=l['text']) for l in al['lines'] if lo <= l['start'] < hi]
+    subs = [dict(s=round(onset(l['start']) + off, 3), e=round(l['end'] + off, 3), t=l['text']) for l in al['lines'] if lo <= l['start'] < hi]
     last = max(s['e'] for s in subs); total = round(last + tail, 2)
     chars = [[c, round(t + off, 3)] for c, t in A if lo <= t < hi]
     d = dict(total=total, off=off, rec_from=lo, rec_to=hi, cues=cues, subs=subs, chars=chars)

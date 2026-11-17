@@ -83,7 +83,7 @@
 /* 地铁 */
 .mt2{position:absolute;left:0;right:0;top:530px;height:180px;overflow:hidden}
 .mt2-car{position:absolute;left:0;top:20px;width:2800px;height:140px;border-radius:26px;background:linear-gradient(180deg,#2b2f38 0,#151820 55%,#0d0f14 100%);box-shadow:0 0 0 1px rgba(255,230,170,.18),0 20px 40px rgba(0,0,0,.6);filter:blur(1.5px)}
-.mt2-car::before{content:'';position:absolute;left:30px;right:30px;top:26px;height:58px;border-radius:8px;background:repeating-linear-gradient(90deg,rgba(255,233,180,.85) 0 150px,rgba(255,233,180,.15) 150px 172px,rgba(20,22,28,1) 172px 200px)}
+.mt2-car::before{content:'';position:absolute;left:30px;right:30px;top:26px;height:58px;border-radius:8px;background:repeating-linear-gradient(90deg,rgba(255,233,180,.5) 0 150px,rgba(255,233,180,.28) 150px 172px,rgba(60,58,52,.9) 172px 200px);filter:blur(2px)}
 .mt2-car::after{content:'';position:absolute;left:0;right:0;bottom:22px;height:6px;background:linear-gradient(90deg,rgba(226,189,118,0),rgba(226,189,118,.9),rgba(226,189,118,0))}
 .mt2 i{position:absolute;height:2px;width:520px;background:linear-gradient(90deg,rgba(255,236,190,0),rgba(255,236,190,.9),rgba(255,236,190,0))}
 .mt2 i:nth-child(3){top:12px}.mt2 i:nth-child(4){top:60px;width:700px}.mt2 i:nth-child(5){top:118px}.mt2 i:nth-child(6){top:168px;width:400px}
@@ -92,3 +92,4 @@
 .t2-you{position:absolute;left:0;right:0;top:170px;text-align:center;font-family:var(--kai);font-size:54px;color:var(--paper);white-space:nowrap}
 .qcard{position:absolute}
 .qc-lead{position:absolute;left:90px;right:90px;top:150px;font-family:var(--kai);font-size:52px;line-height:1.6;color:rgba(42,33,24,.62)}
+.ex-pre{position:absolute;left:0;right:0;top:470px;text-align:center;font-family:var(--kai);font-size:66px;color:var(--paper);white-space:nowrap}

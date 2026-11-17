@@ -30,7 +30,13 @@
     const host = document.getElementById('asides'), main = document.getElementById('main');
     const IN = (el, at, o = {}) => tl.fromTo(el, { opacity: 0, y: o.y ?? 26, filter: `blur(${o.blur ?? 12}px)` }, { opacity: o.o ?? 1, y: 0, filter: 'blur(0px)', duration: o.d ?? 0.9, ease: 'power3.out', immediateRender: false }, at);
     const line = l => `<div class="ax-l ${l.cls || ''}">${l.t}</div>`;
+    // 原画面每次换场的时刻（scene()/show() 都是 tl.set(场景, {autoAlpha: 1})）
+    const sw = tl.getChildren(true, true, false).filter(tw => tw.duration() === 0 && tw.vars.autoAlpha === 1 && tw.targets().some(e => e.classList && e.classList.contains('scene'))).map(tw => tw.startTime());
     for (const a of list) {
+      // 卡片收起时，如果原画面马上（或刚刚）换场，就等新场景已经换上再把原画面放出来，免得旧场景闪一下
+      const late = sw.filter(t => t > a.b - 0.35 && t < a.b + 1.0); const B = late.length ? Math.max(...late) + 0.12 : a.b;
+      // 卡片出现前，如果原画面刚好换场，就在换场之前先把原画面收起来，免得新场景露一下头
+      const early = sw.filter(t => t > a.a - 0.9 && t < a.a + 0.2); const A0 = early.length ? Math.min(a.a - 0.45, Math.min(...early) - 0.62) : a.a - 0.45;
       const sec = document.createElement('section'); sec.className = 'ax ' + (a.cls || '') + (a.img ? ` has-img fit-${a.img.fit || 'cover'} side-${a.img.side || 'l'}` : '');
       const im = a.img;
       sec.innerHTML = (im && im.fit !== 'frame' ? `<div class="ax-pic"><img src="img/${im.src}.jpg" style="object-position:${im.pos || '50% 50%'}"></div><div class="ax-shade"></div>` : '') +
@@ -48,9 +54,9 @@
         const cap = sec.querySelector('.ax-cap'); if (cap) cap.style.cssText = `top:${top + h + 26}px;` + (R ? 'right:150px;text-align:right' : 'left:150px;text-align:left;right:auto');
       }
       tl.set(sec, { autoAlpha: 0 }, 0); tl.set(sec.querySelectorAll('.ax-k,.ax-l,.ax-h,.ax-foot,.ax-cap'), { opacity: 0 }, 0);
-      tl.to(main, { opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power2.in' }, a.a - 0.45);
-      tl.set(main, { visibility: 'hidden' }, a.a + 0.2); tl.set(main, { visibility: 'visible' }, a.b - 0.05);
-      tl.to(main, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, a.b);
+      tl.to(main, { opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power2.in' }, A0);
+      tl.set(main, { visibility: 'hidden' }, Math.max(A0 + 0.62, a.a + 0.2)); tl.set(main, { visibility: 'visible' }, B - 0.05);
+      tl.to(main, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, B);
       tl.to(sec, { autoAlpha: 1, duration: 0.2 }, a.a - 0.1);
       if (im && im.fit !== 'frame') {
         const pic = sec.querySelector('.ax-pic'), img = pic.querySelector('img');
@@ -66,7 +72,7 @@
         if (im.cap) IN(sec.querySelector('.ax-cap'), a.a + 1.0, { d: 1.0, y: 8, blur: 4, o: 0.85 });
       }
       if (a.dust !== false) dust(tl, sec, a.a, a.b, a.a, im ? 30 : 22);
-      const k = sec.querySelector('.ax-k'); if (k) IN(k, a.a, { d: 0.8, y: 12, blur: 6 });
+      const k = sec.querySelector('.ax-k'); if (k) IN(k, a.kAt ?? a.a, { d: 0.8, y: 12, blur: 6 });
       const all = [...(a.lines || []), ...(a.cols || []).flatMap(c => c.lines)];
       const els = [...sec.querySelectorAll('.ax-l')];
       all.forEach((l, i) => { IN(els[i], l.at - 0.15, { d: 0.8 }); if (l.dim) tl.to(els[i], { opacity: 0.35, duration: 0.6 }, l.dim); });
@@ -74,7 +80,7 @@
       sec.querySelectorAll('.ax-col').forEach((c, i) => { tl.set(c, { opacity: 0 }, 0); tl.fromTo(c, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', immediateRender: false }, a.cols[i].at - 0.5); });
       if (a.foot) IN(sec.querySelector('.ax-foot'), a.foot.at - 0.15, { d: 0.9, y: 16 });
       if (a.fx) a.fx(tl, sec, { IN, dust, sweep, kenburns });
-      tl.to(sec, { autoAlpha: 0, filter: 'blur(10px)', duration: 0.5, ease: 'power2.in' }, a.b - 0.45);
+      tl.to(sec, { autoAlpha: 0, filter: 'blur(10px)', duration: 0.5, ease: 'power2.in' }, B - 0.45);
     }
   };
 
@@ -98,6 +104,66 @@
     }
   };
 })();
+// 防“闪”：有的元素没被预先藏起来，场景一亮它就露出来（字比声音先出现），
+// 等到它自己的淡入动画开始时又被打回 0 再淡入——画面就闪一下。
+// 这里统一处理：凡是第一次动透明度就是“从 0 淡入”的元素，从一开始就藏好。
+window.fixEarly = function (tl) {
+  const first = new Map();
+  const abs = tw => { let t = tw.startTime(), p = tw.parent; while (p && p !== tl) { t = p.startTime() + t; p = p.parent; } return t; };
+  for (const tw of tl.getChildren(true, true, false)) {
+    const v = tw.vars || {}, s = v.startAt || {}, st = abs(tw);
+    const fadeIn = s.opacity === 0 || s.autoAlpha === 0 || (v.runBackwards && (v.opacity === 0 || v.autoAlpha === 0));
+    if (!fadeIn && !('opacity' in v) && !('autoAlpha' in v) && !('opacity' in s) && !('autoAlpha' in s)) continue;
+    for (const el of tw.targets()) {
+      if (!(el instanceof Element)) continue;
+      const f = first.get(el);
+      if (!f || st < f.t - 1e-6) first.set(el, { t: st, fadeIn, auto: 'autoAlpha' in s });
+    }
+  }
+  let n = 0;
+  for (const [el, f] of first) if (f.fadeIn && f.t > 0.05 && +gsap.getProperty(el, 'opacity') > 0) { tl.set(el, f.auto ? { autoAlpha: 0 } : { opacity: 0 }, 0); n++; }
+  window.FIXED_EARLY = n;
+};
+// 让画面上的某段字在“说到这句话”的时候才出现：把它原来的淡入挪到这个时刻；
+// 它要是没有自己的淡入（是跟着外框一起出来的），就给它单独加一个淡入。
+// list: [{ sel 或 txt, p（录音里的词）, nth, at（直接给时刻）, d（提前量，默认 -0.15） }]
+window.syncText = function (tl, D, list) {
+  const fadeIn = tw => { const st = tw.vars.startAt || {}; return st.opacity === 0 || st.autoAlpha === 0; };
+  const find = s => {
+    if (s.sel) return [...document.querySelectorAll(s.sel)];
+    const key = s.txt.replace(/\s/g, '');
+    const all = [...document.querySelectorAll('#stage *')].filter(e => !e.closest('#chrome') && !e.closest('#sub') && e.textContent.replace(/\s/g, '').startsWith(key));
+    return all.filter(e => ![...e.children].some(c => all.includes(c))).slice(0, 1);
+  };
+  for (const s of list) {
+    const els = find(s); if (!els.length) throw new Error('syncText 找不到：' + (s.sel || s.txt));
+    const at = (s.at ?? atP(D, s.p, s.nth || 0)) + (s.d ?? -0.15);
+    for (const el of els) {
+      let tws = tl.getTweensOf(el).filter(fadeIn);
+      if (!tws.length) { const chs = [...el.querySelectorAll('.ch')]; if (chs.length) tws = tl.getTweensOf(chs).filter(fadeIn); }
+      if (tws.length) {
+        const t0 = Math.min(...tws.map(tw => tw.startTime()));
+        if (at > t0) tws.filter(tw => tw.startTime() < t0 + 0.4).forEach(tw => tw.startTime(tw.startTime() + at - t0));
+      } else {
+        tl.set(el, { opacity: 0 }, 0);
+        tl.fromTo(el, { opacity: 0, y: 10, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: 'power3.out', immediateRender: false }, at);
+      }
+    }
+  }
+};
+// 字幕：一句接一句说的时候，直接换字，不闪；只有真正停顿（≥0.6 秒）时才淡出、淡入。字幕不早于开口。
+window.makeSubDrawer = function (subs, el) {
+  const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+  const L = subs.map(s => ({ t: s.t, a: s.s - 0.05, z: s.e + 0.3 })).sort((p, q) => p.a - q.a);
+  for (let i = 0; i + 1 < L.length; i++) if (L[i + 1].a - L[i].z < 0.6) { L[i].z = L[i + 1].a; L[i].join = true; L[i + 1].joined = true; }
+  return t => {
+    let cur = null;
+    for (const s of L) { if (s.a > t) break; if (t < s.z) cur = s; }
+    if (!cur) { el.style.opacity = 0; return; }
+    if (el.textContent !== cur.t) el.textContent = cur.t;
+    el.style.opacity = Math.min(cur.joined ? 1 : sm((t - cur.a) / 0.15), cur.join ? 1 : sm((cur.z - t) / 0.22));
+  };
+};
 // 录音里某个词出现的时刻（页面时间）
 window.atP = function (D, phrase, nth = 0) {
   const S = D.chars.map(c => c[0]).join(''); let i = -1;

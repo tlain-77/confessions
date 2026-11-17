@@ -225,7 +225,8 @@
 
   // 15 · 借口（c046–c050）
   { const a = T('c046') - 0.1, b = T('c051') - 0.1; scene('#s15', a, b);
-    type('.ex-k', T('c046') + 0.1, 3.4); IN('.ex-k', a, { d: 0.6 }); tl.set('.ex-rows', { opacity: 1 }, a);
+    type('.ex-k', atP(EP, '但我们这句话') - 0.1, 1.8); IN('.ex-k', a, { d: 0.6 });
+    { const w = document.createElement('div'); w.className = 'ex-pre'; w.textContent = '如今，没什么人信摩尼教了。'; $('#s15').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, atP(EP, '今天倒没有人信') + 0.2, { d: 0.7, y: 14 }); tl.to(w, { opacity: 0, y: -20, filter: 'blur(6px)', duration: 0.5 }, atP(EP, '但我们这句话') - 0.2); } tl.set('.ex-rows', { opacity: 1 }, a);
     [['c048', 'e1'], ['c049', 'e2'], ['c050', 'e3']].forEach(([id, e]) => { tl.set('.ex-r.' + e, { opacity: 1 }, a); IN('.ex-r.' + e + ' .nm', T(id) - 0.1, { x: -30, y: 0, d: 0.6 }); tl.fromTo('.ex-r.' + e + ' i', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, immediateRender: false }, W(id, '是') - 0.2); IN('.ex-r.' + e + ' .ex', W(id, '是') , { x: -20, y: 0, d: 0.6 }); }); }
 
   // 16 · 莫妮卡（c051–c056）
@@ -296,10 +297,10 @@
     tl.set('.metro', { opacity: 1 }, W('c091', '周一早上') - 0.7); DRAW('.mt-l', W('c091', '周一早上') - 0.6, 1.0); type('.mt-t .split', W('c091', '这是周一'), 1.0, { d: 0.6 }); }
 
   // 25 · 婚事（c092–c094），她被送回非洲（c095–c096），心被撕开（c097），又找了一个（c098–c100）
-  { const a = T('c092') - 0.1, b = T('c095') - 0.1; scene('#s23', a, b);
+  { const a = T('c092') - 0.1, b = atP(EP, '被送回了非洲') - 0.55; scene('#s23', a, b);      // 婚事这一场留到“却成了障碍”说完
     type('.mr-h', W('c093', '要往上走') - 0.1, 1.4); IN('.mr-h', a, { d: 0.6 }); tl.set('.mr-cards', { opacity: 1 }, a);
     IN('.mr-c.a', W('c094', '好人家') - 0.1, { y: 30 }); IN('.mr-c.b', W('c094', '两年'), { y: 30 }); }
-  { const a = T('c095') - 0.2, b = T('c097') - 0.1; mapOn(a, b);
+  { const a = atP(EP, '被送回了非洲') - 0.6, b = T('c097') - 0.1; mapOn(a, b);
     tl.set('#mapzoom', { attr: { transform: `translate(${1250 - 1.35 * 1040} ${560 - 1.35 * 500}) scale(1.35)` } }, a); ['carthage', 'rome', 'milan'].forEach(k => tl.set(cityEls[k], { opacity: 1 }, a));
     [R.tc, R.cr, R.rm, R.mo].forEach(r => tl.set(r, { opacity: 0 }, a));
     tl.to(cityEls.thagaste, { opacity: 0, duration: 0.4 }, a); tl.set(cityEls.thagaste, { opacity: 1 }, b); card('.mc5', a, b); DRAW(R.her, W('c096', '她被送回') - 0.3, 2.0, { o: 0.9 }); IN('.mc5 .mp-tag', W('c096', '儿子留下') - 0.1, { d: 0.6, y: 10 }); }
@@ -332,7 +333,7 @@
     IN('.gd-k', a + 0.1, { d: 0.8 }); IN('.gd-ant', W('c115', '安东尼') - 0.2, { y: 20 });
     tl.set('.fig', { opacity: 1 }, a); DRAW('.fg-t', T('c120') - 0.3, 1.4); tl.fromTo('.fg-leaves ellipse', { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.02, transformOrigin: '50% 50%', immediateRender: false }, T('c120') + 0.4);
     tl.to(['.gd-ant'], { opacity: 0, duration: 0.5 }, T('c117') - 0.4);
-    { const w = document.createElement('div'); w.className = 'gd-what'; w.textContent = '“我们这是怎么了？”'; $('#s26').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, T('c117') + 0.3, { y: 20, d: 0.8 }); tl.to(w, { opacity: 0.4, duration: 0.5 }, T('c118') - 0.2); tl.to(w, { opacity: 0, duration: 0.5 }, T('c120') - 0.3); }
+    { const w = document.createElement('div'); w.className = 'gd-what'; w.textContent = '“我们这是怎么了？”'; $('#s26').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, atP(EP, '我们这是怎么了') - 0.15, { y: 20, d: 0.8 }); tl.to(w, { opacity: 0.4, duration: 0.5 }, T('c118') - 0.2); tl.to(w, { opacity: 0, duration: 0.5 }, T('c120') - 0.3); }
     tl.set('.gd-shout', { opacity: 1 }, a); $$('.gd-shout > span').forEach((s2, i) => { tl.set(s2, { opacity: 1 }, a); type(s2, T(['c118', 'c119'][i]), C[['c118', 'c119'][i]].dur * 0.8, { d: 0.5 }); });
     tl.to(['.gd-shout', '.gd-k'], { opacity: 0, duration: 0.5 }, T('c120') - 0.3);
     tl.set('.gd-qs', { opacity: 1 }, a); [['.g1', 'c121', '还要多久'], ['.g2', 'c122', '明天吗'], ['.g3', 'c122', '又是明天'], ['.g4', 'c122', '为什么不是现在']].forEach(([g, id, w]) => IN('.gq' + g, W(id, w) - 0.1, { x: -30, y: 0, d: 0.6 }));
@@ -378,6 +379,7 @@
   tl.set({}, {}, EP.total);
 
   if (window.ASIDES) window.ASIDES(tl);
+  if (window.fixEarly) window.fixEarly(tl);
   // ---------- 字幕 ----------
   const subs = [];
   for (const c of EP.cues) {
@@ -394,8 +396,7 @@
   subs.forEach(s => s.t = s.t.replace(/[，。：；、]$/, ''));
   const subEl = $('#sub span'), prog = $('#prog i');
   const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
-  function drawSub(t) { let cur = null; for (const s of subs) if (t >= s.s - 0.1 && t <= s.e + 0.25) cur = s;
-    if (!cur) { subEl.style.opacity = 0; return; } if (subEl.textContent !== cur.t) subEl.textContent = cur.t; subEl.style.opacity = Math.min(sm((t - (cur.s - 0.1)) / 0.18), sm(((cur.e + 0.25) - t) / 0.18)); }
+  const drawSub = window.makeSubDrawer(subs, subEl);
   function tick(t) { tearEls.forEach(([e, ph, sp]) => { const p = ((t * sp * 0.35 + ph) % 1); e.setAttribute('cy', 420 + p * 560); e.style.opacity = Math.sin(Math.PI * p) * ST2.tears; }); }
 
   for (let t = 0; t <= EP.total + 0.05; t += 1 / 30) tl.time(t, true);

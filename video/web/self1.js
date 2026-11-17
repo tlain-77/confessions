@@ -554,18 +554,13 @@
   tl.set({}, {}, EP.total);
 
   if (window.ASIDES) window.ASIDES(tl);
+  if (window.fixEarly) window.fixEarly(tl);
 
   // ---------- 字幕 ----------
   const subs = EP.subs.slice(2).map(s => ({ s: s.s, e: s.e, t: s.t.replace(/[，。：]$/, '') }));      // 开场三句就是画面上的大字，不重复打字幕
   const subEl = $('#sub span'), prog = $('#prog i');
   const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
-  function drawSub(t) {
-    let cur = null;
-    for (const s of subs) if (t >= s.s - 0.1 && t <= s.e + 0.28) cur = s;
-    if (!cur) { subEl.style.opacity = 0; return; }
-    if (subEl.textContent !== cur.t) subEl.textContent = cur.t;
-    subEl.style.opacity = Math.min(sm((t - (cur.s - 0.1)) / 0.2), sm(((cur.e + 0.28) - t) / 0.2));
-  }
+  const drawSub = window.makeSubDrawer(subs, subEl);      // 一句接一句时直接换字，不闪
 
   // ---------- 沿路线重走一遍的光点 ----------
   const segLen = segEls.map(s => s.getTotalLength()), totLen = segLen.reduce((a, b) => a + b, 0);

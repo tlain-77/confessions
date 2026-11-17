@@ -12,6 +12,31 @@ window.ASIDES = tl => { const D = window.EP2, P = (p, n) => atP(D, p, n);
     { a: P('走到罗马的港口') - 0.5, b: P('回到非洲'), src: 'monica_l', o: 0.36, pos: '50% 26%', cap: PAINT.monica, kb: [1.0, 0, 0, 1.12, 0, -3] },
   ]);
 
+  // 画面上的字等说到了再出现（原来有的跟着整张卡一起出来，比声音早）
+  syncText(tl, D, [
+    { sel: '.mc1 .mp-s', p: '也就是今天的阿尔及利亚' },
+    { txt: '咬了两口', p: '咬了两口' },
+    { txt: '揪着不放', p: '他揪着不放的不是梨' },
+    { sel: '.mc2 .mp-t', p: '那个城市叫迦太基' },
+    { sel: '.mn-lab', p: '黑暗的力量' },
+    { sel: '.bi-r', p: '现在劝也没用' },
+    { sel: '.bg-col.c1 .bg-st', p: '已经到手' },
+    { sel: '.bg-col.c2 .bg-who', p: '我们费这么大的劲' },
+    { sel: '.bg-col.c2 .bg-how', p: '背着这么重的野心' },
+    { sel: '.bg-col.c2 .bg-st', p: '可我们的还没到' },
+    { sel: '.mr-c.b .ob', p: '却成了障碍' },
+    { sel: '.mc5 .mp-t', p: '被送回了非洲' },
+    { sel: '.meter .mt-a', p: '他是为了听口才去的' },
+    { sel: '.meter .mt-n', p: '同行他想听听' },
+    { sel: '.meter .mt-b', p: '至于他讲的内容' },
+    { sel: '.ev.e3 span', p: '跟几位朋友一起读书' },
+    { sel: '.ev.e4 span', p: '他就这么被抓上去了' },
+    { sel: '.ev.e5 span', p: '一直到去世' },
+    { sel: '.ev.e6', p: '一直到去世', d: 0.3 },
+    { sel: '.mo-ic', p: '莫妮卡为这个儿子' },
+    { sel: '.mr-c.b', p: '而那个跟随着' },
+  ]);
+
   makeAsides(tl, D, [
     // 母亲莫妮卡
     { a: P('母亲叫莫妮卡') - 0.3, b: P('这个孩子从小就聪明') - 0.35, k: '母 亲',
@@ -72,7 +97,7 @@ window.ASIDES = tl => { const D = window.EP2, P = (p, n) => atP(D, p, n);
     // 半天狗
     { a: P('我还听过鬼灭之刃'), b: P('那这些年他妈在干什么') - 0.3, k: '鬼 灭 之 刃 · 半 天 狗', cls: 'hand',
       html: '<div class="ht-glow"></div>',
-      lines: [{ t: '偷了东西，却说：', at: P('当时他是偷了一个东西'), cls: 'sm' }, { t: '“不是我偷的，', at: P('却说这东西不是我偷的'), cls: 'big' }, { t: '是我这双手偷的。”', at: P('是我这双手偷的'), cls: 'big gold' }, { t: '多荒谬啊。', at: P('多荒谬啊'), cls: 'kai coral' }],
+      lines: [{ t: '偷了东西，却说：', at: P('当时他是偷了一个东西'), cls: 'sm' }, { t: '“不是我偷的，', at: P('不是我偷的'), cls: 'big' }, { t: '是我这双手偷的。”', at: P('是我这双手偷的'), cls: 'big gold' }, { t: '多荒谬啊。', at: P('多荒谬啊'), cls: 'kai coral' }],
       fx: (tl, sec) => { const g = sec.querySelector('.ht-glow'); tl.set(g, { opacity: 0 }, 0); tl.fromTo(g, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1.1, duration: 1.4, ease: 'power2.out', immediateRender: false }, P('是我这双手偷的') - 0.2); tl.to(g, { opacity: 0.4, duration: 1 }, P('多荒谬啊')); } },
     // 那天晚上
     { a: P('那天晚上莫妮卡') - 0.2, b: P('很多年以后') - 0.3, k: '那 天 晚 上',
@@ -88,25 +113,25 @@ window.ASIDES = tl => { const D = window.EP2, P = (p, n) => atP(D, p, n);
       lines: [{ t: '这像不像我们的现在？', at: P('这像不像我们的现在'), cls: 'big' }, { t: '我们也说了很多谎话，', at: P('我们也说了很多谎话'), cls: 'kai' }, { t: '听的人，也知道那是谎话。', at: P('而听我们话的人'), cls: 'kai gold' }] },
     // 地铁
     { a: P('这更像是我们周一早上的地铁') - 0.1, b: P('差不多同时') - 0.3, k: '一 千 六 百 年 后', cls: 'metro2',
-      html: '<div class="mt2"><div class="mt2-car"></div><div class="mt2-car c2"></div><i></i><i></i><i></i><i></i></div>',
-      lines: [{ t: '周一早上的地铁', at: P('这更像是我们周一早上的地铁'), cls: 'kai' }, { t: '小学 · 初中 · 高中 · 大学 · 工作 · 加班', at: P('是我们上小学'), cls: 'sm' }],
+      html: '<div class="mt2"><div class="mt2-car"></div><i></i><i></i><i></i><i></i></div>',
+      lines: [{ t: '周一早上的地铁', at: P('周一早上') - 0.1, cls: 'kai' }, { t: '小学 · 初中 · 高中 · 大学 · 工作 · 加班', at: P('是我们上小学'), cls: 'sm' }],
       foot: { t: '我们所图的，不就是快乐吗？', at: P('我们所图的不就是快乐吗') },
       fx: (tl, sec) => {
         const cars = sec.querySelectorAll('.mt2-car'), st = sec.querySelectorAll('.mt2 i'), t0 = P('这更像是我们周一早上的地铁');
         tl.set([...cars, ...st], { opacity: 0 }, 0);
-        cars.forEach((c, i) => { const t = i ? P('是我们上小学') + 0.8 : t0 + 0.4; tl.set(c, { opacity: 1 }, t); tl.fromTo(c, { x: 2000 }, { x: -2900, duration: 3.2, ease: 'power1.inOut', immediateRender: false }, t); tl.set(c, { opacity: 0 }, t + 3.2); });
-        st.forEach((s, i) => { const t = t0 + 0.6 + i * 0.25; tl.fromTo(s, { opacity: 0, x: 1900 }, { opacity: 0.7, x: -600, duration: 1.4, ease: 'power2.in', immediateRender: false }, t); tl.to(s, { opacity: 0, duration: 0.3 }, t + 1.2); });
+        cars.forEach(c => { const t = t0 + 0.3; tl.fromTo(c, { opacity: 0 }, { opacity: 1, duration: 0.6, immediateRender: false }, t); tl.fromTo(c, { x: 1950 }, { x: -2850, duration: 8.5, ease: 'sine.inOut', immediateRender: false }, t); tl.to(c, { opacity: 0, duration: 0.6 }, t + 7.9); });
+        st.forEach((s, i) => { const t = t0 + 0.8 + i * 0.5; tl.fromTo(s, { opacity: 0, x: 1900 }, { opacity: 0.55, x: -600, duration: 3.2, ease: 'sine.in', immediateRender: false }, t); tl.to(s, { opacity: 0, duration: 0.5 }, t + 2.7); });
       } },
     // 他去听安波罗修讲道
     { a: P('这时候他已经常去听米兰的主教讲道了') - 0.2, b: P('奥古斯丁这小子') - 0.3, k: '米 兰 · 主 教',
       img: { src: 'sermon', fit: 'frame', side: 'r', box: [600, 790], pos: '50% 40%', cap: PAINT.sermon, kb: [1.18, 0, -3, 1.05, 0, 2] },
-      lines: [{ t: '他常去听主教讲道', at: P('这时候他已经常去听米兰的主教讲道了') + 0.5, cls: 'kai' }, { t: '安波罗修', at: P('这位主教是安布罗修') + 0.3, cls: 'big gold' }, { t: '当时最有名的讲道人', at: P('是当时很有名的讲道人'), cls: 'sm' }] },
+      lines: [{ t: '他常去听主教讲道', at: P('这时候他已经常去听米兰的主教讲道了') + 1.6, cls: 'kai' }, { t: '安波罗修', at: P('这位主教是安布罗修') + 0.3, cls: 'big gold' }, { t: '当时最有名的讲道人', at: P('是当时很有名的讲道人'), cls: 'sm' }] },
     // 拿着，读吧
     { a: P('拿着读吧') - 0.5, b: P('罗马书') - 0.4, k: '隔 壁 孩 子 的 声 音',
       img: { src: 'conversion', fit: 'cover', side: 'r', pos: '35% 40%', cap: PAINT.conversion, kb: [1.14, 2, 0, 1.02, -1, 0] },
-      lines: [{ t: '“拿着，读吧！', at: P('拿着读吧'), cls: 'big gold' }, { t: '拿着，读吧！”', at: P('拿着读吧', 1), cls: 'big' }, { t: '哪个儿童游戏里，都没有这句词', at: P('他想了想'), cls: 'sm', dim: P('他又站起来') }, { t: '他回去拿起保罗书信，翻开——', at: P('他又站起来'), cls: 'kai' }] },
+      lines: [{ t: '“拿着，读吧！', at: P('拿着读吧'), cls: 'big gold' }, { t: '拿着，读吧！”', at: P('拿着读吧', 1), cls: 'big' }, { t: '哪个儿童游戏里，都没有这句词', at: P('儿童游戏') - 0.1, cls: 'sm', dim: P('他又站起来') }, { t: '他回去拿起保罗书信，翻开——', at: P('他又站起来'), cls: 'kai' }] },
     // 受洗
-    { a: P('他辞去了教职') - 0.2, b: P('然后他准备回非洲') - 0.2, k: '387 年 · 复 活 节',
+    { a: P('他辞去了教职') - 0.2, b: P('然后他准备回非洲') - 0.2, k: '387 年 · 复 活 节', kAt: P('复活节') - 0.25,
       img: { src: 'vesting', fit: 'frame', side: 'l', box: [820, 486], pos: '50% 50%', cap: PAINT.vesting },
       lines: [{ t: '辞去教职', at: P('他辞去了教职'), cls: 'sm' }, { t: '安波罗修为他施洗', at: P('安布罗修给他施洗'), cls: 'gold' }, { t: '那年，他三十二岁', at: P('那年他32岁'), cls: 'kai' }] },
   ]); };

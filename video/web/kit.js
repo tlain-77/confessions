@@ -64,8 +64,7 @@ window.kit = async function () {
     subs.forEach(s => s.t = s.t.replace(/[，。：；、]$/, ''));
     const subEl = $('#sub span'), prog = $('#prog i');
     const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
-    function drawSub(t) { let cur = null; for (const s of subs) if (t >= s.s - 0.1 && t <= s.e + 0.25) cur = s;
-      if (!cur) { subEl.style.opacity = 0; return; } if (subEl.textContent !== cur.t) subEl.textContent = cur.t; subEl.style.opacity = Math.min(sm((t - (cur.s - 0.1)) / 0.18), sm(((cur.e + 0.25) - t) / 0.18)); }
+    const drawSub = window.makeSubDrawer(subs, subEl);
     for (let t = 0; t <= EP.total + 0.05; t += 1 / 30) tl.time(t, true);
     tl.time(0, true);
     window.DURATION = EP.total;

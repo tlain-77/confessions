@@ -124,5 +124,6 @@
   // 片尾
   { const a = EP.total - 6.2; scene('#tZ', a, EP.total + 1); IN('#tZ .z-k', a + 0.2, { d: 0.9 }); type('#tZ .z-t', a + 0.5, 1.0, { d: 0.9, y: 24, blur: 14 }); IN('#tZ .z-s', a + 1.3, { d: 0.9, y: 10 }); light(a, { light: 0.4, rays: 0.3 }); }
   if (window.ASIDES) window.ASIDES(tl);
+  if (window.fixEarly) window.fixEarly(tl);
   K.finish();
 })();
