@@ -68,6 +68,7 @@ window.kit = async function () {
     for (let t = 0; t <= EP.total + 0.05; t += 1 / 30) tl.time(t, true);
     tl.time(0, true);
     window.DURATION = EP.total;
+    window.TL = tl;
     window.seek = function (t) { t = Math.max(0, Math.min(EP.total, t)); tl.time(t, false); if (tick) tick(t); drawBg(t); drawGrain(t); drawSub(t); prog.style.width = (t / EP.total * 100).toFixed(3) + '%'; };
     seek(0); window.READY = true;
   };

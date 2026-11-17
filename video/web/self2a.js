@@ -82,7 +82,7 @@
   gsap.set(['#map', '.ch-l', '.ch-r .sec'], { opacity: 0 });
   gsap.set('#mapzoom', { attr: { transform: 'translate(0 0) scale(1)' } });
   const tl = gsap.timeline({ paused: true });
-  const reveal = (t, at) => { for (const el of (typeof t === 'string' ? $$(t) : [].concat(t))) { let p = el.parentElement; while (p && !p.classList.contains('scene') && p.id !== 'stage') { if (+gsap.getProperty(p, 'opacity') === 0) tl.set(p, { opacity: 1 }, Math.max(0, at - 0.01)); p = p.parentElement; } } };
+  const reveal = (t, at) => { for (const el of (typeof t === 'string' ? $$(t) : [].concat(t))) { let p = el.parentElement; while (p && !p.classList.contains('scene') && p.id !== 'stage' && p.id !== 'map') { if (+gsap.getProperty(p, 'opacity') === 0) tl.set(p, { opacity: 1 }, Math.max(0, at - 0.01)); p = p.parentElement; } } };
   const IN = (t, at, o = {}) => (reveal(t, at), tl.fromTo(t, { opacity: 0, y: o.y ?? 26, x: o.x ?? 0, scale: o.s ?? 1, filter: `blur(${o.blur ?? 12}px)` },
     { opacity: o.o ?? 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 0.9, ease: o.ease ?? 'power3.out', stagger: o.st ?? 0, immediateRender: false }, at));
   const OUT = (t, at, o = {}) => tl.to(t, { opacity: 0, y: o.y ?? -20, filter: `blur(${o.blur ?? 10}px)`, duration: o.d ?? 0.5, ease: 'power2.in', stagger: o.st ?? 0 }, at);
@@ -163,8 +163,8 @@
     big('.wq-t', W('c019', '我当时') - 0.15, { st: 0.05, d: 0.9 });
     tl.set('.wq-rows', { opacity: 1 }, a); IN('.wq-r.q1', W('c020', '我不饿') - 0.1, { x: -20, y: 0, d: 0.5 }); IN('.wq-r.q1 i', W('c020', '我不饿') + 0.3, { s: 2, y: 0, d: 0.35 });
     IN('.wq-r.q2', W('c020', '梨也不好吃') - 0.1, { x: -20, y: 0, d: 0.5 }); IN('.wq-r.q2 i', W('c020', '不好吃') + 0.3, { s: 2, y: 0, d: 0.35 });
-    tl.set('.wq-r.q3', { opacity: 1 }, a); type('.wq-r.q3 .split', W('c020', '这事不让干') - 0.05, 0.9, { d: 0.6 }); IN('.wq-r.q3 i', WE('c020', '不让干'), { s: 2, y: 0, d: 0.35 }); flash(WE('c020', '不让干'), 760, 680, 0.35);
-    tl.to(['.wq-k', '.wq-t', '.wq-rows'], { opacity: 0, filter: 'blur(8px)', duration: 0.5 }, T('c021') - 0.45);
+    tl.set('.wq-r.q3', { opacity: 1 }, a); type('.wq-r.q3 .split', W('c020', '这事不让干') - 0.05, 0.55, { d: 0.45 }); IN('.wq-r.q3 i', W('c020', '不让干'), { s: 2, y: 0, d: 0.35 }); flash(W('c020', '不让干') + 0.1, 760, 680, 0.35);
+    tl.to(['.wq-k', '.wq-t', '.wq-rows'], { opacity: 0, filter: 'blur(8px)', duration: 0.5 }, T('c021') - 0.2);
     tl.set('.wq-big', { opacity: 1 }, a); type('.wq-big > span', T('c021'), 0.6); big('.wq-big b', W('c021', '犯规'), { st: 0.12 }); }
 
   // 8 · 朋友（c022–c023）
@@ -244,14 +244,14 @@
   // 18 · 海港之夜（c059–c065）
   { const a = T('c059') - 0.1, b = T('c066') - 0.1; scene('#s17', a, b); light(a, { light: 0.3, rays: 0.05, fx: 1420, fy: 0 });
     tl.set('.sea-svg', { opacity: 1 }, a); ['.sea-water', '.sea-moon', '.shore', '.lights'].forEach((s2, i) => IN(s2, a + i * 0.15, { y: 0, d: 1.0 })); DRAW('.sea-hz', a, 1.4);
-    tl.set('.ship', { opacity: 1 }, a); tl.set('.ship', { attr: { transform: 'translate(760 640)' } }, a);
+    tl.fromTo('.ship', { opacity: 0 }, { opacity: 1, duration: 1.0, ease: 'power2.out', immediateRender: false }, a + 0.35); tl.set('.ship', { attr: { transform: 'translate(760 640)' } }, a);
     IN('.sea-age', a + 0.1, { d: 0.7 });
     tl.set('.sea-bub', { opacity: 1, scale: 0 }, a); tl.fromTo('.sea-bub', { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false, transformOrigin: '10% 100%' }, W('c061', '我上船') - 0.15);
     $$('.sea-bub > span').forEach((s2, i) => type(s2, W('c061', ['我上船', '你先去'][i]), 1.2, { d: 0.4, y: 6 }));
     tl.to('.sea-bub', { opacity: 0, duration: 0.4 }, T('c062') - 0.3); tl.to('.sea-age', { opacity: 0, duration: 0.4 }, T('c062') - 0.3);
     tl.to('.ship', { attr: { transform: 'translate(1500 640) scale(0.25)' }, duration: C['c062'].dur + 1.5, ease: 'power1.in' }, T('c062') - 0.2);
     tl.set('.sea-gone', { opacity: 1 }, a); type('.sea-gone', W('c062', '船已经开了') - 0.1, 1.0); OUT('.sea-gone', T('c064') - 0.4);
-    tl.set('.monica', { opacity: 1 }, a); IN('.monica', T('c064') - 0.2, { y: 0, d: 0.8 });
+    IN('.monica', T('c064') - 0.2, { y: 0, d: 0.8 });
     tl.set('.sea-pray', { opacity: 1 }, a); type('.sea-pray', W('c064', '别让他走'), 0.9, { d: 0.6 });
     tl.set('.sea-no', { opacity: 1 }, a); big('.sea-no', T('c065') - 0.05, { st: 0.1, d: 0.8 }); }
 
@@ -282,7 +282,7 @@
   // 23 · 快乐吗（c078–c081）
   { const a = T('c078') - 0.1, b = T('c082') - 0.1; scene('#s21', a, b); light(a, { light: 0.5, rays: 0.4, fx: 960 });
     big('.hq', a + 0.05, { st: 0.07, d: 0.8 });
-    IN('.scroll', T('c079') + 0.3, { y: 60, d: 1.0, blur: 6 }); tl.set('.sc-l', { opacity: 1 }, a); $$('.sc-l').forEach((l, i) => IN(l, T('c080') + i * 0.35, { d: 0.6, y: 6, blur: 4 }));
+    IN('.scroll', T('c079') + 0.3, { y: 60, d: 1.0, blur: 6 }); tl.set('.sc-l', { opacity: 0 }, a); $$('.sc-l').forEach((l, i) => IN(l, T('c080') + i * 0.35, { d: 0.6, y: 6, blur: 4 }));
     stamp('.st3', W('c081', '谎话') - 0.05); tl.set('.sc-n', { opacity: 1 }, a); type('.sc-n > span:nth-child(1)', W('c081', '台下鼓掌'), 0.8); type('.sc-n > span:nth-child(2)', W('c081', '也知道'), 0.8); }
 
   // 24 · 乞丐（c082–c091）
@@ -359,17 +359,17 @@
     for (const e in evAt) IN('.ev.' + e, evAt[e], { y: 20, d: 0.7 });
     tl.set('.lt-gold', { opacity: 1, strokeDashoffset: 1 }, a); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[1] - 200) / 1520, duration: 0.8, ease: 'power2.inOut' }, evAt.e1); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[2] - 200) / 1520, duration: 0.8 }, evAt.e2); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[3] - 200) / 1520, duration: 0.8 }, evAt.e3); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[4] - 200) / 1520, duration: 0.8 }, evAt.e4); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[5] - 200) / 1520, duration: 0.8 }, evAt.e5);
     // 莫妮卡的话
-    tl.set('.lt-q', { opacity: 1 }, a); $$('.qq').forEach(q => tl.set(q, { opacity: 1 }, a)); type($$('.qq')[0], W('c137', '神给我的'), 0.7, { d: 0.6 }); type($$('.qq')[1], W('c137', '比我求的'), 0.8, { d: 0.6 }); tl.set('.qa', { opacity: 0 }, a); IN('.qa', E('c137') - 0.2, { d: 0.6, y: 8 });
+    tl.set('.lt-q', { opacity: 1 }, a); $$('.qq').forEach(q => tl.set(q, { opacity: 1 }, a)); type($$('.qq')[0], W('c137', '神给我的'), 0.7, { d: 0.6 }); type($$('.qq')[1], W('c137', '比我求的'), 0.8, { d: 0.6 }); tl.set('.qa', { opacity: 0 }, a); IN('.qa', W('c137', '比我求的') + 0.7, { d: 0.6, y: 8 });
     tl.set(['.qq .ch', '.qa'], { opacity: 0 }, T('c133') - 0.01); tl.to('.lt-q', { opacity: 0, duration: 0.5 }, T('c138') - 0.3);
     // 希波：会众回头
-    tl.to(['.ev', '.lt-svg', '.lt-k'], { opacity: 0.15, duration: 0.6 }, T('c143') - 0.4);
+    tl.to(['.ev.e1', '.ev.e2', '.ev.e3', '.ev.e4', '.lt-svg', '.lt-k'], { opacity: 0.15, duration: 0.6 }, T('c143') - 0.4);
     tl.set('.crowd2', { opacity: 1 }, a); crowd.forEach((c, i) => IN(c, T('c143') - 0.3 + i * 0.008, { d: 0.4, y: 10, blur: 2 })); IN(aug, T('c143'), { d: 0.5, y: 0 });
     tl.set('.lt-say', { opacity: 1 }, a); type('.lt-say', W('c143', '我们教会'), 1.6, { d: 0.6 });
     crowd.forEach((c, i) => tl.to(c, { attr: { cx: +c.getAttribute('cx') + (1500 - c.getAttribute('cx')) * 0.06, cy: +c.getAttribute('cy') + (870 - c.getAttribute('cy')) * 0.06 }, fill: '#e2bd76', duration: 0.6, ease: 'power2.out' }, T('c144') + i * 0.006));
     tl.to(aug, { attr: { r: 26 }, duration: 0.4, yoyo: true, repeat: 3 }, W('c144', '看见了'));
     tl.to(['.crowd2', '.lt-say'], { opacity: 0, duration: 0.6 }, T('c146') - 0.4);
     tl.set('.lt-cry', { opacity: 1 }, a); type('.lt-cry span', W('c146', '他哭了'), 0.6, { d: 0.6 }); type('.lt-cry em', T('c147'), 1.4, { d: 0.6 });
-    tl.to('.lt-cry', { opacity: 0, duration: 0.5 }, T('c148') - 0.4); tl.to(['.ev', '.lt-svg', '.lt-k'], { opacity: 1, duration: 0.8 }, T('c148') - 0.3);
+    tl.to('.lt-cry', { opacity: 0, duration: 0.5 }, T('c148') - 0.4); tl.to(['.ev.e1', '.ev.e2', '.ev.e3', '.ev.e4', '.lt-svg', '.lt-k'], { opacity: 1, duration: 0.8 }, T('c148') - 0.3);
     tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[6] - 200) / 1520, duration: 1.4, ease: 'power2.inOut' }, evAt.e6); }
 
   // 片尾
@@ -380,6 +380,7 @@
 
   if (window.ASIDES) window.ASIDES(tl);
   if (window.fixEarly) window.fixEarly(tl);
+  if (window.fixClash) window.fixClash(tl);
   // ---------- 字幕 ----------
   const subs = [];
   for (const c of EP.cues) {
@@ -402,6 +403,7 @@
   for (let t = 0; t <= EP.total + 0.05; t += 1 / 30) tl.time(t, true);
   tl.time(0, true);
   window.DURATION = EP.total;
+  window.TL = tl;
   window.seek = function (t) { t = Math.max(0, Math.min(EP.total, t)); tl.time(t, false); tick(t); drawBg(t); drawGrain(t); drawSub(t); prog.style.width = (t / EP.total * 100).toFixed(3) + '%'; };
   seek(0);
   window.READY = true;

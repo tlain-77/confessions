@@ -34,7 +34,7 @@
     on('.t13', a); $$('.t13 .slab').forEach((s, i) => tl.fromTo(s, { opacity: 0, y: -70 }, { opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.7)', immediateRender: false }, a + 0.1 + i * 0.1));
     IN('.w13-a', a + 0.1, { d: 0.6 }); tl.fromTo('.n13', { textContent: 1 }, { textContent: 13, snap: { textContent: 1 }, duration: 1.3, ease: 'none', immediateRender: false }, a + 0.2);
     type('.w13-b', T('c011'), D('c011') * 0.8);
-    tl.fromTo('.ni', { opacity: 0, scale: 1.6, filter: 'blur(30px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', immediateRender: false }, W('c012', '第二人称')); on('.ni', W('c012', '第二人称'));
+    tl.fromTo('.ni', { opacity: 0, scale: 1.6, filter: 'blur(30px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', immediateRender: false }, W('c012', '第二人称'));
     IN('.ni-s', W('c012', '第二人称') + 0.4, { d: 0.6, y: 10 }); flash(W('c012', '第二人称') + 0.2, 1530, 350, 0.5);
     tl.to(['.w13'], { opacity: 0, duration: 0.4 }, T('c013') - 0.3);
     $$('.wi').forEach((w, i) => IN(w, W(i < 2 ? 'c013' : 'c014', ['偷梨', '那个女人', '不要现在', '骗他妈'][i]) - 0.1, { x: -20, y: 0, d: 0.5 }));
@@ -59,7 +59,7 @@
     $$('.xi').forEach((x, i) => IN(x, (i < 1 ? W('c027', '吃') : i < 2 ? T('c028') : i < 3 ? T('c029') : T('c030')) - 0.1, { x: -30, y: 0, d: 0.6 }));
     on('.loop', T('c032') - 0.2); DRAW('.loop .lp', W('c032', '更麻烦的是'), D('c032') * 0.8); DRAW('.loop .lpa', W('c032', '更麻烦的是') + D('c032') * 0.8, 0.3);
     on('.loop-t', a); $$('.loop-t span').forEach((s, i) => IN(s, W('c032', ['不在乎别人夸', '得意', '虚荣'][i]) - 0.1, { d: 0.5, y: 8 }));
-    type('.hum', W('c033', '我发现') - 0.1, D('c033') * 0.5);
+    type('.hum', W('c033', '我发现') - 0.1, E('c033') - W('c033', '我发现') - 0.3);
     tl.to(['.xl', '.loop', '.loop-t', '.hum', '.x-h'], { opacity: 0, filter: 'blur(8px)', duration: 0.5 }, T('c034') - 0.35);
     on('.look', a); IN('.lk-a', T('c034'), { d: 0.7, y: 10 }); on('.lk-b', a); $$('.lk-b span').forEach((s, i) => IN(s, W('c035', ['回头看', '也低头看'][i]) - 0.1, { d: 0.8, y: 30, blur: 16 }));
     tl.to('.look', { opacity: 0, duration: 0.4 }, T('c036') - 0.3);
@@ -100,7 +100,7 @@
     tl.to(['.life', '.frag', '.lf-t'], { opacity: 0, duration: 0.5 }, T('c077') - 0.3);
     on('.tt', a); IN('.tt-a', T('c078'), { y: 20 }); IN('.tt-b', T('c079'), { y: 20 });
     tl.to('.tt', { y: -40, opacity: 0.5, duration: 0.6 }, T('c080'));
-    on('.ob2', a); type('.ob2 > .split', T('c081'), 0.8, { d: 0.6 }); big('.ob2 b', W('c081', '回头看'), { st: 0.08 });
+    on('.ob2', a); type('.ob2 > span.split', T('c081'), 0.8, { d: 0.6 }); big('.ob2 b', W('c081', '回头看'), { st: 0.08 });
     tl.to(['.tt', '.ob2'], { opacity: 0, duration: 0.5 }, T('c082') - 0.3); }
   // 13 · 恩典在前头
   { const a = T('c084') - 0.1, b = T('c094') - 0.1; scene('#t13', a, b); light(a, { light: 0.6, rays: 0.5 });
@@ -125,5 +125,6 @@
   { const a = EP.total - 6.2; scene('#tZ', a, EP.total + 1); IN('#tZ .z-k', a + 0.2, { d: 0.9 }); type('#tZ .z-t', a + 0.5, 1.0, { d: 0.9, y: 24, blur: 14 }); IN('#tZ .z-s', a + 1.3, { d: 0.9, y: 10 }); light(a, { light: 0.4, rays: 0.3 }); }
   if (window.ASIDES) window.ASIDES(tl);
   if (window.fixEarly) window.fixEarly(tl);
+  if (window.fixClash) window.fixClash(tl);
   K.finish();
 })();

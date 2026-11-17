@@ -68,7 +68,7 @@
         const fr = sec.querySelector('.ax-frame'), img = fr.querySelector('img'), sh = fr.querySelector('.ax-sheen');
         tl.fromTo(fr, { opacity: 0, y: 50, rotationY: im.side === 'r' ? -18 : 18, scale: 0.94, filter: 'blur(10px)' }, { opacity: 1, y: 0, rotationY: 0, scale: 1, filter: 'blur(0px)', duration: 1.3, ease: 'power3.out', immediateRender: false }, a.a - 0.2);
         kenburns(tl, img, a.a, a.b, im.kb || [1.08, 0, 1, 1.0, 0, -1]);
-        tl.fromTo(sh, { xPercent: -160 }, { xPercent: 160, duration: 1.6, ease: 'power1.inOut', immediateRender: false }, a.a + 1.0);
+        tl.set(sh, { xPercent: -95 }, 0); tl.fromTo(sh, { xPercent: -95 }, { xPercent: 95, duration: 3.4, ease: 'sine.inOut', immediateRender: false }, a.a + 1.0);   // 反光一开始就放在框外，不会先在画中间停一道
         if (im.cap) IN(sec.querySelector('.ax-cap'), a.a + 1.0, { d: 1.0, y: 8, blur: 4, o: 0.85 });
       }
       if (a.dust !== false) dust(tl, sec, a.a, a.b, a.a, im ? 30 : 22);
@@ -123,6 +123,32 @@ window.fixEarly = function (tl) {
   let n = 0;
   for (const [el, f] of first) if (f.fadeIn && f.t > 0.05 && +gsap.getProperty(el, 'opacity') > 0) { tl.set(el, f.auto ? { autoAlpha: 0 } : { opacity: 0 }, 0); n++; }
   window.FIXED_EARLY = n;
+};
+// 防“闪一帧”：某个元素正在淡入/淡出的半路上，又有一个瞬时的 set 把它的透明度直接设成别的值
+// （多半是“把上层容器先显示出来”的那种 set），那一帧它会整个跳一下，下一帧淡入淡出动画又把它拉回去。
+// 淡入淡出动画本来就会每帧覆盖这个值，所以这种 set 只会造成那一帧的跳动——删掉它，别的帧完全不变。
+window.fixClash = function (tl) {
+  const kids = tl.getChildren(true, true, false);
+  const abs = tw => { let t = tw.startTime(), p = tw.parent; while (p && p !== tl) { t = p.startTime() + t; p = p.parent; } return t; };
+  const META = new Set(['duration', 'delay', 'overwrite', 'ease', 'repeat', 'immediateRender', 'lazy', 'data', 'id', 'callbackScope', 'parent']);
+  const runs = new Map();                     // 元素 → 它身上有时长的透明度动画 [{a, b, auto, from}]（错开出场的不算，每个元素的时间段不一样）
+  for (const tw of kids) {
+    const d = tw.duration(), v = tw.vars || {};
+    if (!(d > 0) || v.stagger || !('opacity' in v || 'autoAlpha' in v)) continue;
+    const a = abs(tw), r = { a, b: a + d, auto: 'autoAlpha' in v, from: !!v.startAt };
+    for (const el of tw.targets()) if (el instanceof Element) { if (!runs.has(el)) runs.set(el, []); runs.get(el).push(r); }
+  }
+  let n = 0;
+  for (const tw of kids) {
+    if (tw.duration() !== 0) continue;
+    const v = tw.vars || {}, keys = Object.keys(v).filter(k => !META.has(k));
+    if (!keys.length || !keys.every(k => k === 'opacity' || k === 'autoAlpha')) continue;
+    const t = abs(tw), needAuto = keys.includes('autoAlpha'); if (t < 0.01) continue;
+    const els = tw.targets().filter(e => e instanceof Element);
+    const covered = el => (runs.get(el) || []).some(r => (needAuto ? r.auto : true) && t < r.b - 1e-4 && (r.a < t - 1e-4 || (r.from && r.a <= t + 1e-4)));
+    if (els.length && els.length === tw.targets().length && els.every(covered)) { tw.kill(); n++; }
+  }
+  window.FIXED_CLASH = n;
 };
 // 让画面上的某段字在“说到这句话”的时候才出现：把它原来的淡入挪到这个时刻；
 // 它要是没有自己的淡入（是跟着外框一起出来的），就给它单独加一个淡入。

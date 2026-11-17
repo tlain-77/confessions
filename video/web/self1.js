@@ -555,6 +555,7 @@
 
   if (window.ASIDES) window.ASIDES(tl);
   if (window.fixEarly) window.fixEarly(tl);
+  if (window.fixClash) window.fixClash(tl);
 
   // ---------- 字幕 ----------
   const subs = EP.subs.slice(2).map(s => ({ s: s.s, e: s.e, t: s.t.replace(/[，。：]$/, '') }));      // 开场三句就是画面上的大字，不重复打字幕
@@ -575,6 +576,7 @@
   tl.time(0, true);
 
   window.DURATION = EP.total;
+  window.TL = tl;
   window.seek = function (t) {
     t = Math.max(0, Math.min(EP.total, t));
     tl.time(t, false);
