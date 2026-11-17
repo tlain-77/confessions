@@ -31,9 +31,11 @@ R = [[a, min(b, lim, N)] for a, b in R if a < min(lim, N)]
 new = []
 for a, b in R:
     f = f'{CK6}/self3_{a}_{b}.mp4'
-    if not os.path.exists(f):
-        subprocess.run(f'FRAMES_DIR=out/frames_s3p PAGE=self3.html node render.mjs --fps 30 --workers 4 --crf 14 --from {a / 30!r} --to {b / 30!r} --audio none --out {f}.tmp.mp4 2>&1 | grep -v "^  \\|warning"', shell=True, check=True)
-        os.replace(f + '.tmp.mp4', f)
+    for wk in (4, 2, 2):                                  # 浏览器偶尔崩（Target crashed）：少开几个进程再试
+        if os.path.exists(f): break
+        subprocess.run(f'set -o pipefail; FRAMES_DIR=out/frames_s3p PAGE=self3.html node render.mjs --fps 30 --workers {wk} --crf 14 --from {a / 30!r} --to {b / 30!r} --audio none --out {f}.tmp.mp4 2>&1 | grep -v "^  \\|warning"', shell=True, executable='/bin/bash')
+        if os.path.exists(f + '.tmp.mp4'): os.replace(f + '.tmp.mp4', f)
+        else: print(f'render failed for {a}-{b} with {wk} workers', flush=True)
     n = frames(f); assert n == b - a, (f, n, b - a)
     new.append((a, b, f))
 print(f'{len(new)} patched ranges, {sum(b - a for a, b, _ in new)} frames', flush=True)
