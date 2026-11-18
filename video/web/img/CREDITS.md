@@ -39,3 +39,50 @@
 | station.jpg | 莫奈《圣拉扎尔火车站》 1877 | Wikimedia Commons: Claude Monet - The Saint-Lazare Station - Google Art Project.jpg |
 | fankuan.jpg | 范宽《溪山行旅图》 北宋 | Wikimedia Commons: Fan Kuan - Travelers Among Mountains and Streams - Google Art Project.jpg（台北故宫博物院） |
 | angler.jpg | 马远《寒江独钓图》 南宋 | Wikimedia Commons: Angler on a Wintry Lake, by Ma Yuan, 1195.jpg（东京国立博物馆） |
+| narcissus.jpg | 卡拉瓦乔《纳西索斯》 约1597 | Wikimedia Commons: Narcissus-Caravaggio (1594-96) edited.jpg |
+| athens.jpg | 拉斐尔《雅典学院》 1511 | Wikimedia Commons: "The School of Athens" by Raffaello Sanzio da Urbino.jpg |
+| lightworld.jpg | 亨特《世界之光》 1854 | Wikimedia Commons: Hunt, William Homan - The Light of the World - 1853-54.jpg |
+| mill.jpg | 门采尔《轧铁工厂》 1875 | Wikimedia Commons: Adolph Menzel - Eisenwalzwerk - Google Art Project.jpg |
+| icarus.jpg | 勃鲁盖尔（传）《伊卡洛斯坠落的风景》 约1560 | Wikimedia Commons: Pieter Bruegel the Elder - Landscape with the Fall of Icarus - Brussels, Royal Museums of Fine Arts of Belgium - Google Arts & Culture.jpg |
+| expulsion.jpg | 托马斯·科尔《逐出伊甸园》 1828 | Wikimedia Commons: Cole Thomas Expulsion from the Garden of Eden 1828.jpg |
+| philosopher.jpg | 伦勃朗《沉思的哲学家》 1632 | Wikimedia Commons: Rembrandt - The Philosopher in Meditation (cleaned).jpg |
+| jacob.jpg | 德拉克洛瓦《雅各与天使摔跤》 1861 | Wikimedia Commons: Eugène Delacroix — Jacob Wrestling with the Angel.jpg |
+| ladder.jpg | 布莱克《雅各的梯子》 约1800 | Wikimedia Commons: Blake jacobsladder.jpg |
+| bones.jpg | 多雷《以西结看见枯骨的平原》 1866 | Wikimedia Commons: Ezekiel’s Vision of the Valley of Dry Bones.jpg |
+| lazarus.jpg | 伦勃朗《拉撒路复活》 约1630 | Wikimedia Commons: Rembrandt Harmensz. van Rijn - The Raising of Lazarus - Google Art Project.jpg |
+| doctor.jpg | 菲尔德斯《医生》 1891 | Wikimedia Commons: Luke Fildes (1891) The Doctor.png |
+| avenue.jpg | 霍贝玛《米德尔哈尼斯的林荫道》 1689 | Wikimedia Commons: Meindert Hobbema - The Alley at Middelharnis - WGA11427.jpg |
+| annunc.jpg | 弗拉·安杰利科《天使报喜》 约1434 | Wikimedia Commons: Fra Angelico - Annunciation - WGA0474.jpg |
+| dewitte.jpg | 德·维特《阿姆斯特丹老教堂里的讲道》 约1660 | Wikimedia Commons: Emanuel de Witte (c.1615-1617-1692) - The Interior of the Oude Kerk, Amsterdam, during a Sermon - NG1053 - National Gallery.jpg |
+| pollice.jpg | 热罗姆《拇指朝下》 1872 | Wikimedia Commons: Jean-Leon Gerome Pollice Verso.jpg |
+| claudius.jpg | 阿尔玛-塔德玛《罗马皇帝 · 公元41年》 1871 | Wikimedia Commons: Sir Lawrence Alma-Tadema, RA, OM - A Roman Emperor (Claudius) - Walters 37165.jpg |
+| geographer.jpg | 维米尔《地理学家》 1669 | Wikimedia Commons: Johannes Vermeer - The Geographer - Google Art Project.jpg |
+| burning.jpg | 透纳《上下议院大火》 1835 | Wikimedia Commons: Joseph Mallord William Turner - The Burning of the Houses of Lords and Commons, 16 October 1834 - 1942.647 - Cleveland Museum of Art.jpg |
+| monk.jpg | 弗里德里希《海边的修士》 1810 | Wikimedia Commons: Caspar David Friedrich - Monk by the Sea.jpg |
+| sins.jpg | 博斯《七宗罪与最后四事》 约1500 | Wikimedia Commons: Hieronymus Bosch- The Seven Deadly Sins and the Four Last Things.JPG |
+| beggar.jpg | 牟利罗《年轻的乞丐》 约1650 | Wikimedia Commons: Bartolomé Esteban Perez Murillo - The Young Beggar - WGA16348.jpg |
+| temeraire.jpg | 透纳《无畏号最后的航程》 1839 | Wikimedia Commons: The Fighting Temeraire, JMW Turner, National Gallery.jpg |
+| damascus.jpg | 卡拉瓦乔《圣保罗归信》 1601 | Wikimedia Commons: Conversion on the Way to Damascus-Caravaggio (c.1600-1).jpg |
+| isle.jpg | 勃克林《死之岛》 1883 | Wikimedia Commons: Arnold Böcklin - Die Toteninsel III (Alte Nationalgalerie, Berlin).jpg |
+| hands.jpg | 丢勒《祈祷的手》 1508 | Wikimedia Commons: Albrecht Dürer - Praying Hands, 1508 - Google Art Project.jpg |
+| melencolia.jpg | 丢勒《忧郁 I》 1514 | Wikimedia Commons: Albrecht Dürer - Melencolia I - Google Art Project (427760).jpg |
+| rebels.jpg | 勃鲁盖尔《叛逆天使的坠落》 1562 | Wikimedia Commons: Pieter Bruegel the Elder - The Fall of the Rebel Angels - Google Art Project.jpg |
+| awaken.jpg | 亨特《良心的觉醒》 1853 | Wikimedia Commons: William Holman Hunt - The Awakening Conscience - Google Art Project.jpg |
+| jdream.jpg | 里贝拉《雅各的梦》 1639 | Wikimedia Commons: José de Ribera - Jacob's Dream - WGA19383.jpg |
+| empyrean.jpg | 多雷《神曲 · 天堂篇》插图 1868 | Wikimedia Commons: Paradiso Canto 31 (no caption).jpg |
+| paulathens.jpg | 拉斐尔《保罗在雅典讲道》 1515 | Wikimedia Commons: Raphael - St Paul Preaching at Athens c.1515-6.jpg |
+| mount.jpg | 布洛赫《登山宝训》 1877 | Wikimedia Commons: Carl Bloch - The Sermon on the Mount.jpg |
+| cafe.jpg | 梵高《夜间露天咖啡座》 1888 | Wikimedia Commons: Vincent van Gogh - Cafe Terrace at Night (1888).jpg |
+| restflight.jpg | 卡拉瓦乔《逃往埃及途中的休息》 约1597 | Wikimedia Commons: Rest on the Flight into Egypt-Caravaggio (c.1597).jpg |
+| moses.jpg | 伦勃朗《摩西与十诫》 1659 | Wikimedia Commons: Rembrandt - Moses with the Ten Commandments - Google Art Project.jpg |
+| snowstorm.jpg | 透纳《暴风雪中的汽船》 1842 | Wikimedia Commons: Joseph Mallord William Turner - Snow Storm - Steam-Boat off a Harbour's Mouth - WGA23178.jpg |
+| tavern.jpg | 布劳沃《酒馆》 约1635 | Wikimedia Commons: Adriaen Brouwer - Tavern Scene - National Gallery, London.jpg |
+| gleaners.jpg | 米勒《拾穗者》 1857 | Wikimedia Commons: Jean-François Millet - Gleaners - Google Art Project.jpg |
+| rainy.jpg | 卡耶博特《巴黎街道 · 雨天》 1877 | Wikimedia Commons: Gustave Caillebotte - Paris Street; Rainy Day - Google Art Project.jpg |
+| oldman.jpg | 伦勃朗《红衣老人》 约1654 | Wikimedia Commons: Rembrandt Harmensz. van Rijn - Portrait of an Old Man in Red.jpg |
+| thomas.jpg | 卡拉瓦乔《多疑的多马》 1602 | Wikimedia Commons: The Incredulity of Saint Thomas-Caravaggio (1601-2).jpg |
+| paulprison.jpg | 伦勃朗《狱中的保罗》 1627 | Wikimedia Commons: Rembrandt St. Paul in Prison.jpg |
+| lamb.jpg | 凡·艾克兄弟《羔羊的崇拜》 1432 | Wikimedia Commons: Ghent Altarpiece - Adoration of the Mystic Lamb.jpg |
+| abbey.jpg | 弗里德里希《橡树林中的修道院》 1810 | Wikimedia Commons: Caspar David Friedrich - Abtei im Eichwald - Google Art Project.jpg |
+
+`soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。

@@ -93,3 +93,11 @@
 .qcard{position:absolute}
 .qc-lead{position:absolute;left:90px;right:90px;top:150px;font-family:var(--kai);font-size:52px;line-height:1.6;color:rgba(42,33,24,.62)}
 .ex-pre{position:absolute;left:0;right:0;top:470px;text-align:center;font-family:var(--kai);font-size:66px;color:var(--paper);white-space:nowrap}
+/* 逐句换背景（shots.js） */
+#shots{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.shot{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+.shot img{position:absolute;max-width:none;will-change:transform}
+.sh-shade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 44%,rgba(5,6,10,.5) 0,rgba(5,6,10,.36) 50%,rgba(5,6,10,.6) 85%,rgba(5,6,10,.82) 100%)}
+#shotcaps{position:absolute;inset:0;pointer-events:none}
+.shot.fit .bgb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:transform}
+.shot.fit .fg{position:absolute;will-change:transform;box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 0 1px rgba(255,230,170,.18)}

@@ -28,6 +28,11 @@ r = api(action='query', titles=title, prop='imageinfo', iiprop='url|size|extmeta
 page = next(iter(r['query']['pages'].values()))
 if 'imageinfo' not in page: sys.exit(f'not found: {title}')
 ii = page['imageinfo'][0]; md = ii.get('extmetadata', {})
+if ii['width'] <= width:                                  # 原图不够宽：维基会给原图地址（限流很严），改要一个比原图小的标准尺寸
+    std = [s for s in (500, 960, 1280, 1920, 2560) if s < ii['width']]
+    if std:
+        width = std[-1]; r = api(action='query', titles=title, prop='imageinfo', iiprop='url|size|extmetadata', iiurlwidth=width)
+        ii = next(iter(r['query']['pages'].values()))['imageinfo'][0]; md = ii.get('extmetadata', {})
 lic = md.get('LicenseShortName', {}).get('value', '?'); art = md.get('Artist', {}).get('value', '?'); date = md.get('DateTimeOriginal', {}).get('value', '?')
 url = ii.get('thumburl') or ii['url']
 print(f'{title}\n  {ii["width"]}x{ii["height"]}  license: {lic}\n  artist: {art[:120]}\n  date: {date[:60]}\n  {url}')

@@ -12,11 +12,23 @@ const f0 = Math.round(from * fps), f1 = Math.round(to * fps), total = f1 - f0;
 console.log(`rendering ${total} frames (${from}s → ${to.toFixed(2)}s) at ${fps} fps with ${workers} workers`);
 const t0 = Date.now(); let done = 0;
 await Promise.all(Array.from({ length: workers }, async (_, w) => {
-  const b = await chromium.launch(); const page = await openPage(b, port, false, query);
-  for (let s = 0; s < from; s += 0.25) await page.evaluate(x => window.seek(x), s);        // walk up to the start, like real playback
+  // 浏览器偶尔截图失败或崩掉（页面重、四个一起跑时）：截图失败就等一下重试；崩了就重开一个，从头走到当前时刻再接着截
+  const open = async upto => { const b = await chromium.launch({ args: (process.env.CHROME_ARGS || '').split(' ').filter(Boolean) }); const page = await openPage(b, port, false, query);
+    for (let s = 0; s < upto; s += 0.25) await page.evaluate(x => window.seek(x), s); return { b, page }; };   // walk up to the start, like real playback
+  let { b, page } = await open(from);
   for (let f = f0 + w; f < f1; f += workers) {
-    await page.evaluate(x => window.seek(x), f / fps);
-    await page.screenshot({ path: `${dir}/f_${String(f - f0).padStart(6, '0')}.jpg`, type: 'jpeg', quality: 97 });
+    for (let k = 0; ; k++) {
+      try {
+        await page.evaluate(x => window.seek(x), f / fps);
+        await page.screenshot({ path: `${dir}/f_${String(f - f0).padStart(6, '0')}.jpg`, type: 'jpeg', quality: 97 });
+        break;
+      } catch (e) {
+        if (k >= 5) throw e;
+        console.log(`  worker ${w}: frame ${f} failed (${String(e.message).split('\n')[0].slice(0, 80)}), retry ${k + 1}`);
+        if (/crash|closed|Target/i.test(String(e.message))) { try { await b.close(); } catch {} ({ b, page } = await open(f / fps - 0.25)); }
+        else await new Promise(r => setTimeout(r, 1500));
+      }
+    }
     if (++done % 300 === 0) console.log(`  ${done}/${total}  ${(done / ((Date.now() - t0) / 1000)).toFixed(1)} fps`);
   }
   await b.close();

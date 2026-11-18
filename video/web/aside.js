@@ -62,6 +62,29 @@
       if (!joinPrev) { tl.to(main, { opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power2.in' }, A0); tl.set(main, { visibility: 'hidden' }, Math.max(A0 + 0.62, a.a + 0.2)); }
       if (!joinNext) { tl.set(main, { visibility: 'visible' }, B - 0.05); tl.to(main, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, B); }
       tl.to(sec, { autoAlpha: 1, duration: 0.2 }, a.a - 0.1);
+      (window.ASIDE_SPANS = window.ASIDE_SPANS || []).push([A0, B]);
+      // 一张卡片里，说到下一句就换一幅画（或同一幅画推近的局部）：alts: [{src, at, f, z, cap}]
+      if (im && im.alts) {
+        const box = sec.querySelector(im.fit === 'frame' ? '.ax-fi' : '.ax-pic'), FO = window.FOCUS || {};
+        const caps = [sec.querySelector('.ax-cap')];
+        im.alts.forEach((al, i) => {
+          const nx = im.alts[i + 1], end = nx ? nx.at : a.b, fo = FO[al.src], f = al.f || (fo ? [0.5, Math.min(0.62, Math.max(0.38, fo[2]))] : [0.5, 0.5]);
+          const img = document.createElement('img'); img.src = `img/${al.src}.jpg`;
+          img.style.cssText = `object-position:${f[0] * 100}% ${f[1] * 100}%;transform-origin:${f[0] * 100}% ${f[1] * 100}%`;
+          box.appendChild(img);
+          tl.set(img, { opacity: 0 }, 0);
+          tl.fromTo(img, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'sine.inOut', immediateRender: false }, al.at - 0.45);
+          const z = al.z || 1.0, kb = i % 2 ? [z * 1.1, 1.5, 0, z, -1.5, 0] : [z, -1, 1, z * 1.1, 1, -1];
+          kenburns(tl, img, al.at + 0.15, end, kb);
+          if (al.cap) {
+            const c = document.createElement('div'); c.className = 'ax-cap'; c.textContent = al.cap; sec.appendChild(c);
+            if (caps[0]) c.style.cssText = caps[0].style.cssText;
+            tl.set(c, { opacity: 0 }, 0);
+            const pc = caps[caps.length - 1]; if (pc) tl.to(pc, { opacity: 0, duration: 0.4 }, al.at - 0.45);
+            tl.to(c, { opacity: 0.85, duration: 0.8 }, al.at + 0.3); caps.push(c);
+          }
+        });
+      }
       if (im && im.fit !== 'frame') {
         const pic = sec.querySelector('.ax-pic'), img = pic.querySelector('img');
         tl.fromTo(pic, { opacity: 0, filter: 'blur(18px) brightness(.4)' }, { opacity: 1, filter: 'blur(0px) brightness(1)', duration: 1.4, ease: 'power2.out', immediateRender: false }, a.a - 0.3);
