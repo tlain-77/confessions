@@ -1,0 +1,55 @@
+/* 讲稿页通用版式（lec.js）：每一场是一栏竖排的内容，元素按顺序排好——先占位、后出现，出现时位置不会跳 */
+.scene.lec{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:150px 190px 180px;box-sizing:border-box;text-align:center}
+.scene.lec.left{align-items:flex-start;text-align:left;padding-left:170px;padding-right:720px}
+.scene.lec.right{align-items:flex-end;text-align:right;padding-left:720px;padding-right:170px}
+.scene.lec.top{justify-content:flex-start;padding-top:190px}
+.scene.lec > *{flex:none}
+/* 要点句 */
+.ll{margin:12px 0;font-weight:700;font-size:58px;line-height:1.48;letter-spacing:.03em;white-space:nowrap;text-shadow:0 2px 22px rgba(0,0,0,.7)}
+.ll.big{font-weight:900;font-size:92px;letter-spacing:.06em;line-height:1.3}
+.ll.h2{font-weight:900;font-size:74px}
+.ll.kai{font-family:var(--kai);font-weight:400;font-size:62px}
+.ll.sm{font-family:var(--sans);font-weight:300;font-size:40px;letter-spacing:.08em;color:var(--paper2)}
+.ll.lbl{font-family:var(--sans);font-weight:300;font-size:30px;letter-spacing:.32em;color:var(--gold);margin-bottom:18px}
+.ll.coral{color:var(--coral)}
+.ll.dim{color:var(--paper2)}
+.ll.wrap{white-space:normal;max-width:1460px;text-wrap:balance}
+.ll.gold .ch,.ll .gd .ch,.ll.gold:not(.split){background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.ll b.hl{color:var(--coral);font-weight:inherit}
+.ll .x{position:relative}
+.ll .x::after{content:'';position:absolute;left:-4%;right:-4%;top:52%;height:5px;background:var(--coral);transform:scaleX(var(--sx,0));transform-origin:0 50%}
+/* 原文卡（周士良译本），跟着念的声音逐字出来 */
+.lq{position:relative;margin:14px 0;width:1380px;padding:52px 84px 60px;box-sizing:border-box;border-radius:6px;background:var(--sheet);color:var(--inkc);box-shadow:0 40px 90px rgba(0,0,0,.72);text-align:left}
+.lq-k{font-family:var(--sans);font-weight:300;font-size:26px;letter-spacing:.3em;color:#8a7350}
+.lq-t{margin-top:20px;font-weight:700;font-size:58px;line-height:1.62}
+.lq-t.sm{font-size:50px}.lq-t.xs{font-size:44px;line-height:1.7}
+.lq-t b{font-weight:inherit}
+.lq.mini{width:1180px;padding:34px 60px 40px;margin-bottom:28px}
+.lq.mini .lq-t{font-size:42px;margin-top:12px}
+/* 经文卡 */
+.lv{margin:16px 0;max-width:1440px;text-shadow:0 2px 20px rgba(0,0,0,.7)}
+.lv em{display:block;font-family:var(--sans);font-style:normal;font-weight:300;font-size:28px;letter-spacing:.24em;color:var(--gold)}
+.lv span{display:block;margin-top:14px;text-wrap:balance;font-family:var(--kai);font-size:50px;line-height:1.55;color:var(--paper)}
+.lv.sm span{font-size:42px}
+/* 示意图 */
+.lf{position:relative;margin:6px 0 10px;padding:0;border-radius:8px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.75),0 0 0 1px rgba(255,230,170,.22)}
+.lf img{display:block;width:1180px;height:auto;will-change:transform}
+.lf.sm img{width:940px}
+/* 停下来想一想 */
+.lt{margin:22px 0;padding:34px 70px 40px;border:1px solid rgba(226,189,118,.55);border-radius:16px;background:rgba(5,6,10,.5);max-width:1380px;text-align:center}
+.lt b{display:block;font-family:var(--sans);font-weight:300;font-size:28px;letter-spacing:.5em;padding-left:.5em;color:var(--gold)}
+.lt span{display:block;margin-top:18px;text-wrap:balance;font-family:var(--kai);font-size:60px;line-height:1.5;color:var(--paper)}
+/* 两栏对照 */
+.lc2{display:flex;gap:80px;margin:18px 0;justify-content:center;align-items:flex-start}
+.lc2 > div{width:680px;text-align:center}
+.lc2 b{display:block;font-weight:900;font-size:62px;line-height:1.35;text-shadow:0 2px 20px rgba(0,0,0,.7)}
+.lc2 span{display:block;margin-top:16px;text-wrap:balance;font-family:var(--kai);font-size:44px;line-height:1.5;color:var(--paper2);text-shadow:0 2px 18px rgba(0,0,0,.7)}
+.lc2 > div.g b{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.lc2 > div.c b{color:var(--coral)}
+/* 三行并列（本于他 / 倚靠他 / 归于他） */
+.l3{display:flex;gap:70px;margin:20px 0;justify-content:center}
+.l3 > div{text-align:center}
+.l3 b{display:block;font-weight:900;font-size:66px;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.l3 span{display:block;margin-top:12px;font-family:var(--kai);font-size:42px;color:var(--paper)}
+/* 小注（改革宗信条等出处） */
+.ln{margin-top:16px;font-family:var(--sans);font-weight:300;font-size:30px;letter-spacing:.14em;color:var(--paper3)}

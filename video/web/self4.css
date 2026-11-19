@@ -1,0 +1,13 @@
+/* 本人录制 · 第二讲（卷一第二章）：片头、下一讲预告、片尾 */
+#L0 .op-k{top:300px}
+#L0 .op-t2{position:absolute;left:0;right:0;top:372px;text-align:center;font-weight:900;font-size:100px;line-height:1.36;letter-spacing:.08em;padding-left:.08em}
+#L0 .op-t2 .ch{text-shadow:0 4px 30px rgba(0,0,0,.6)}
+#L0 .op-l{top:690px}
+/* 三栏对照时每栏窄一点 */
+.lc2.n3 > div{width:470px}
+.lc2.n3 b{font-size:56px}
+/* 下一讲预告 */
+.nxt .nx-t{font-size:88px}
+.nxt .nx-l{white-space:nowrap}
+/* 片尾 */
+#LZ .z-t{font-size:80px}
