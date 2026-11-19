@@ -189,8 +189,34 @@
   // 引文卡：一个个出现
   // 引文：卡片在 a 出现；字从 ta（录音里真正念到引文的时刻）开始一个个出来
   const RS = EP.chars.map(c => c[0]).join(''), after = (p, t) => { let i = -1; while ((i = RS.indexOf(p, i + 1)) >= 0) if (EP.chars[i][1] >= t) return EP.chars[i][1]; throw new Error('录音里找不到：' + p); };
+  // 一段字（引文）在录音里每个字什么时候念到：在 [t1, t2] 这段录音里按字找最长公共子序列，
+  // 对不上的字（标点、念的时候换了说法的字）按前后对上的字插值；对上的不到一半就返回 null
+  const speakTimes = (list, t1, t2) => {
+    const isH = ch => /[一-鿿0-9]/.test(ch), K = [];
+    EP.chars.forEach((c, k) => { if (c[1] >= t1 && c[1] <= t2) K.push(k); });
+    const q = list.map((ch, i) => [ch, i]).filter(([ch]) => isH(ch)), n = q.length, m = K.length;
+    if (!n || !m) return null;
+    const L = Array.from({ length: n + 1 }, () => new Int16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = q[i][0] === EP.chars[K[j]][0] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    const t = list.map(() => null);
+    for (let i = 0, j = 0; i < n && j < m;) {
+      if (q[i][0] === EP.chars[K[j]][0]) { t[q[i][1]] = EP.chars[K[j]][1]; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+    }
+    const got = t.map((x, i) => x === null ? -1 : i).filter(i => i >= 0);
+    if (got.length < 0.5 * n) return null;
+    return t.map((x, i) => {
+      if (x !== null) return x;
+      const p = got.filter(k => k < i).pop(), nx = got.find(k => k > i);
+      return p === undefined ? t[nx] - (nx - i) * 0.2 : nx === undefined ? t[p] + (i - p) * 0.2 : t[p] + (t[nx] - t[p]) * (i - p) / (nx - p);
+    });
+  };
   const quote = (id, a, b, hlAt, ta, lead) => { scene('#sQ', a, b); IN('#' + id, a, { y: 60, d: 1.0, blur: 6 }); const cs = chars('#' + id + ' .qc-t'), t0 = ta ?? a + 0.4;
-    if (lead) { const l = document.createElement('div'); l.className = 'qc-lead'; l.textContent = lead; $('#' + id).appendChild(l); tl.set(l, { opacity: 0 }, 0); IN(l, a + 0.7, { d: 0.9, y: 10, blur: 4 }); tl.to(l, { opacity: 0, duration: 0.4 }, t0 - 0.45); } IN(cs, t0, { st: Math.max(0.6, b - t0 - 1.4) * 0.7 / cs.length, d: 0.5, y: 6, blur: 4 }); OUT('#' + id, b - 0.6, { d: 0.5 }); };
+    if (lead) { const l = document.createElement('div'); l.className = 'qc-lead'; l.textContent = lead; $('#' + id).appendChild(l); tl.set(l, { opacity: 0 }, 0); IN(l, a + 0.7, { d: 0.9, y: 10, blur: 4 }); tl.to(l, { opacity: 0, duration: 0.4 }, t0 - 0.45); }
+    // 引文跟着念的声音一个字一个字出来（原来是匀速打字，会跑到声音前面一两秒）
+    const ts = speakTimes(cs.map(c => c.textContent), t0 - 1.0, b);
+    if (ts) cs.forEach((c, i) => IN(c, Math.max(t0 - 0.3, ts[i] - 0.05), { d: 0.5, y: 6, blur: 4 }));
+    else IN(cs, t0, { st: Math.max(0.6, b - t0 - 1.4) * 0.7 / cs.length, d: 0.5, y: 6, blur: 4 });
+    OUT('#' + id, b - 0.6, { d: 0.5 }); };
   // 11 · 爱上了恋爱（c029）
   quote('q29', T('c029') - 0.1, T('c030') - 0.1, 0, after('大意是', T('c029')) + 0.7, '他后来回忆那段日子，说过一句特别准的话——');
 
@@ -227,7 +253,7 @@
   { const a = T('c046') - 0.1, b = T('c051') - 0.1; scene('#s15', a, b);
     type('.ex-k', atP(EP, '但我们这句话') - 0.1, 1.8); IN('.ex-k', a, { d: 0.6 });
     { const w = document.createElement('div'); w.className = 'ex-pre'; w.textContent = '如今，没什么人信摩尼教了。'; $('#s15').appendChild(w); tl.set(w, { opacity: 0 }, 0); IN(w, atP(EP, '今天倒没有人信') + 0.2, { d: 0.7, y: 14 }); tl.to(w, { opacity: 0, y: -20, filter: 'blur(6px)', duration: 0.5 }, atP(EP, '但我们这句话') - 0.2); } tl.set('.ex-rows', { opacity: 1 }, a);
-    [['c048', 'e1'], ['c049', 'e2'], ['c050', 'e3']].forEach(([id, e]) => { tl.set('.ex-r.' + e, { opacity: 1 }, a); IN('.ex-r.' + e + ' .nm', T(id) - 0.1, { x: -30, y: 0, d: 0.6 }); tl.fromTo('.ex-r.' + e + ' i', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, immediateRender: false }, W(id, '是') - 0.2); IN('.ex-r.' + e + ' .ex', W(id, '是') , { x: -20, y: 0, d: 0.6 }); }); }
+    [['c048', 'e1'], ['c049', 'e2'], ['c050', 'e3']].forEach(([id, e]) => { tl.set('.ex-r.' + e, { opacity: 1 }, a); IN('.ex-r.' + e + ' .nm', T(id) - 0.1, { x: -30, y: 0, d: 0.6 }); tl.fromTo('.ex-r.' + e + ' i', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, immediateRender: false }, W(id, '是', 1) - 0.2); IN('.ex-r.' + e + ' .ex', W(id, '是', 1) , { x: -20, y: 0, d: 0.6 }); }); }   // 第 2 个“是”（第 1 个在“不是”里）
 
   // 16 · 莫妮卡（c051–c056）
   { const a = T('c051') - 0.1, b = T('c057') - 0.1; scene('#s16', a, b); light(a, { light: 0.5, rays: 0.4, fx: 960 });

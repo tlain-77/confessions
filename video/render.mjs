@@ -2,7 +2,7 @@
 // node render.mjs [--fps 60] [--from 0] [--to <sec>] [--workers 4] [--audio out/sample_mix.wav] [--out out/sample.mp4]
 import fs from 'node:fs'; import { execFileSync } from 'node:child_process'; import { chromium, serve, openPage } from './lib.mjs';
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
-const fps = +arg('fps', 60), workers = +arg('workers', 4), audio = arg('audio', 'out/sample_mix.wav'), out = arg('out', 'out/sample.mp4'), crf = arg('crf', '17');
+const fps = +arg('fps', 60), workers = +arg('workers', 4), audio = arg('audio', 'out/sample_mix.wav'), out = arg('out', 'out/sample.mp4'), crf = arg('crf', '17'), preset = arg('preset', 'slow');
 const dir = process.env.FRAMES_DIR || 'out/frames'; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });   // FRAMES_DIR：同时跑两个渲染时各用各的帧目录
 const { server, port } = await serve(); const browser = await chromium.launch();   // one browser per worker below: screenshots don't parallelize inside one
 const query = arg('query', '');
@@ -37,6 +37,6 @@ await browser.close(); server.close();
 console.log(`frames done in ${((Date.now() - t0) / 1000).toFixed(0)}s — encoding`);
 const a = fs.existsSync(audio) ? ['-ss', String(from), '-t', String(to - from), '-i', audio] : [];
 execFileSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-framerate', String(fps), '-i', `${dir}/f_%06d.jpg`, ...a,
-  '-c:v', 'libx264', '-preset', 'slow', '-crf', crf, '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-x264-params', 'aq-mode=3:aq-strength=1.1:deblock=-1,-1',
+  '-c:v', 'libx264', '-preset', preset, '-crf', crf, '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-x264-params', 'aq-mode=3:aq-strength=1.1:deblock=-1,-1',
   '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', ...(a.length ? ['-c:a', 'aac', '-b:a', '192k', '-shortest'] : []), '-movflags', '+faststart', out], { stdio: 'inherit' });
 console.log('wrote', out, (fs.statSync(out).size / 1e6).toFixed(1) + ' MB');

@@ -8,6 +8,9 @@
   const W = 1920, H = 1080;
   window.makeShots = function (tl, list, opt = {}) {
     const F = window.FOCUS, CAP = opt.caps || {}, X = opt.xf ?? 0.9;
+    // 一个镜头还没完全淡入、马上就因为旁白卡或片尾整层淡出：这个镜头不放，让前一个镜头自己淡出。
+    // 不然前一个镜头会在它“淡入完”的时刻被直接藏掉，而它其实还没亮起来——画面一帧之内暗下去
+    for (let i = list.length - 2; i >= 0; i--) if (list[i].src && !list[i + 1].src && list[i + 1].a - list[i].a < X + 0.5) list.splice(i, 1);
     const host = document.createElement('div'); host.id = 'shots';
     const main = document.getElementById('main'); main.parentNode.insertBefore(host, main);
     const shade = document.createElement('div'); shade.className = 'sh-shade';
