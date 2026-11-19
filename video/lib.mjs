@@ -18,7 +18,8 @@ export async function openPage(browser, port, log = false, query = '', pageName 
   const page = await ctx.newPage();
   page.on('pageerror', e => console.error('PAGE ERROR', e.message));
   if (log) page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') console.error('console', m.type(), m.text()); });
-  await page.goto(`http://127.0.0.1:${port}/web/${pageName}${query}`);
+  // 页面里图多（逐句换背景要预载几百张画），四个一起开、机器又忙的时候，30 秒的默认上限不够
+  await page.goto(`http://127.0.0.1:${port}/web/${pageName}${query}`, { timeout: 180000 });
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }
