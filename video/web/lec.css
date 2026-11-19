@@ -34,7 +34,7 @@
 /* 示意图 */
 .lf{position:relative;margin:6px 0 10px;padding:0;border-radius:8px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.75),0 0 0 1px rgba(255,230,170,.22)}
 .lf img{display:block;width:1180px;height:auto;will-change:transform}
-.lf.sm img{width:940px}
+.lf.sm img{width:1200px}
 /* 停下来想一想 */
 .lt{margin:22px 0;padding:34px 70px 40px;border:1px solid rgba(226,189,118,.55);border-radius:16px;background:rgba(5,6,10,.5);max-width:1380px;text-align:center}
 .lt b{display:block;font-family:var(--sans);font-weight:300;font-size:28px;letter-spacing:.5em;padding-left:.5em;color:var(--gold)}
