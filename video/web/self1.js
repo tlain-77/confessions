@@ -513,7 +513,8 @@
   const tO = at('因为你要是不知道'), tO4 = at('他是从哪儿走过来的'), tO5 = at('那么开头那句'), tO5b = at2('那么开头那句你是伟大的', '你是伟大的'), tO6b = at('客套的话'),
     tO7 = at('那等你知道了他的故事'), tO9 = en('你再回来听') + 0.2, tO11 = at('那是一个把自己折腾了'), eO = en('好不容易说出来的第一句话');
   sceneOut('#sM', tO - 0.6, 0.6);
-  show('#sO', tO - 0.2);
+  // 这一场左边有一层深色渐变（#sO::before）：原来一帧之内整个亮出来，背景是亮的画时左边一下子暗掉；改成 0.6 秒淡入
+  tl.fromTo('#sO', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: 'sine.inOut', immediateRender: false }, tO - 0.5);
   tl.fromTo('#map', { autoAlpha: 0, scale: 1.1 }, { autoAlpha: 1, scale: 1.0, duration: 2.4, ease: 'power2.out', immediateRender: false }, tO - 0.3);
   tl.to('#map', { scale: 1.05, duration: eO - tO - 1.0, ease: 'none' }, tO + 2.1);
   light(tO - 0.5, { light: 0.34, rays: 0.1, fx: 1040, dust: 0.55, bloom: 0 }, 1.8);
