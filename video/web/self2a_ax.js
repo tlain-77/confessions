@@ -105,7 +105,8 @@ window.ASIDES = tl => { const D = window.EP2, P = (p, n) => atP(D, p, n);
         { t: '虚心的人有福了！因为天国是他们的。', at: P('虚心的人有福了') },
         { t: '弟兄们，从前我到你们那里去，并没有用高言大智……我说的话、讲的道，不是用智慧委婉的言语，乃是用圣灵和大能的明证。', at: P('弟兄们从前我') },
         { t: '哥林多前书 2:1, 4', at: P('不是用智慧委婉的言语'), cls: 'src' }] }],
-      fx: (tl, sec) => { const sh = sec.querySelector('.ax-shade'); tl.fromTo(sh, { opacity: 0.45 }, { opacity: 1, duration: 1.2, immediateRender: false }, P('西塞罗的三句话') - 0.6); } },
+      // 画先亮着（压暗层 0.45），开始念西塞罗那三句时慢慢压暗。原来压暗层一开始就是 1，到这时先一下跳回 0.45 再变暗——画面一帧之内突然亮一下
+      fx: (tl, sec) => { const sh = sec.querySelector('.ax-shade'); tl.set(sh, { opacity: 0.45 }, 0); tl.to(sh, { opacity: 1, duration: 1.2 }, P('西塞罗的三句话') - 0.6); } },
     // 半天狗
     { a: P('我还听过鬼灭之刃'), b: P('那这些年他妈在干什么') - 0.3, k: '鬼 灭 之 刃 · 半 天 狗', cls: 'hand',
       html: '<div class="ht-glow"></div>',
