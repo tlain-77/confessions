@@ -84,5 +84,26 @@
 | paulprison.jpg | 伦勃朗《狱中的保罗》 1627 | Wikimedia Commons: Rembrandt St. Paul in Prison.jpg |
 | lamb.jpg | 凡·艾克兄弟《羔羊的崇拜》 1432 | Wikimedia Commons: Ghent Altarpiece - Adoration of the Mystic Lamb.jpg |
 | abbey.jpg | 弗里德里希《橡树林中的修道院》 1810 | Wikimedia Commons: Caspar David Friedrich - Abtei im Eichwald - Google Art Project.jpg |
+| g_school.jpg | 戈佐利《塔加斯特的学堂》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/01scene.html |
+| g_carthage.jpg | 戈佐利《奥古斯丁在迦太基求学》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/02scene.html |
+| g_leaving.jpg | 戈佐利《奥古斯丁离开母亲》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/03scene.html |
+| g_ostia.jpg | 戈佐利《在奥斯提亚登岸》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/05scene.html |
+| g_rome.jpg | 戈佐利《奥古斯丁在罗马教书》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/06scene.html |
+| g_milan.jpg | 戈佐利《奥古斯丁启程去米兰》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/1/07scene.html |
+| g_arrival.jpg | 戈佐利《奥古斯丁到达米兰》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/2/08scene.html |
+| tolle.jpg | 戈佐利《奥古斯丁读保罗书信》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/2/10scene.html |
+| g_baptism.jpg | 戈佐利《安波罗修为奥古斯丁施洗》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/2/11scene.html |
+| g_monica.jpg | 戈佐利《莫妮卡之死》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/2/13scene.html |
+| g_hippo.jpg | 戈佐利《奥古斯丁在希波祝福信众》 1464—1465 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/g/gozzoli/4gimigna/2/14scene.html |
+| carpaccio.jpg | 卡尔帕乔《圣奥古斯丁的异象》 1502 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/carpacci/3schiavo/1/1vision.html |
+| antony.jpg | 委拉斯开兹《圣安东尼与隐修士保罗》 约1635 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/v/velazque/03/0313vela.html |
+| kiss.jpg | 海耶兹《吻》 1859 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/h/hayez/6hayez.html |
+| port.jpg | 克劳德·洛兰《示巴女王登船的海港》 1648 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/claude/2/10sheba.html |
+| carthage2.jpg | 透纳《迦太基帝国的衰落》 1817 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/t/turner/1/107turne.html |
+| empire.jpg | 托马斯·科尔《帝国的历程 · 鼎盛》 1836 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/cole/empire.html |
+| rome.jpg | 帕尼尼《古罗马景观画廊》 1758 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/p/pannini/roma1.html |
+| luther_monk.jpg | 老克拉纳赫《奥古斯丁修会修士马丁·路德》 约1520 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/cranach/lucas_e/12/02luthe1.html |
+| luther.jpg | 老克拉纳赫《马丁·路德像》 1525 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/cranach/lucas_e/12/05luthe1.html |
+| calvin.jpg | 佚名《青年加尔文像》 16世纪 | Wikimedia Commons: John Calvin - Young.jpg |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。

@@ -91,7 +91,9 @@
       return { a, src, z: full ? 1.0 : (j % 2 ? 1.55 : 1.4), f, mv };
     };
     const FB = o.fallback || {}, ok = k => k && (F[k] ? k : FB[k] && F[FB[k]] ? FB[k] : null);
-    for (const c of D.cues) {
+    const cues = D.cues, GAP = o.gap ?? 0;
+    for (let ci = 0; ci < cues.length; ci++) {
+      const c = cues[ci];
       if (o.skip && o.skip(c)) continue;
       let imgs = (P[c.id] || [prev]).map(ok).filter(Boolean); if (!imgs.length) imgs = [prev];
       if (!imgs[0]) continue;
@@ -102,12 +104,51 @@
         const cand = subs.map(s => s.s).filter(t => t > cut[cut.length - 1] + MIN && t < c.end - MIN);
         cut.push(cand.length ? cand.reduce((p, q) => Math.abs(q - want) < Math.abs(p - want) ? q : p) : want);
       }
+      const ex = !!P[c.id];
       imgs.forEach((src, k) => {
-        const a = cut[k] - LEAD;
-        if (out.length && out[out.length - 1].src && a - out[out.length - 1].a < MIN) return;   // 太近：这一句不另换
-        out.push(shot(a, src)); prev = src;
+        const a = cut[k] - LEAD, last = out[out.length - 1];
+        if (last && last.src && a - last.a < MIN) {                      // 太近：这一句不另换
+          if (o.prefer && ex) {                                          // 但这句特意指定了画：别丢掉它
+            if (!last.ex) { out[out.length - 1] = { ...shot(last.a, src), ex: true }; prev = src; }   // 上一个只是沿用的局部：换成这幅
+            else if (last.a + MIN < c.end - 0.4) { out.push({ ...shot(last.a + MIN, src), ex: true }); prev = src; }   // 稍晚一点再换
+          }
+          return;
+        }
+        out.push({ ...shot(a, src), ex }); prev = src;
       });
+      // 讲稿以外临场说的话（有字幕、没有对应的讲稿句子）：每隔几秒在字幕分句处换一个镜头，不让画面停住
+      const nxt = cues[ci + 1], g0 = c.end, g1 = nxt ? nxt.start : D.total;
+      if (GAP && g1 - g0 > GAP) {
+        const gimgs = (P[c.id + '+'] || []).map(ok).filter(Boolean); let gi = 0;
+        for (const sb of subs) {
+          if (sb.s <= g0 + 0.2 || sb.s >= g1 - MIN) continue;
+          const a = sb.s - LEAD, last = out[out.length - 1];
+          if (last && a - last.a < Math.max(MIN, o.gapEvery ?? 3.4)) continue;
+          const src = gimgs.length ? gimgs[Math.min(gi++, gimgs.length - 1)] : prev; if (!src) continue;
+          out.push(shot(a, src)); prev = src;
+        }
+      }
     }
     return out;
+  };
+
+  // 一集的逐句换背景：排镜头；旁白卡（自己有画）和片尾不放背景；卡片收起时背景接着来
+  window.runShots = function (tl, D, plan, o = {}) {
+    const list = planShots(D, plan, o);
+    const spans = (window.ASIDE_SPANS || []).map(([a, b]) => [a + 0.3, b]).sort((p, q) => p[0] - q[0]);
+    const tail = D.total - (o.tail ?? 6.6);
+    const inSpan = t => spans.find(([a, b]) => t >= a && t < b);
+    const kept = list.filter(s => !inSpan(s.a) && s.a < tail);
+    const all = kept.slice();
+    for (const [a, b] of spans) {
+      all.push({ a, src: null });
+      const nx = kept.find(s => s.a >= b), pv = [...list].reverse().find(s => s.a < b);
+      const nextCard = spans.some(([a2]) => a2 > a && a2 < b + 1.5);          // 紧接着又是一张卡：不在两张卡之间闪一下背景
+      if (b < tail && !nextCard && (!nx || nx.a - b > 1.2) && (pv || nx)) all.push({ ...(pv || nx), a: b - 0.25 });
+    }
+    all.push({ a: tail, src: null });
+    all.sort((p, q) => p.a - q.a);
+    makeShots(tl, all, { caps: window.SHOT_CAPS, o: o.o ?? 0.6, xf: o.xf ?? 0.7 });
+    window.SHOT_LIST = all;
   };
 })();

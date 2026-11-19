@@ -556,6 +556,7 @@
   if (window.ASIDES) window.ASIDES(tl);
   if (window.fixEarly) window.fixEarly(tl);
   if (window.fixClash) window.fixClash(tl);
+  if (window.SHOTS) window.SHOTS(tl);   // 逐句换背景（放在防闪处理之后，不让它们动镜头的淡入淡出）
 
   // ---------- 字幕 ----------
   const subs = EP.subs.slice(2).map(s => ({ s: s.s, e: s.e, t: s.t.replace(/[，。：]$/, '') }));      // 开场三句就是画面上的大字，不重复打字幕

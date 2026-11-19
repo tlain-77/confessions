@@ -381,6 +381,7 @@
   if (window.ASIDES) window.ASIDES(tl);
   if (window.fixEarly) window.fixEarly(tl);
   if (window.fixClash) window.fixClash(tl);
+  if (window.SHOTS) window.SHOTS(tl);   // 逐句换背景（放在防闪处理之后，不让它们动镜头的淡入淡出）
   // ---------- 字幕 ----------
   const subs = [];
   for (const c of EP.cues) {

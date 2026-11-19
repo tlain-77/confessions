@@ -1,9 +1,8 @@
 // 本人录制 · 他为什么这样写：自己加的两段话、配画
 window.ASIDES = tl => { const D = window.EPD, P = (p, n) => atP(D, p, n);
-  makeBackdrops(tl, [
-    { a: 0.1, b: P('你可以把自己放到') - 0.2, src: 'study', o: 0.36, pos: '50% 38%', cap: '波提切利《书房中的圣奥古斯丁》 1480', kb: [1.0, 0, 0, 1.14, 0, -4] },
-    { a: P('还记得他妈在岸边哭') - 0.4, b: P('那个喝醉的乞丐') + 0.4, src: 'sea', o: 0.32, pos: '55% 60%', cap: '艾瓦佐夫斯基《月夜》 1850', kb: [1.0, 0, 0, 1.1, -2, 0] },
-  ]);
+  // 衬底的画：改成逐句换镜头，见 self2b_shots.js
+  const CP = k => window.SHOT_CAPS[k], DT = (k, i) => window.FOCUS[k][3][i];
+  const al = (src, at, o = {}) => ({ src, at, cap: CP(src), ...o });   // 卡片里说到这句换这幅画
   syncText(tl, D, [
     { sel: '.decl', p: '写一份声明' },
     { sel: '.tw.c1 .tw-a', p: '也忍不住的会管理' },
@@ -25,16 +24,22 @@ window.ASIDES = tl => { const D = window.EPD, P = (p, n) => atP(D, p, n);
   ]);
   makeAsides(tl, D, [
     { a: P('那么我说到这儿') - 0.1, b: P('可是过了1600多年') - 0.25, k: '你 可 能 会 问', kAt: P('你可能会问') - 0.15,
+      img: { src: 'rainy', fit: 'cover', side: 'c', pos: '50% 50%', cap: CP('rainy'), kb: [1.0, 0, 0, 1.1, 0, -1], alts: [al('portrait', P('这个人挺有趣的'))] },
       lines: [{ t: '“那可以啊，', at: P('那可以啊'), cls: 'big' }, { t: '这个人挺有趣的，挺有意思的——”', at: P('这个人挺有趣的'), cls: 'kai' }] },
     { a: P('你自己16岁') - 0.2, b: P('那你可能还会说') - 0.3, k: '你 自 己 的',
+      img: { src: 'v_youth', fit: 'cover', side: 'c', pos: '50% 50%', cap: CP('v_youth'), kb: [1.0, 0, 0, 1.1, 0, -1],
+        alts: [al('isle', P('你那些不愿意想的事')), al('lightworld', P('如果也是在这样的神面前')), al('wanderer', P('我不知道'))] },
       lines: [{ t: '16 岁 · 25 岁', at: P('你自己16岁') + 0.3, cls: 'big gold' }, { t: '那些不愿意想的事，那些觉得天塌了的事', at: P('你那些不愿意想的事'), cls: 'kai' },
         { t: '如果也在这样的神面前过一遍——你会看到什么？', at: P('如果也是在这样的神面前'), cls: 'sm' }],
       foot: { t: '我不知道。但值得试一试——这也是我想慢慢读这本书的原因。', at: P('我不知道') } },
     { a: P('好像都被改了一个好听的名字'), b: P('还有一样是我读到后面才发现的') - 0.3,
+      img: { src: 'narcissus', fit: 'cover', side: 'c', pos: '50% 50%', cap: CP('narcissus'), kb: [1.0, 0, 0, 1.1, 0, -1],
+        alts: [al('vanitas', P('让人意识不到')), al('portrait', P('但我想更加真实的了解自己')), al('prodigal', P('并且把这个破烂不堪的自己'))] },
       lines: [{ t: '都被改了一个好听的名字', at: P('好像都被改了一个好听的名字'), cls: 'kai' }, { t: '意识不到自己是一个什么样的人', at: P('让人意识不到'), cls: 'sm' },
         { t: '更加真实地了解自己', at: P('但我想更加真实的了解自己') }, { t: '把破烂不堪的自己带到神面前', at: P('并且把这个破烂不堪的自己'), cls: 'gold' }, { t: '悔改，求神接纳', at: P('求神的接纳'), cls: 'kai' }] },
     { a: P('我也希望在读的过程中'), b: P('再多说一句') - 0.3, k: '我 也 希 望',
-      img: { src: 'portrait', fit: 'frame', side: 'r', box: [560, 720], pos: '50% 30%', cap: '菲利普·德·尚帕涅《圣奥古斯丁》 约1645', kb: [1.2, 0, -3, 1.06, 0, 1] },
+      img: { src: 'portrait', fit: 'frame', side: 'r', box: [560, 720], pos: '50% 30%', cap: '菲利普·德·尚帕涅《圣奥古斯丁》 约1645', kb: [1.2, 0, -3, 1.06, 0, 1] ,
+        alts: [al('hands', P('我也把我的罪写明在神的面前')), al('narcissus', P('希望我们都不用伪装')), al('avenue', P('也希望神可以带领我们'))] },
       lines: [{ t: '借着奥古斯丁对待自己的方式', at: P('借助奥古斯丁') - 0.1, cls: 'sm' }, { t: '把我的罪写明在神的面前', at: P('我也把我的罪写明在神的面前'), cls: 'gold' },
         { t: '不用伪装，不用假装很圣洁', at: P('希望我们都不用伪装'), cls: 'kai' }, { t: '求神带领我们，看完奥古斯丁的一生', at: P('也希望神可以带领我们'), cls: 'sm' }] },
   ]); };

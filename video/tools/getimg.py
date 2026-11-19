@@ -28,7 +28,9 @@ r = api(action='query', titles=title, prop='imageinfo', iiprop='url|size|extmeta
 page = next(iter(r['query']['pages'].values()))
 if 'imageinfo' not in page: sys.exit(f'not found: {title}')
 ii = page['imageinfo'][0]; md = ii.get('extmetadata', {})
-if ii['width'] <= width:                                  # 原图不够宽：维基会给原图地址（限流很严），改要一个比原图小的标准尺寸
+if ii['width'] <= width and os.environ.get('ORIG'):      # ORIG=1：原图本来就小（比如 WGA 的壁画照片），直接要原图，不再缩小
+    ii = dict(ii, thumburl=ii['url'])
+elif ii['width'] <= width:                                # 原图不够宽：维基会给原图地址（限流很严），改要一个比原图小的标准尺寸
     std = [s for s in (500, 960, 1280, 1920, 2560) if s < ii['width']]
     if std:
         width = std[-1]; r = api(action='query', titles=title, prop='imageinfo', iiprop='url|size|extmetadata', iiurlwidth=width)
