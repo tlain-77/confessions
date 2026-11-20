@@ -53,3 +53,14 @@
 .l3 span{display:block;margin-top:12px;font-family:var(--kai);font-size:42px;color:var(--paper)}
 /* 小注（改革宗信条等出处） */
 .ln{margin-top:16px;font-family:var(--sans);font-weight:300;font-size:30px;letter-spacing:.14em;color:var(--paper3)}
+/* 动画插图（anim.js） */
+.la{margin:4px 0}
+.la svg{display:block;width:var(--aw,1120px);height:auto;overflow:visible}
+.la text{paint-order:stroke;stroke:rgba(5,6,10,.55);stroke-width:6px;stroke-linejoin:round}
+/* 一行一行的对句（左：处境；右：却……） */
+.lr{display:grid;grid-template-columns:auto auto;row-gap:18px;column-gap:56px;margin:18px 0;justify-content:center;text-align:left}
+.lr > div{display:contents}
+.lr i{font-style:normal;font-family:var(--kai);font-size:58px;color:var(--paper2);text-align:right;text-shadow:0 2px 18px rgba(0,0,0,.7)}
+.lr b{font-weight:900;font-size:62px;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* 示意图上的发光框 */
+.lf-spot{position:absolute;box-sizing:border-box;border:4px solid rgba(240,200,120,.95);border-radius:18px;box-shadow:0 0 26px rgba(240,190,90,.75),inset 0 0 22px rgba(240,190,90,.35);pointer-events:none}

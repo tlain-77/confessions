@@ -105,5 +105,15 @@
 | luther_monk.jpg | 老克拉纳赫《奥古斯丁修会修士马丁·路德》 约1520 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/cranach/lucas_e/12/02luthe1.html |
 | luther.jpg | 老克拉纳赫《马丁·路德像》 1525 | Web Gallery of Art（公有领域）: https://www.wga.hu/html/c/cranach/lucas_e/12/05luthe1.html |
 | calvin.jpg | 佚名《青年加尔文像》 16世纪 | Wikimedia Commons: John Calvin - Young.jpg |
+| milkmaid.jpg | 维米尔《倒牛奶的女仆》 约1660 | Wikimedia Commons: Johannes Vermeer - Het melkmeisje - Google Art Project.jpg |
+| pitcher.jpg | 格勒兹《打碎的水罐》 1771 | Wikimedia Commons: Jean-Baptiste Greuze - The Broken Pitcher - WGA10657.jpg |
+| brioche.jpg | 夏尔丹《奶油圆蛋糕》 1763 | Wikimedia Commons: Jean Siméon Chardin - 'La Brioche' (Cake) - WGA04779.jpg |
+| prayer.jpg | 尼古拉斯·马斯《饭前祷告的老妇人》 约1656 | Wikimedia Commons: Nicolaes Maes - Old Woman Saying Grace - WGA13820.jpg |
+| stpeter.jpg | 帕尼尼《罗马圣彼得大教堂内景》 约1754 | Wikimedia Commons（CC0，美国国家美术馆）: Giovanni Paolo Panini, Interior of Saint Peter's, Rome, c. 1754, NGA 50884.jpg |
+| elephant.jpg | 伦勃朗《大象》 1637 | Wikimedia Commons: Rembrandt Harmenszoon van Rijn - An Elephant, 1637 - Google Art Project.jpg |
+| pentecost.jpg | 埃尔·格列柯《五旬节》 约1600 | Wikimedia Commons: El Greco - The Pentecost - WGA10533.jpg |
+| shepherd.jpg | 普洛克霍斯特《好牧人》 19世纪 | Wikimedia Commons: Bernhard Plockhorst - Good Shephard.jpg |
+| goldfinch.jpg | 法布里蒂乌斯《金翅雀》 1654 | Wikimedia Commons: Carel Fabritius - The Goldfinch - 605 - Mauritshuis.jpg |
+| zurbaran.jpg | 苏巴朗《四个器皿的静物》 约1650（第三讲“瓦器”动画里用的那只红陶罐） | Wikimedia Commons: Francisco de Zurbarán - Still Life with Four Vessels - Google Art Project.jpg |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。

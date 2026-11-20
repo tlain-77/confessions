@@ -1,0 +1,16 @@
+/* 本人录制 · 第三讲（卷一第三章）：片头、下一讲预告、片尾 */
+#L0 .op-k{top:300px}
+#L0 .op-t2{position:absolute;left:0;right:0;top:372px;text-align:center;font-weight:900;font-size:100px;line-height:1.36;letter-spacing:.08em;padding-left:.08em}
+#L0 .op-t2 .ch{text-shadow:0 4px 30px rgba(0,0,0,.6)}
+#L0 .op-l{top:690px}
+/* 三栏对照时每栏窄一点 */
+.lc2.n3 > div{width:470px}
+.lc2.n3 b{font-size:56px}
+/* 下一讲预告 */
+.nxt .nx-t{font-size:88px}
+.nxt .nx-l{white-space:nowrap}
+/* 片尾 */
+#LZ .z-t{font-size:80px}
+/* 原文卡出来时，一道光从左扫到右 */
+.lq::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(105deg,transparent calc(var(--sw,-30%) - 12%),rgba(255,236,190,.55) var(--sw,-30%),transparent calc(var(--sw,-30%) + 12%));mix-blend-mode:soft-light}
+.lq{border:1px solid rgba(226,189,118,.5);box-shadow:0 40px 90px rgba(0,0,0,.72),0 0 60px rgba(226,189,118,.18)}

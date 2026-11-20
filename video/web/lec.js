@@ -11,6 +11,9 @@
 //   { cols: [{ b, s, at, c: 'g' | 'c' }, ...] }                    两栏 / 三栏对照，各栏各自出现
 //   { tri: [{ b, s, at }, ...] }                                   三格并列（本于他 / 倚靠他 / 归于他）
 //   { n: '小注', at }                                              出处小字
+//   { anim: 'bottle' | 'building' | 'breaking' | 'jar' | 'gather' | 'cake' | …, at, 各步的时刻…, w: 宽 }   动画插图（anim.js）
+//   { rows: [['左', '右', 左的时刻, 右的时刻], ...] }               一行一行的对句（四面受敌 / 却不被困住）
+//   fig 还可以加 w（图宽）、spots: [[时刻, 左%, 上%, 宽%, 高%], ...]（一个发光的框，说到哪部分就移到哪部分）
 //   每一项还可以加 flash: 1（光闪一下）、dim: at（到这时变淡，让位给后面的）
 window.lecture = async function (o = {}) {
   const K = await kit(); const EP = K.EP, LEC = window.LEC;
@@ -27,11 +30,13 @@ window.lecture = async function (o = {}) {
       const d = document.createElement('div');
       if (it.q) { d.className = 'lq' + (it.mini ? ' mini' : ''); d.innerHTML = `<div class="lq-k">${H(it.k || '')}</div><div class="lq-t split${it.sm ? ' sm' : ''}${it.xs ? ' xs' : ''}">${H(it.q)}</div>`; }
       else if (it.v) { d.className = 'lv' + (it.sm ? ' sm' : ''); d.innerHTML = `<em>${H(it.ref || '')}</em><span>${H(it.v)}</span>`; }
-      else if (it.fig) { d.className = 'lf' + (it.sm ? ' sm' : ''); d.innerHTML = `<img src="fig/${it.fig}.png">`; }
+      else if (it.fig) { d.className = 'lf' + (it.sm ? ' sm' : ''); d.innerHTML = `<img src="fig/${it.fig}.png"${it.w ? ` style="width:${it.w}px"` : ''}>` + (it.spots ? '<i class="lf-spot"></i>' : ''); }
       else if (it.think) { d.className = 'lt'; d.innerHTML = `<b>停下来想一想</b><span>${H(it.think)}</span>`; }
       else if (it.cols) { d.className = 'lc2' + (it.cls ? ' ' + it.cls : ''); d.innerHTML = it.cols.map(c => `<div class="${c.c || ''}"><b>${H(c.b)}</b>${c.s ? `<span>${H(c.s)}</span>` : ''}</div>`).join(''); }
       else if (it.tri) { d.className = 'l3'; d.innerHTML = it.tri.map(c => `<div><b>${H(c.b)}</b><span>${H(c.s || '')}</span></div>`).join(''); }
       else if (it.n) { d.className = 'ln'; d.innerHTML = H(it.n); }
+      else if (it.anim) { it._replay = window.ANIM_BUILD(it.anim, d, it, AT); if (it.w) d.style.setProperty('--aw', it.w + 'px'); }   // 动画插图（anim.js）：先画好，动画等时间轴建好再挂
+      else if (it.rows) { d.className = 'lr'; d.innerHTML = it.rows.map(r => `<div><i>${H(r[0])}</i><b>${H(r[1])}</b></div>`).join(''); }
       else { d.className = 'll ' + (it.c || '') + (it.type || /big|h2/.test(it.c || '') ? ' split' : ''); d.innerHTML = H(it.t); }
       sec.appendChild(d); return d;
     });
@@ -58,6 +63,7 @@ window.lecture = async function (o = {}) {
   const starts = built.map(b => AT(b.sc.at));
   for (let i = 1; i < starts.length; i++) if (!(starts[i] > starts[i - 1] + 0.5)) throw new Error(`第 ${i} 场的开始时刻（${starts[i]}）不在上一场（${starts[i - 1]}）之后：` + JSON.stringify(built[i].sc.at));
   const END = EP.total - 6.6;
+  window.LEC_TIMES = starts.map((t, i) => [t, i + 1 < starts.length ? starts[i + 1] : END]);   // 每一场的起止（检查截图用）
   built.forEach((b, i) => {
     const a = starts[i] - 0.1, e = i + 1 < built.length ? starts[i + 1] - 0.1 : END;
     scene(b.sec, a, e);
@@ -80,8 +86,17 @@ window.lecture = async function (o = {}) {
           if (spec[j].sat !== undefined && sp) { IN(b, t0, { y: 24, d: 0.8 }); IN(sp, AT(spec[j].sat), { y: 14, d: 0.7 }); }
           else IN(p, t0, { y: 24, d: 0.8 });
         });
+      } else if (it.anim) {
+        IN(el, Math.max(a + 0.05, at - 0.3), { y: 20, d: 0.8, blur: 6 }); it._replay(tl);
+      } else if (it.rows) {
+        [...el.children].forEach((r, j) => { IN(r.querySelector('i'), AT(it.rows[j][2]), { y: 16, d: 0.7 }); IN(r.querySelector('b'), AT(it.rows[j][3]), { y: 16, d: 0.7, blur: 6 }); });
       } else if (it.fig) {
         IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
+        if (it.spots) {                                                  // 发光的框：第一处淡入，之后平移到下一处
+          const sp = el.querySelector('.lf-spot'), box = r => ({ left: r[1] + '%', top: r[2] + '%', width: r[3] + '%', height: r[4] + '%' });
+          gsap.set(sp, { ...box(it.spots[0]), opacity: 0 });
+          it.spots.forEach((r, j) => { const t = AT(r[0]); if (j) tl.to(sp, { ...box(r), duration: 0.9, ease: 'power2.inOut' }, t - 0.2); else tl.to(sp, { opacity: 1, duration: 0.7 }, Math.max(t, at + 0.8)); });
+        }
         tl.fromTo(el.querySelector('img'), { scale: 1.0 }, { scale: 1.045, duration: Math.max(1, e - at), ease: 'none', immediateRender: false }, at);
       } else if (it.type) type(el, at, it.type, { d: 0.6 });
       else if (/big|h2/.test(it.c || '')) big(el, at, { st: Math.min(0.12, 1.2 / Math.max(1, chars(el).length)) });
