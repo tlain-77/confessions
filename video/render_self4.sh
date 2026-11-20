@@ -1,6 +1,6 @@
 #!/bin/bash
 # 本人录制 · 第二讲（卷一第二章）：整段做成一个视频，不分段。
-# 按 180 秒分块渲染（30fps；分块只是中间文件，用 crf 16 + fast；已渲好的块跳过，可以断点续跑；每块核对帧数），
+# 按 STEP 秒分块渲染（默认 180；磁盘紧时用 STEP=90 CRF=20：中间的帧和分块都小一半）（30fps；分块只是中间文件，用 crf 16 + fast；已渲好的块跳过，可以断点续跑；每块核对帧数），
 # 接起来，配上人声 + 配乐（out/self4_mix.wav），两遍编码把整片压在 395 MB 左右（发送上限 400 MiB，画质优先）。
 set -e
 cd "$(dirname "$0")"
@@ -9,8 +9,9 @@ NAME="04-第二讲-我请你来可我本来就在你里面（本人录制）"
 OUT="../本人录制/$NAME.mp4"
 TOT=$(python3 -c "import json;print(json.load(open('out/self4_data.json'))['total'])")
 : > $CK/list.txt
-for s in $(python3 -c "import math; print(' '.join(str(i * 180) for i in range(math.ceil($TOT / 180))))"); do
-  f=$CK/self4_$s.mp4; to=$(python3 -c "print(round(min($s + 180, $TOT), 3))")
+STEP=${STEP:-180}
+for s in $(python3 -c "import math; print(' '.join(str(i * $STEP) for i in range(math.ceil($TOT / $STEP))))"); do
+  f=$CK/self4_$s.mp4; to=$(python3 -c "print(round(min($s + $STEP, $TOT), 3))")
   if [ ! -f $f ]; then
     FRAMES_DIR=out/frames_s4 PAGE=self4.html node render.mjs --fps 30 --workers 4 --crf ${CRF:-16} --preset ${PRESET:-fast} --from $s --to $to --audio none --out $f.tmp.mp4 2>&1 | grep --line-buffered -v "warning"
     n=$(ffprobe -v error -count_packets -select_streams v:0 -show_entries stream=nb_read_packets -of csv=p=0 $f.tmp.mp4)
