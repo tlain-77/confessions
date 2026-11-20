@@ -14,7 +14,7 @@ b{font-weight:inherit}
 .gold .ch,.goldfill{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .gold-t{color:var(--gold)!important}
 svg{overflow:visible}
-svg [pathLength]{stroke-dasharray:1;stroke-dashoffset:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg [pathLength]{stroke-dasharray:1 2;stroke-dashoffset:1.01;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
 #vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 78% 72% at 50% 46%,transparent 38%,rgba(0,0,0,.66) 100%)}
 #grain{position:absolute;inset:-160px;pointer-events:none;opacity:.085;mix-blend-mode:overlay}

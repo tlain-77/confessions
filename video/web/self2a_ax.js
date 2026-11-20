@@ -61,7 +61,7 @@ window.ASIDES = tl => { const D = window.EP2, P = (p, n) => atP(D, p, n);
         const ms = sec.querySelectorAll('.rh-m'), ps = sec.querySelectorAll('.rh-row > i'), at = [P('演讲'), P('写作'), P('辩论')];
         tl.set([...ms, ...ps], { opacity: 0 }, 0);
         ms.forEach((m, i) => { tl.fromTo(m, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', immediateRender: false }, at[i] - 0.15);
-          tl.fromTo(m.querySelector('circle'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut', immediateRender: false }, at[i] - 0.15); });
+          tl.fromTo(m.querySelector('circle'), { strokeDashoffset: 1.01 }, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut', immediateRender: false }, at[i] - 0.15); });
         ps.forEach((p, i) => IN(p, at[i + 1] - 0.3, { d: 0.4, y: 0, blur: 4 }));
         tl.to(ms, { boxShadow: '0 0 60px rgba(243,213,148,.45)', duration: 0.8, stagger: 0.12 }, P('合在一起') - 0.2);
       } },

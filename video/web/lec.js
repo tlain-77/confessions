@@ -108,32 +108,34 @@ window.lecture = async function (o = {}) {
       for (const [lab, x] of inner) { const tx = AT(x); if (tx < a - 0.7 - (b.late || 0) || tx > e - 0.3) throw new Error(`第 ${i} 场「${lab}」的时刻 ${tx.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）`); }
       if (!xf && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
-        IN(el, Math.max(a + 0.05, at - 0.6), { y: 40, d: 0.9, blur: 8 });
+        IN(el, Math.max(a + 0.05, at - 0.6), { y: 18, d: 1.1, blur: 3 });
         const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at0 - 1.0, e);
-        if (ts) cs.forEach((c, j) => IN(c, Math.max(at - 0.3, ts[j] - 0.05), { d: 0.45, y: 8, blur: 6 }));
-        else type(el.querySelector('.lq-t'), at, Math.max(1.5, (e - at) * 0.7), { d: 0.5, y: 8, blur: 6 });
+        if (ts) cs.forEach((c, j) => IN(c, Math.max(at - 0.3, ts[j] - 0.05), { d: 0.6, y: 5, blur: 3 }));
+        else type(el.querySelector('.lq-t'), at, Math.max(1.5, (e - at) * 0.7), { d: 0.6, y: 5, blur: 3 });
         (it.hl || []).forEach(([sel, t2, col]) => tl.to(chars(el.querySelector('.lq-t ' + sel)), { color: col || '#b8321c', duration: 0.5, stagger: 0.02 }, AT(t2)));
       } else if (it.cols || it.tri) {
         // 每栏的标题在 at 出来；下面的小字可以另给时刻 sat（说到时再出来），不给就跟标题一起
         const parts = [...el.children], spec = it.cols || it.tri;
         parts.forEach((p, j) => {
           const t0 = spec[j].at !== undefined ? AT(spec[j].at) : at + j * 0.4, b = p.querySelector('b'), sp = p.querySelector('span');
-          if (spec[j].sat !== undefined && sp) { IN(b, t0, { y: 24, d: 0.8 }); IN(sp, AT(spec[j].sat), { y: 14, d: 0.7 }); }
-          else IN(p, t0, { y: 24, d: 0.8 });
+          if (spec[j].sat !== undefined && sp) { IN(b, t0, { y: 12, d: 1.0 }); IN(sp, AT(spec[j].sat), { y: 8, d: 0.9 }); }
+          else IN(p, t0, { y: 12, d: 1.0 });
         });
       } else if (it.anim || it.ill) {
-        IN(el, Math.max(a + 0.05, at - 0.3), { y: 20, d: 0.8, blur: 6 }); it._replay(tl);
+        // 图解：容器在里面最早的那一样出来之前一点点出现（不要等到整个图解的“重点”才一起冒出来）
+        let t1 = at; if (it.ill) (it.items || []).forEach(x => { t1 = Math.min(t1, AT(Array.isArray(x) ? x[2] : x.at)); });
+        IN(el, Math.max(a + 0.05, t1 - 0.4), { y: 8, d: 0.9, blur: 2 }); it._replay(tl);
       } else if (it.rows) {
-        [...el.children].forEach((r, j) => { IN(r.querySelector('i'), AT(it.rows[j][2]), { y: 16, d: 0.7 }); IN(r.querySelector('b'), AT(it.rows[j][3]), { y: 16, d: 0.7, blur: 6 }); });
+        [...el.children].forEach((r, j) => { IN(r.querySelector('i'), AT(it.rows[j][2]), { y: 10, d: 0.9 }); IN(r.querySelector('b'), AT(it.rows[j][3]), { y: 10, d: 0.9, blur: 3 }); });
       } else if (it.pic) {
-        IN(el, at, { y: 26, s: 0.97, d: 1.1, blur: 8 });
+        IN(el, at, { y: 14, s: 0.985, d: 1.3, blur: 3 });
         tl.fromTo(el.querySelector('img'), { scale: 1.0 }, { scale: it.z || 1.12, duration: Math.max(1, e - at), ease: 'none', immediateRender: false }, at);
-        if (it.cap) IN(el.querySelector('.lp-c'), it.capAt !== undefined ? AT(it.capAt) : at + 0.5, { y: 12, d: 0.8 });   // 说明字可以等说到时再出来
+        if (it.cap) IN(el.querySelector('.lp-c'), it.capAt !== undefined ? AT(it.capAt) : at + 0.5, { y: 8, d: 1.0 });   // 说明字可以等说到时再出来
       } else if (it.pics) {
-        [...el.children].forEach((p, j) => { const t0 = AT(it.pics[j][2]), o3 = it.pics[j][3] || {}; IN(p, t0, { y: 26, d: 1.0, blur: 8 }); tl.fromTo(p.querySelector('img'), { scale: 1.0 }, { scale: 1.1, duration: Math.max(1, e - t0), ease: 'none', immediateRender: false }, t0);
-          if (o3.capAt !== undefined && p.querySelector('.lp-c')) IN(p.querySelector('.lp-c'), AT(o3.capAt), { y: 12, d: 0.8 }); });
+        [...el.children].forEach((p, j) => { const t0 = AT(it.pics[j][2]), o3 = it.pics[j][3] || {}; IN(p, t0, { y: 14, d: 1.2, blur: 3 }); tl.fromTo(p.querySelector('img'), { scale: 1.0 }, { scale: 1.1, duration: Math.max(1, e - t0), ease: 'none', immediateRender: false }, t0);
+          if (o3.capAt !== undefined && p.querySelector('.lp-c')) IN(p.querySelector('.lp-c'), AT(o3.capAt), { y: 8, d: 1.0 }); });
       } else if (it.fig) {
-        if (xf) IN(el, at, { y: 0, d: 0.6, blur: 0, ease: 'sine.inOut' }); else IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
+        if (xf) IN(el, at, { y: 0, d: 0.6, blur: 0, ease: 'sine.inOut' }); else IN(el, at, { y: 14, s: 0.985, d: 1.3, blur: 3 });
         if (it.spots) {                                                  // 发光的框：第一处淡入，之后平移到下一处
           const sp = el.querySelector('.lf-spot'), box = r => ({ left: r[1] + '%', top: r[2] + '%', width: r[3] + '%', height: r[4] + '%' });
           gsap.set(sp, { ...box(it.spots[0]), opacity: 0 });
@@ -141,9 +143,9 @@ window.lecture = async function (o = {}) {
         }
         tl.fromTo(el.querySelector('img'), { scale: 1.0 }, { scale: 1.045, duration: Math.max(1, e - at), ease: 'none', immediateRender: false }, at);
       } else if (it.type) type(el, at, it.type, { d: 0.6 });
-      else if (/big|h2/.test(it.c || '')) big(el, at, { st: Math.min(0.12, 1.2 / Math.max(1, chars(el).length)) });
-      else IN(el, at, { y: it.v ? 30 : 22, d: it.v || it.think ? 1.0 : 0.8 });
-      if (it.flash) flash(at + 0.2, 960, 540, 0.45);
+      else if (/big|h2/.test(it.c || '')) big(el, at, { st: Math.min(0.06, 0.8 / Math.max(1, chars(el).length)) });
+      else IN(el, at, { y: it.v ? 14 : 12, d: it.v || it.think ? 1.2 : 1.05 });
+      if (it.flash) flash(at + 0.1, 960, 540, 0.26);
       if (it.dim !== undefined) tl.to(el, { opacity: 0.32, duration: 0.6 }, AT(it.dim));
       if (it.strike !== undefined) tl.fromTo(el, { '--sx': 0 }, { '--sx': 1, duration: 0.45, ease: 'power2.inOut', immediateRender: false }, AT(it.strike));
     });

@@ -86,7 +86,7 @@
   const IN = (t, at, o = {}) => (reveal(t, at), tl.fromTo(t, { opacity: 0, y: o.y ?? 26, x: o.x ?? 0, scale: o.s ?? 1, filter: `blur(${o.blur ?? 12}px)` },
     { opacity: o.o ?? 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 0.9, ease: o.ease ?? 'power3.out', stagger: o.st ?? 0, immediateRender: false }, at));
   const OUT = (t, at, o = {}) => tl.to(t, { opacity: 0, y: o.y ?? -20, filter: `blur(${o.blur ?? 10}px)`, duration: o.d ?? 0.5, ease: 'power2.in', stagger: o.st ?? 0 }, at);
-  const DRAW = (t, at, d = 1, o = {}) => { reveal(t, at); tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', immediateRender: false }, at); };
+  const DRAW = (t, at, d = 1, o = {}) => { reveal(t, at); tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1.01 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', immediateRender: false }, at); };
   const type = (sel, at, dur, o = {}) => { const cs = chars(sel); return IN(cs, at, { st: Math.max(0.02, dur) / Math.max(1, cs.length), d: o.d ?? 0.7, y: o.y ?? 18, blur: o.blur ?? 10, s: o.s }); };
   const big = (sel, at, o = {}) => (reveal(chars(sel), at), tl.fromTo(chars(sel), { opacity: 0, y: o.y ?? 50, scale: o.s ?? 1.12, filter: `blur(${o.blur ?? 22}px)` }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 1.1, ease: 'expo.out', stagger: o.st ?? 0.07, immediateRender: false }, at));
   const light = (at, v, d = 1.5) => tl.to(BG, { ...v, duration: d, ease: 'sine.inOut' }, at);
@@ -383,7 +383,7 @@
     IN('.lt-k', a + 0.1, { d: 0.7 }); tl.set('.lt-svg', { opacity: 1 }, a); tl.set('.lt-base', { opacity: 1 }, a); tl.fromTo('.lt-base', { attr: { x2: 200 } }, { attr: { x2: 1720 }, duration: 1.4, ease: 'power3.inOut', immediateRender: false }, a + 0.2);
     const evAt = { e1: W('c133', '施洗') - 0.4, e2: W('c134', '病倒了') - 0.3, e3: T('c138') - 0.1, e4: T('c141') - 0.1, e5: T('c148') - 0.1, e6: W('c148', '一直做到去世') };
     for (const e in evAt) IN('.ev.' + e, evAt[e], { y: 20, d: 0.7 });
-    tl.set('.lt-gold', { opacity: 1, strokeDashoffset: 1 }, a); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[1] - 200) / 1520, duration: 0.8, ease: 'power2.inOut' }, evAt.e1); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[2] - 200) / 1520, duration: 0.8 }, evAt.e2); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[3] - 200) / 1520, duration: 0.8 }, evAt.e3); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[4] - 200) / 1520, duration: 0.8 }, evAt.e4); tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[5] - 200) / 1520, duration: 0.8 }, evAt.e5);
+    tl.set('.lt-gold', { opacity: 1, strokeDashoffset: 1.01 }, a); tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[1] - 200) / 1520, duration: 0.8, ease: 'power2.inOut' }, evAt.e1); tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[2] - 200) / 1520, duration: 0.8 }, evAt.e2); tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[3] - 200) / 1520, duration: 0.8 }, evAt.e3); tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[4] - 200) / 1520, duration: 0.8 }, evAt.e4); tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[5] - 200) / 1520, duration: 0.8 }, evAt.e5);
     // 莫妮卡的话
     tl.set('.lt-q', { opacity: 1 }, a); $$('.qq').forEach(q => tl.set(q, { opacity: 1 }, a)); type($$('.qq')[0], W('c137', '神给我的'), 0.7, { d: 0.6 }); type($$('.qq')[1], W('c137', '比我求的'), 0.8, { d: 0.6 }); tl.set('.qa', { opacity: 0 }, a); IN('.qa', W('c137', '比我求的') + 0.7, { d: 0.6, y: 8 });
     tl.set(['.qq .ch', '.qa'], { opacity: 0 }, T('c133') - 0.01); tl.to('.lt-q', { opacity: 0, duration: 0.5 }, T('c138') - 0.3);
@@ -396,7 +396,7 @@
     tl.to(['.crowd2', '.lt-say'], { opacity: 0, duration: 0.6 }, T('c146') - 0.4);
     tl.set('.lt-cry', { opacity: 1 }, a); type('.lt-cry span', W('c146', '他哭了'), 0.6, { d: 0.6 }); type('.lt-cry em', T('c147'), 1.4, { d: 0.6 });
     tl.to('.lt-cry', { opacity: 0, duration: 0.5 }, T('c148') - 0.4); tl.to(['.ev.e1', '.ev.e2', '.ev.e3', '.ev.e4', '.lt-svg', '.lt-k'], { opacity: 1, duration: 0.8 }, T('c148') - 0.3);
-    tl.to('.lt-gold', { strokeDashoffset: 1 - (EVX[6] - 200) / 1520, duration: 1.4, ease: 'power2.inOut' }, evAt.e6); }
+    tl.to('.lt-gold', { strokeDashoffset: 1.01 - (EVX[6] - 200) / 1520, duration: 1.4, ease: 'power2.inOut' }, evAt.e6); }
 
   // 片尾
   { const a = EP.total - 6.2; scene('#sZ2', a, EP.total + 1); tl.to(['.ch-l', secLab], { opacity: 0, duration: 0.8 }, a - 0.6);

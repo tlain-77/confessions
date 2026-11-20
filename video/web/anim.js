@@ -25,20 +25,21 @@
   const line = (svg, d, o = {}) => {
     const uid = svg._uid || svg.ownerSVGElement._uid;
     const col = o.c || GOLD, stroke = col === GOLD ? `url(#gg${uid})` : col === PAPER ? `url(#pg${uid})` : col;
-    const at = { d, fill: 'none', stroke, 'stroke-width': o.w || 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 };
+    const W = (o.w || 4) * 0.8;                                            // 线比原来细两成，柔光也淡一些（显得精致）
+    const at = { d, fill: 'none', stroke, 'stroke-width': W, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1 };
     const g = mk('g', {}, svg), ps = [];
-    if (o.glow !== false) ps.push(mk('path', { ...at, stroke: o.gc || col, 'stroke-width': o.gw ?? (o.w || 4) * 2.4, opacity: o.go ?? 0.32, filter: `url(#f${uid})` }, g));
+    if (o.glow !== false) ps.push(mk('path', { ...at, stroke: o.gc || col, 'stroke-width': o.gw ?? W * 2.4, opacity: (o.go ?? 0.32) * 0.72, filter: `url(#f${uid})` }, g));
     const p = mk('path', { ...at, ...(o.f ? { filter: `url(#${o.f})` } : {}) }, g); ps.push(p);
     g._p = ps; g._m = p; return g;
   };
   const text = (svg, x, y, t, o = {}) => {
     const uid = svg._uid || (svg.ownerSVGElement && svg.ownerSVGElement._uid);
     const fill = o.c === GOLD && uid ? `url(#gg${uid})` : (o.c || PAPER);
-    const e = mk('text', { x, y, 'text-anchor': o.a || 'middle', fill, 'font-size': o.s || 34, 'font-family': o.font || 'Noto Serif SC', 'font-weight': o.wt || 700, 'letter-spacing': o.ls ?? '0.06em' }, svg); e.textContent = t; return e;
+    const e = mk('text', { x, y, 'text-anchor': o.a || 'middle', fill, 'font-size': o.s || 34, 'font-family': o.font || 'Noto Serif SC', 'font-weight': o.wt || 500, 'letter-spacing': o.ls ?? '0.1em' }, svg); e.textContent = t; return e;
   };
   // 描线：用样式里的 stroke-dashoffset（ep1.css 里 svg [pathLength] 有一条样式规则，会盖过同名的属性）
-  const DRAW = (tl, e, at, d = 1.2) => { const t = e._p || e; gsap.set(t, { strokeDashoffset: 1 }); tl.to(t, { strokeDashoffset: 0, duration: d, ease: 'power2.inOut' }, at); };
-  const SHOW = (tl, e, at, d = 0.7, o = {}) => { gsap.set(e, { opacity: 0 }); tl.fromTo(e, { opacity: 0, y: o.y ?? 12 }, { opacity: o.o ?? 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at); };
+  const DRAW = (tl, e, at, d = 1.2) => { const t = e._p || e; gsap.set(t, { strokeDashoffset: 1.01 }); tl.to(t, { strokeDashoffset: 0, duration: d * 1.1, ease: 'power2.inOut' }, at); };
+  const SHOW = (tl, e, at, d = 0.7, o = {}) => { gsap.set(e, { opacity: 0 }); tl.fromTo(e, { opacity: 0, y: o.y ?? 8 }, { opacity: o.o ?? 1, y: 0, duration: Math.max(d, 0.9), ease: 'power2.out', immediateRender: false }, at); };
   const grad = (defs, id, kind, attrs, stops) => { const g = mk(kind, { id, gradientUnits: 'userSpaceOnUse', ...attrs }, defs); stops.forEach(([o, c, a]) => mk('stop', { offset: o, 'stop-color': c, 'stop-opacity': a ?? 1 }, g)); return `url(#${id})`; };
   // 线条图标（Tabler，ill.js 载入）：中心 (x, y)，边长 sz；返回一个组，组上的 _p 是所有线（描线用）
   const icon = (par, name, x, y, sz, o = {}) => {
@@ -73,19 +74,38 @@
       const body = mk('path', { d: BOTTLE + ' Z', fill: glassF, opacity: 0 }, svg);
       const inside = mk('g', { 'clip-path': `url(#cb${uid})` }, svg);
       const lvl = mk('g', {}, inside);                                      // 整个水体（随水位上下）
-      let wave = 'M200,0'; for (let x = 200, k = 0; x < 1240; x += 20, k++) wave += ` Q${x + 10},${k % 2 ? 6 : -6} ${x + 20},0`;
+      let wave = 'M200,0'; for (let x = 200, k = 0; x < 1240; x += 30, k++) wave += ` Q${x + 15},${k % 2 ? 3.5 : -3.5} ${x + 30},0`;
       const flow = mk('g', {}, lvl);
       mk('path', { d: wave + ' L1240,600 L200,600 Z', fill: waterF }, flow);
-      mk('path', { d: wave, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.75, 'stroke-width': 2.4 }, flow);
+      mk('path', { d: wave, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.55, 'stroke-width': 1.6 }, flow);
       gsap.set(lvl, { y: 528 });
       const bub = [], r = rng(21);
       for (let i = 0; i < 14; i++) bub.push(mk('circle', { cx: 360 + r() * 280, cy: 505, r: 2 + r() * 4, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.7, 'stroke-width': 1.5, opacity: 0 }, inside));
+      const shadow = mk('ellipse', { cx: 500, cy: 534, rx: 210, ry: 15, fill: '#000', opacity: 0, filter: `url(#b${uid})` }, svg);
+      svg.insertBefore(shadow, body);
+      // 水面：一层亮的面（椭圆，超出瓶壁的部分被裁掉）；水里几道柔和的光纹，跟着水面慢慢流
+      const surfG = grad(defs, 'sf' + uid, 'radialGradient', { cx: 500, cy: 0, r: 200 }, [[0, '#ffffff', 0.75], [0.7, '#e8f6ff', 0.4], [1, '#cfe8fb', 0.2]]);
+      mk('ellipse', { cx: 500, cy: 3, rx: 210, ry: 10, fill: surfG }, lvl);
+      for (let k = 0; k < 3; k++) mk('path', { d: `M200,${60 + k * 62} C260,${44 + k * 62} 320,${76 + k * 62} 380,${60 + k * 62} S500,${44 + k * 62} 560,${60 + k * 62} S680,${76 + k * 62} 740,${60 + k * 62} S860,${44 + k * 62} 920,${60 + k * 62} S1040,${76 + k * 62} 1100,${60 + k * 62}`, fill: 'none', stroke: '#ffffff', 'stroke-width': 3, opacity: 0.1 + 0.04 * (2 - k), filter: `url(#${soft})` }, flow);
+      // 倒水：一道细水柱（瓶口上面一段 + 瓶子里一段，水面以下被水盖住），水面有一圈圈涟漪
+      const colF = grad(defs, 'sc' + uid, 'linearGradient', { x1: 494, y1: 0, x2: 506, y2: 0 }, [[0, '#cfe8fb', 0.5], [0.5, '#ffffff', 0.95], [1, '#cfe8fb', 0.5]]);
+      const col1 = mk('rect', { x: 494, y: 0, width: 12, height: 62, rx: 5, fill: colF, opacity: 0 }, svg);
+      const col2 = mk('rect', { x: 494, y: 40, width: 12, height: 520, fill: colF, opacity: 0 }, inside); inside.insertBefore(col2, lvl);
+      const rip = [0, 1, 2, 3].map(() => mk('ellipse', { cx: 500, cy: 2, rx: 10, ry: 2, fill: 'none', stroke: '#ffffff', 'stroke-width': 1.6, opacity: 0 }, lvl));
       const b = line(svg, BOTTLE, { c: PAPER, w: 4.5, go: 0.4 });
+      const wall = mk('path', { d: BOTTLE, transform: 'translate(500 300) scale(0.962 0.984) translate(-500 -300)', fill: 'none', stroke: '#eaf6ff', 'stroke-width': 1.3, opacity: 0 }, svg);   // 玻璃的厚度：里面再一道淡线
+      const rim = line(svg, 'M470,60 A30,6.5 0 1 0 530,60 A30,6.5 0 1 0 470,60', { c: PAPER, w: 3, go: 0.3 });   // 瓶口一圈
       const hi = [mk('path', { d: 'M352,318 C345,380 345,440 351,492', fill: 'none', stroke: '#ffffff', 'stroke-width': 7, 'stroke-linecap': 'round', opacity: 0, filter: `url(#${soft})` }, svg),
-        mk('path', { d: 'M378,248 C402,226 432,212 458,203', fill: 'none', stroke: '#ffffff', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0, filter: `url(#${soft})` }, svg)];
+        mk('path', { d: 'M378,248 C402,226 432,212 458,203', fill: 'none', stroke: '#ffffff', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0, filter: `url(#${soft})` }, svg),
+        mk('path', { d: 'M650,336 C655,392 655,442 650,488', fill: 'none', stroke: '#ffffff', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0, filter: `url(#${soft})` }, svg),
+        mk('path', { d: 'M478,72 L478,140', fill: 'none', stroke: '#ffffff', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0, filter: `url(#${soft})` }, svg)];
       const t1 = text(svg, 215, 305, '天地', { s: 42, c: GOLD, ls: '0.3em' }), t2 = text(svg, 800, 305, '神？', { s: 42, c: '#cfe8fb', ls: '0.2em' });
       const t0 = AT(s.at), tf = AT(s.fill);
-      DRAW(tl, b, t0, 1.4); tl.to(body, { opacity: 1, duration: 1.2 }, t0 + 0.4); tl.to(hi, { opacity: 0.5, duration: 1.0 }, t0 + 1.0);
+      DRAW(tl, b, t0, 1.4); tl.to(body, { opacity: 1, duration: 1.2 }, t0 + 0.4); tl.to(hi, { opacity: 0.45, duration: 1.2 }, t0 + 1.0);
+      DRAW(tl, rim, t0 + 1.1, 0.6); tl.to(wall, { opacity: 0.26, duration: 1.2 }, t0 + 1.0); tl.to(shadow, { opacity: 0.55, duration: 1.4 }, t0 + 0.6);
+      tl.to([col1, col2], { opacity: 0.9, duration: 0.3 }, tf - 0.2); tl.to([col1, col2], { opacity: 0, duration: 0.6 }, tf + 2.5);   // 倒水的那几秒才有水柱
+      rip.forEach((e, i) => { for (let k = 0; k < 2; k++) { const d = tf + 0.1 + i * 0.32 + k * 1.3;
+        tl.fromTo(e, { attr: { rx: 10, ry: 2 }, opacity: 0.7 }, { attr: { rx: 70, ry: 9 }, opacity: 0, duration: 1.1, ease: 'sine.out', immediateRender: false }, d); } });
       SHOW(tl, t1, t0 + 0.6); SHOW(tl, t2, tf - 0.2);
       tl.fromTo(flow, { x: 0 }, { x: -400, duration: 26, ease: 'none', immediateRender: false }, t0);   // 水面一直在轻轻流动
       tl.to(lvl, { y: 64, duration: 2.8, ease: 'power1.inOut' }, tf);
@@ -104,15 +124,24 @@
     },
     // 楼和地基：楼画出来，地基亮起来——是地基托着楼
     building({ tl, el, AT, s }) {
-      const { svg, glowId } = base(el);
-      const parts = ['M380,470 L380,110 L620,110 L620,470', 'M380,170 L620,170 M380,230 L620,230 M380,290 L620,290 M380,350 L620,350 M380,410 L620,410', 'M470,470 L470,420 L530,420 L530,470'];
-      const ls = parts.map((d, i) => line(svg, d, { c: PAPER, w: i ? 2.5 : 4 }));
-      const f = mk('rect', { x: 300, y: 470, width: 400, height: 50, rx: 4, fill: GOLD, opacity: 0, filter: `url(#${glowId})` }, svg);
-      const tF = text(svg, 500, 506, '地　基', { s: 30, c: '#2a2118' }), tB = text(svg, 500, 80, '楼', { s: 40 });
-      ls.forEach((l, i) => DRAW(tl, l, AT(s.at) + i * 0.4, 1.3)); SHOW(tl, tB, AT(s.at) + 0.8);
-      tl.to(f, { opacity: 1, duration: 1.0, ease: 'power2.out' }, AT(s.found)); SHOW(tl, tF, AT(s.found) + 0.3);
-      const arrows = [430, 500, 570].map(x => line(svg, `M${x},560 L${x},480 M${x - 12},494 L${x},480 L${x + 12},494`, { c: GOLD, w: 3 }));
-      arrows.forEach((a, i) => DRAW(tl, a, AT(s.found) + 0.4 + i * 0.15, 0.7));
+      // 一座古典的殿（三级台阶、六根柱子、横梁、三角楣）立在一块地基上；说到“地基托着楼”，地基亮起来，光从下往上透过柱间
+      const { svg, defs, uid, blur } = base(el);
+      const fglow = mk('ellipse', { cx: 500, cy: 494, rx: 360, ry: 80, fill: grad(defs, 'fh' + uid, 'radialGradient', { cx: 500, cy: 494, r: 360 }, [[0, '#ffe6a6', 0.55], [1, GOLD, 0]]), opacity: 0, filter: `url(#${blur})` }, svg);
+      const lightG = grad(defs, 'lg' + uid, 'linearGradient', { x1: 0, y1: 440, x2: 0, y2: 210 }, [[0, '#ffe6a6', 0.6], [1, '#ffe6a6', 0]]);
+      const beams = [376, 438, 500, 562, 624].map(x => mk('rect', { x: x - 16, y: 222, width: 32, height: 218, fill: lightG, opacity: 0, style: 'mix-blend-mode:screen' }, svg));
+      const steps = line(svg, 'M296,440 L704,440 M284,453 L716,453 M272,466 L728,466', { c: PAPER, w: 2.4 });
+      const cols = [345, 407, 469, 531, 593, 655].map(x => line(svg, `M${x - 13},228 L${x - 13},436 M${x + 13},228 L${x + 13},436 M${x - 20},228 L${x + 20},228 M${x - 20},436 L${x + 20},436`, { c: PAPER, w: 2.4 }));
+      const beam = line(svg, 'M306,188 L694,188 L694,224 L306,224 Z M314,206 L686,206', { c: PAPER, w: 2.6 });
+      const ped = line(svg, 'M296,188 L500,92 L704,188', { c: PAPER, w: 3 }), ped2 = line(svg, 'M346,178 L500,108 L654,178 Z', { c: PAPER, w: 1.6, go: 0.12 });
+      const fg = grad(defs, 'fg' + uid, 'linearGradient', { x1: 0, y1: 472, x2: 0, y2: 522 }, [[0, '#fff2c8'], [0.45, '#e2bd76'], [1, '#8a6428']]);
+      const f = mk('rect', { x: 250, y: 472, width: 500, height: 48, rx: 3, fill: fg, opacity: 0 }, svg);
+      const tF = text(svg, 500, 506, '地　基', { s: 30, c: '#2a2118', wt: 700 }), tB = text(svg, 500, 60, '楼', { s: 40 });
+      const t0 = AT(s.at);
+      DRAW(tl, steps, t0, 0.8); cols.forEach((c, i) => DRAW(tl, c, t0 + 0.35 + i * 0.12, 1.0)); DRAW(tl, beam, t0 + 1.1, 0.8); DRAW(tl, ped, t0 + 1.5, 1.0); DRAW(tl, ped2, t0 + 1.9, 0.8);
+      SHOW(tl, tB, t0 + 1.4);
+      const tf = AT(s.found);
+      tl.to(fglow, { opacity: 1, duration: 1.4, ease: 'sine.inOut' }, tf); tl.to(f, { opacity: 1, duration: 1.0, ease: 'power2.out' }, tf); SHOW(tl, tF, tf + 0.3);
+      beams.forEach((b, i) => { tl.to(b, { opacity: 0.85, duration: 1.4, ease: 'sine.inOut' }, tf + 0.5 + i * 0.1); tl.to(b, { opacity: 0.45, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: 3 }, tf + 2.0 + i * 0.1); });
     },
     // 瓶即使破碎，你并不散溢：玻璃瓶里满是光 → 瓶身裂开 → 碎玻璃崩落、闪着光往下掉，光还在原地，更亮，光芒慢慢转、光点往上飘
     breaking({ tl, el, AT, s }) {
@@ -259,7 +288,7 @@
       slices.forEach(([p]) => tl.to(p, { opacity: 0, duration: 0.6 }, t1)); tl.to(q, { opacity: 0, duration: 0.5 }, t1);
       for (let i = 0; i < 7; i++) {
         const x = 150 + i * 116, c = mk('circle', { cx: x, cy: 300, r: 44, fill: `url(#co${uid})`, stroke: '#f6dfa6', 'stroke-width': 2.5, opacity: 0, filter: `url(#${glowId})` }, svg);
-        tl.fromTo(c, { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', immediateRender: false }, t1 + 0.4 + i * 0.12);
+        tl.fromTo(c, { opacity: 0, scale: 0.85, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out', immediateRender: false }, t1 + 0.4 + i * 0.12);
       }
       const t2 = text(svg, 500, 420, '就像只照顾你一个人', { s: 38, c: GOLD, ls: '0.12em' }); SHOW(tl, t2, s.cap !== undefined ? AT(s.cap) : t1 + 1.4);
     },
@@ -310,42 +339,62 @@
     },
     // 陪着你把错误的想法走到底，让你自己撞上墙：一条路画出来，两个点沿着路走，撞到墙上
     wall({ tl, el, AT, s }) {
+      // 陪你把错误的想法走到底：一条路，两点光（你的想法，和陪着你的奥古斯丁）一起走到尽头，撞上一堵石墙
       const { svg, glowId } = base(el);
-      const P = 'M90,380 C220,380 260,250 390,262 C520,274 560,360 700,330 L758,318';
-      const road = line(svg, P, { c: PAPER, w: 3 });
+      const P = 'M90,380 C220,380 260,250 390,262 C520,274 560,360 700,330 L756,318';
+      const road = line(svg, P, { c: PAPER, w: 2.6, go: 0.25 });
       const wall = mk('g', { opacity: 0 }, svg);
-      mk('rect', { x: 770, y: 110, width: 96, height: 360, fill: 'rgba(235,162,124,.16)', stroke: CORAL, 'stroke-width': 4 }, wall);
-      for (let i = 1; i < 6; i++) { const y = 110 + i * 60; mk('path', { d: `M770,${y} L866,${y} M${i % 2 ? 818 : 794},${y - 60} L${i % 2 ? 818 : 794},${y}`, stroke: CORAL, 'stroke-width': 2, opacity: 0.7 }, wall); }
-      const me = mk('circle', { cx: 90, cy: 380, r: 15, fill: PAPER, opacity: 0, filter: `url(#${glowId})` }, svg);
-      const au = mk('circle', { cx: 60, cy: 392, r: 13, fill: GOLD, opacity: 0, filter: `url(#${glowId})` }, svg);
+      for (let r = 0; r < 8; r++) for (let c = -1; c < 2; c++) {                      // 石块：错缝砌，深色石面、上沿一道细高光
+        const x = 770 + c * 48 + (r % 2 ? 24 : 0), y = 110 + r * 45, x0 = Math.max(770, x), x1 = Math.min(866, x + 46);
+        if (x1 - x0 < 8) continue;
+        mk('rect', { x: x0, y: y + 1, width: x1 - x0 - 2, height: 42, rx: 3, fill: '#3a2f26', 'fill-opacity': 0.92, stroke: '#8f6c50', 'stroke-width': 1.2 }, wall);
+        mk('path', { d: `M${x0 + 3},${y + 3} L${x1 - 5},${y + 3}`, stroke: '#e8c9a0', 'stroke-width': 1.2, opacity: 0.45 }, wall);
+      }
+      const me = mk('circle', { cx: 90, cy: 380, r: 13, fill: PAPER, opacity: 0, filter: `url(#${glowId})` }, svg);
+      const au = mk('circle', { cx: 60, cy: 392, r: 11, fill: GOLD, opacity: 0, filter: `url(#${glowId})` }, svg);
       const t1 = text(svg, 120, 450, '错误的想法', { s: 30, c: PAPER }), t2 = text(svg, 300, 520, '奥古斯丁陪你一起走', { s: 30, c: GOLD });
       const t0 = AT(s.at);
-      DRAW(tl, road, t0, 1.6); tl.to(wall, { opacity: 1, duration: 0.8 }, t0 + 0.6);
-      tl.to([me, au], { opacity: 1, duration: 0.5 }, t0 + 0.4); SHOW(tl, t1, t0 + 0.5); SHOW(tl, t2, t0 + 1.2);
+      DRAW(tl, road, t0, 1.6); tl.fromTo(wall, { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: 1.0, ease: 'power2.out', immediateRender: false }, t0 + 0.6);
+      tl.to([me, au], { opacity: 1, duration: 0.6 }, t0 + 0.4); SHOW(tl, t1, t0 + 0.5); SHOW(tl, t2, t0 + 1.2);
       // 两个点的位置全由这两段“进度”算出来（逐帧定位时也对）：从出现起走到撞墙，撞墙后往回弹一点
       const pos = (c, q, dx = 0) => { const L = road._m.getTotalLength(), pt = road._m.getPointAtLength(Math.max(0, Math.min(1, q)) * L); c.setAttribute('cx', pt.x - dx); c.setAttribute('cy', pt.y); };
       const th = AT(s.hit), ts = t0 + 0.4, D = th - ts, walk = Math.max(1.5, Math.min(D, th - t0 - 0.6)), o = { p: 0 }, b = { p: 0 };
       tl.to(o, { p: 1, duration: D, ease: 'none', onUpdate: () => { const q = Math.max(0, (o.p * D - (D - walk)) / walk) ** 1.6; pos(me, 0.1 + 0.9 * q); pos(au, 0.9 * q); } }, ts);
-      tl.to(wall, { x: 7, duration: 0.07, ease: 'none' }, th); tl.to(wall, { x: -5, duration: 0.09, ease: 'none' }, th + 0.07); tl.to(wall, { x: 0, duration: 0.2, ease: 'power2.out' }, th + 0.16);
-      tl.to(b, { p: 1, duration: 0.45, ease: 'power2.out', onUpdate: () => pos(me, 1, 40 * b.p) }, th + 0.02);
-      const burst = [0, 1, 2, 3, 4, 5].map(i => { const a = (-150 + i * 60) * Math.PI / 180; return line(svg, `M${758 + Math.cos(a) * 26},${318 + Math.sin(a) * 26} L${758 + Math.cos(a) * 58},${318 + Math.sin(a) * 58}`, { c: CORAL, w: 4 }); });
-      burst.forEach((b, i) => { DRAW(tl, b, th + i * 0.02, 0.25); tl.to(b, { opacity: 0, duration: 0.5 }, th + 0.6); });
+      tl.to(wall, { x: 5, duration: 0.07, ease: 'none' }, th); tl.to(wall, { x: -3, duration: 0.09, ease: 'none' }, th + 0.07); tl.to(wall, { x: 0, duration: 0.25, ease: 'power2.out' }, th + 0.16);
+      tl.to(b, { p: 1, duration: 0.5, ease: 'power2.out', onUpdate: () => pos(me, 1, 40 * b.p) }, th + 0.02);
+      // 撞上：一圈光环散开，几粒火星往后溅
+      const ring = mk('circle', { cx: 756, cy: 318, r: 10, fill: 'none', stroke: '#fff1d6', 'stroke-width': 2, opacity: 0 }, svg);
+      tl.fromTo(ring, { attr: { r: 10 }, opacity: 0.9 }, { attr: { r: 64 }, opacity: 0, duration: 0.8, ease: 'power2.out', immediateRender: false }, th);
+      const rr = rng(13);
+      for (let i = 0; i < 9; i++) { const a = Math.PI * (0.62 + rr() * 0.76), d = 40 + rr() * 60, sp = mk('circle', { cx: 750, cy: 318, r: 2 + rr() * 2, fill: '#ffe2b0', opacity: 0, filter: `url(#${glowId})` }, svg);
+        tl.fromTo(sp, { x: 0, y: 0, opacity: 1 }, { x: Math.cos(a) * d, y: Math.sin(a) * d * 0.8 + 10, opacity: 0, duration: 0.7 + rr() * 0.3, ease: 'power2.out', immediateRender: false }, th + 0.02); }
       const tH = text(svg, 818, 80, '撞上墙', { s: 44, c: CORAL }); SHOW(tl, tH, th + 0.2);
       const tE = text(svg, 450, 160, '——自己发现：这条路走不通', { s: 34, c: GOLD }); SHOW(tl, tE, th + 1.0);
     },
     // 神像空气一样，摊在整个宇宙里，每个地方分到薄薄一层？——不是这样
     thin({ tl, el, AT, s }) {
-      const { svg, defs, glowId } = base(el);
-      const rg = mk('radialGradient', { id: 't' + glowId }, defs);
-      mk('stop', { offset: 0, 'stop-color': '#fff3d0', 'stop-opacity': 1 }, rg); mk('stop', { offset: 0.6, 'stop-color': GOLD, 'stop-opacity': 0.8 }, rg); mk('stop', { offset: 1, 'stop-color': GOLD, 'stop-opacity': 0 }, rg);
-      const box = line(svg, 'M110,90 L890,90 L890,470 L110,470 Z', { c: PAPER, w: 3 });
-      const lab = text(svg, 150, 135, '宇宙', { s: 30, a: 'start', c: PAPER, wt: 400 });
-      const blob = mk('ellipse', { cx: 500, cy: 280, rx: 100, ry: 100, fill: `url(#t${glowId})`, opacity: 0 }, svg);
-      DRAW(tl, box, AT(s.at), 1.2); SHOW(tl, lab, AT(s.spread) + 0.75);   // “摊在整个宇宙”说到“宇宙”时 tl.to(blob, { opacity: 1, duration: 0.8 }, AT(s.at) + 0.4);
-      tl.to(blob, { attr: { rx: 375, ry: 12 }, opacity: 0.55, duration: 2.2, ease: 'power2.inOut' }, AT(s.spread));
-      const t1 = text(svg, 500, 230, '每个地方，分到薄薄的一层？', { s: 36, c: '#d8ecfa' }); SHOW(tl, t1, AT(s.spread) + 1.4);
-      const x = line(svg, 'M170,130 L830,430', { c: CORAL, w: 7 }); DRAW(tl, x, AT(s.no), 0.5);
-      const t2 = text(svg, 500, 535, '不是这样的', { s: 44, c: CORAL }); SHOW(tl, t2, AT(s.no) + 0.3);
+      // 神像空气一样摊在整个宇宙里，每个地方分到薄薄一层？一片星空里，一团金光慢慢摊成薄薄的一层 →“不是这样的”：这层薄光散成光点，消失
+      const { svg, defs, uid, glowId } = base(el);
+      const r = rng(7), stars = [];
+      for (let i = 0; i < 110; i++) stars.push(mk('circle', { cx: 120 + r() * 760, cy: 70 + r() * 410, r: 0.7 + r() * 1.7, fill: '#f6eeda', opacity: 0 }, svg));
+      const frame = line(svg, 'M110,58 L890,58 L890,492 L110,492 Z', { c: PAPER, w: 1.6, go: 0.12 });
+      const lab = text(svg, 140, 100, '宇宙', { s: 30, a: 'start', c: PAPER, wt: 400 });
+      const mist = mk('ellipse', { cx: 500, cy: 280, rx: 110, ry: 110, fill: grad(defs, 'tm' + uid, 'radialGradient', { cx: 500, cy: 280, r: 1, gradientUnits: 'objectBoundingBox' }, []), opacity: 0 }, svg);
+      const mg = mk('radialGradient', { id: 'tg' + uid }, defs); mk('stop', { offset: 0, 'stop-color': '#fff3d0', 'stop-opacity': 0.95 }, mg); mk('stop', { offset: 0.55, 'stop-color': GOLD, 'stop-opacity': 0.55 }, mg); mk('stop', { offset: 1, 'stop-color': GOLD, 'stop-opacity': 0 }, mg);
+      mist.setAttribute('fill', `url(#tg${uid})`);
+      const t0 = AT(s.at), tsp = AT(s.spread), tno = AT(s.no);
+      stars.forEach((st, i) => { const o = 0.25 + r() * 0.65; tl.to(st, { opacity: o, duration: 1.2, ease: 'sine.out' }, t0 + (i % 17) * 0.05);
+        if (i % 4 === 0) tl.to(st, { opacity: o * 0.35, duration: 1.4 + r(), ease: 'sine.inOut', yoyo: true, repeat: 5 }, t0 + 1.4 + (i % 7) * 0.3); });
+      DRAW(tl, frame, t0, 1.4); SHOW(tl, lab, tsp + 0.75);
+      tl.to(mist, { opacity: 1, duration: 1.0, ease: 'sine.out' }, t0 + 0.4);
+      tl.to(mist, { attr: { rx: 380, ry: 13 }, opacity: 0.6, duration: 2.6, ease: 'power2.inOut' }, tsp);
+      const t1 = text(svg, 500, 232, '每个地方，分到薄薄的一层？', { s: 36, c: '#e8f1f8' }); SHOW(tl, t1, tsp + 1.4);
+      // 不是这样：薄薄的那一层碎成光点，往上散掉
+      tl.to(mist, { opacity: 0, duration: 0.7, ease: 'power1.in' }, tno);
+      for (let i = 0; i < 30; i++) { const x = 130 + i * 25 + r() * 10, d = tno + Math.abs(i - 15) * 0.02, m = mk('circle', { cx: x, cy: 280 + (r() - 0.5) * 12, r: 1.6 + r() * 2.2, fill: '#ffe9b5', opacity: 0, filter: `url(#${glowId})` }, svg);
+        tl.fromTo(m, { opacity: 0.95, y: 0 }, { opacity: 0, y: -(30 + r() * 70), duration: 1.2 + r() * 0.6, ease: 'power1.out', immediateRender: false }, d); }
+      tl.to(t1, { opacity: 0.35, duration: 0.8 }, tno + 0.2);
+      const t2 = text(svg, 500, 545, '不是这样的', { s: 44, c: CORAL }); SHOW(tl, t2, tno + 0.3);
     },
     // 好像神切下来一块，放进世界里，全世界共用这一块——那剩下的神呢？（切走的地方留一道虚线）
     slice({ tl, el, AT, s }) {
@@ -391,22 +440,36 @@
     },
     // 大的分得多、小的分得少？标签一换：大象/麻雀 → 大教会/小团契 → 大教堂/出租屋 → 有名的牧师/最后一排
     scale({ tl, el, AT, s }) {
+      // 大的分得多、小的分得少？两只玻璃器皿（一大一小）盛着金色的光：大的盛得多，小的只有一点；标签一换再换
       const { svg, defs, uid, glowId } = base(el);
-      const b1 = line(svg, 'M110,150 L520,150 L520,460 L110,460 Z', { c: PAPER, w: 4 }), b2 = line(svg, 'M680,330 L860,330 L860,460 L680,460 Z', { c: PAPER, w: 4 });
-      const sf = grad(defs, 'sf' + uid, 'linearGradient', { x1: 0, y1: 190, x2: 0, y2: 450 }, [[0, '#fff2c8'], [0.35, '#ebc883'], [1, '#a9792f']]);
-      const f1 = mk('rect', { x: 124, y: 446, width: 382, height: 0, rx: 10, fill: sf, opacity: 0.92 }, svg);
-      const f2 = mk('rect', { x: 694, y: 446, width: 152, height: 0, rx: 6, fill: sf, opacity: 0.92 }, svg);
-      DRAW(tl, b1, AT(s.at) - 0.3, 1.0); DRAW(tl, b2, AT(s.at) - 0.1, 0.8);
-      tl.to(f1, { attr: { y: 196, height: 250 }, duration: 1.6, ease: 'power2.out' }, AT(s.fill)); tl.to(f2, { attr: { y: 420, height: 26 }, duration: 1.0, ease: 'power2.out' }, AT(s.fill) + 0.2);
-      const leg = text(svg, 500, 535, '金色 = 分到的神', { s: 28, c: PAPER, wt: 400 }); SHOW(tl, leg, AT(s.fill) + 0.8);
+      const V1 = 'M150,150 L150,430 Q150,462 182,462 L478,462 Q510,462 510,430 L510,150', V2 = 'M690,330 L690,442 Q690,462 710,462 L830,462 Q850,462 850,442 L850,330';
+      mk('path', { d: V1 + ' Z' }, mk('clipPath', { id: 'v1' + uid }, defs)); mk('path', { d: V2 + ' Z' }, mk('clipPath', { id: 'v2' + uid }, defs));
+      const glass = grad(defs, 'vg' + uid, 'linearGradient', { x1: 0, y1: 0, x2: 1, y2: 0, gradientUnits: 'objectBoundingBox' }, [[0, '#eaf6ff', 0.2], [0.15, '#eaf6ff', 0.05], [0.85, '#eaf6ff', 0.04], [1, '#eaf6ff', 0.16]]);
+      const liq = grad(defs, 'vl' + uid, 'linearGradient', { x1: 0, y1: 0, x2: 0, y2: 1, gradientUnits: 'objectBoundingBox' }, [[0, '#fff2c8', 0.95], [0.4, '#ebc883', 0.92], [1, '#a9792f', 0.95]]);
+      const body1 = mk('path', { d: V1 + ' Z', fill: glass, opacity: 0 }, svg), body2 = mk('path', { d: V2 + ' Z', fill: glass, opacity: 0 }, svg);
+      const in1 = mk('g', { 'clip-path': `url(#v1${uid})` }, svg), in2 = mk('g', { 'clip-path': `url(#v2${uid})` }, svg);
+      const l1 = mk('g', {}, in1), l2 = mk('g', {}, in2);
+      mk('rect', { x: 140, y: 0, width: 380, height: 520, fill: liq }, l1); mk('ellipse', { cx: 330, cy: 0, rx: 190, ry: 8, fill: '#fff6dc', opacity: 0.8 }, l1);
+      mk('rect', { x: 680, y: 0, width: 180, height: 200, fill: liq }, l2); mk('ellipse', { cx: 770, cy: 0, rx: 90, ry: 5, fill: '#fff6dc', opacity: 0.8 }, l2);
+      gsap.set(l1, { y: 470 }); gsap.set(l2, { y: 470 });
+      const glow1 = mk('ellipse', { cx: 330, cy: 330, rx: 230, ry: 170, fill: GOLD, opacity: 0, filter: `url(#b${uid})` }, svg), glow2 = mk('ellipse', { cx: 770, cy: 440, rx: 90, ry: 30, fill: GOLD, opacity: 0, filter: `url(#b${uid})` }, svg);
+      svg.insertBefore(glow1, body1); svg.insertBefore(glow2, body1);
+      const b1 = line(svg, V1, { c: PAPER, w: 3.4, go: 0.3 }), b2 = line(svg, V2, { c: PAPER, w: 3.4, go: 0.3 });
+      const r1 = line(svg, 'M150,150 A180,9 0 1 0 510,150 A180,9 0 1 0 150,150', { c: PAPER, w: 2, go: 0.2 }), r2 = line(svg, 'M690,330 A80,5 0 1 0 850,330 A80,5 0 1 0 690,330', { c: PAPER, w: 2, go: 0.2 });
+      DRAW(tl, b1, AT(s.at) - 0.3, 1.1); DRAW(tl, r1, AT(s.at) + 0.5, 0.6); DRAW(tl, b2, AT(s.at) - 0.1, 0.9); DRAW(tl, r2, AT(s.at) + 0.6, 0.5);
+      tl.to([body1, body2], { opacity: 1, duration: 1.0 }, AT(s.at));
+      const tf = AT(s.fill);
+      tl.to(l1, { y: 205, duration: 2.0, ease: 'power2.inOut' }, tf); tl.to(l2, { y: 436, duration: 1.4, ease: 'power2.inOut' }, tf + 0.2);
+      tl.to(glow1, { opacity: 0.22, duration: 1.6 }, tf + 0.4); tl.to(glow2, { opacity: 0.16, duration: 1.2 }, tf + 0.5);
+      const leg = text(svg, 500, 535, '金色 = 分到的神', { s: 28, c: PAPER, wt: 400 }); SHOW(tl, leg, tf + 0.8);
       let prev = null;
       s.pairs.forEach(([at, big, small, at2], i) => {
         const g = mk('g', {}, svg), gb = mk('g', { opacity: 0 }, g), gs = mk('g', { opacity: 0 }, g);
-        text(gb, 315, 120, big, { s: big.length > 4 ? 40 : 46, c: PAPER }); text(gs, 770, 300, small, { s: small.length > 4 ? 32 : 40, c: PAPER });
+        text(gb, 330, 118, big, { s: big.length > 4 ? 40 : 46, c: PAPER }); text(gs, 770, 300, small, { s: small.length > 4 ? 32 : 40, c: PAPER });
         const t = AT(at), t2 = at2 !== undefined ? AT(at2) : t;
-        if (prev) tl.to(prev, { opacity: 0, y: -12, duration: 0.5 }, t - 0.25);
-        tl.fromTo(gb, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false }, t + (i ? 0.1 : -0.3));
-        tl.fromTo(gs, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false }, t2 - 0.05);
+        if (prev) tl.to(prev, { opacity: 0, y: -8, duration: 0.5 }, t - 0.25);
+        tl.fromTo(gb, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', immediateRender: false }, t + (i ? 0.1 : -0.3));
+        tl.fromTo(gs, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', immediateRender: false }, t2 - 0.05);
         prev = g;
       });
     },
@@ -459,7 +522,7 @@
       s.items.forEach((w, i) => {
         const a = -Math.PI / 2 + i / n * Math.PI * 2, x = 500 + Math.cos(a) * 395, y = 290 + Math.sin(a) * 215;
         const t = text(svg, x, y + 14, w, { s: w.length > 3 ? 38 : 44, c: GOLD });
-        tl.fromTo(t, { opacity: 0, scale: 0.6, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', immediateRender: false }, AT(w) - 0.05);
+        tl.fromTo(t, { opacity: 0, scale: 0.92, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out', immediateRender: false }, AT(w) - 0.05);
       });
       tl.to(sun, { attr: { r: 210 }, duration: 3, ease: 'sine.inOut' }, AT(s.items[n - 1]));
     },
@@ -491,7 +554,7 @@
       const t0 = AT(s.at), tn = AT(s.notes);
       DRAW(tl, staff, t0, 1.2); SHOW(tl, title, t0 + 0.3);
       DRAW(tl, man, tn - 0.4, 1.1); DRAW(tl, pen, tn + 0.4, 0.5); SHOW(tl, lab, AT(s.name));
-      notes.forEach((n, i) => { tl.fromTo(n.g, { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.45, ease: 'back.out(2)', immediateRender: false }, tn + 0.3 + i * 0.2); DRAW(tl, threads[i], tn + 0.6 + i * 0.2, 0.8); });
+      notes.forEach((n, i) => { tl.fromTo(n.g, { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', immediateRender: false }, tn + 0.3 + i * 0.2); DRAW(tl, threads[i], tn + 0.6 + i * 0.2, 0.8); });
       if (s.sweep !== undefined) { const ts = AT(s.sweep); tl.set(sweep, { opacity: 1 }, ts); tl.fromTo(sweep, { x: 0 }, { x: X1 - X0 + 110, duration: 2.6, ease: 'none', immediateRender: false }, ts); tl.set(sweep, { opacity: 0 }, ts + 2.6);
         notes.forEach(n => { const t = ts + (n.x - X0 + 90) / (X1 - X0 + 110) * 2.6; tl.to(n.g, { scale: 1.25, svgOrigin: `${n.x} ${n.y}`, duration: 0.18, ease: 'power2.out' }, t); tl.to(n.g, { scale: 1, svgOrigin: `${n.x} ${n.y}`, duration: 0.35 }, t + 0.18); }); }
       const tni = AT(s.notin); DRAW(tl, frame, tni, 1.0); DRAW(tl, arrow, tni + 0.6, 0.5); DRAW(tl, no, tni + 1.2, 0.45);
@@ -597,7 +660,7 @@
       const t1 = AT(s.at); DRAW(tl, mid, t1, 1.1); SHOW(tl, lp, t1 + 0.4); tl.to(seed, { opacity: 1, duration: 0.8 }, t1 + 0.2); SHOW(tl, lg, t1 + 0.5);
       const t2 = AT(s.world); DRAW(tl, outer, t2, 1.2); SHOW(tl, lw, t2 + 0.4);
       if (s.mid !== undefined) { const t3 = AT(s.mid); tl.fromTo(mid, { scale: 1 }, { scale: 0.93, svgOrigin: '500 280', duration: 0.5, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, t3); tl.fromTo(outer, { scale: 1 }, { scale: 0.96, svgOrigin: '500 280', duration: 0.5, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, t3 + 0.15); }
-      const t4 = AT(s.seed); tl.to(seed, { attr: { rx: 18, ry: 31 }, rotation: -24, svgOrigin: '500 280', duration: 0.9, ease: 'back.out(2)' }, t4); SHOW(tl, lk, t4 + 0.2);
+      const t4 = AT(s.seed); tl.to(seed, { attr: { rx: 18, ry: 31 }, rotation: -24, svgOrigin: '500 280', duration: 1.1, ease: 'power2.inOut' }, t4); SHOW(tl, lk, t4 + 0.9);
       const bits = (s.self || []).map(([w, at], i) => { const [x, y] = [[300, 290], [700, 290], [500, 482]][i]; const t = text(svg, x, y, w, { s: 30, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 }); SHOW(tl, t, AT(at)); return t; });
       const t6 = AT(s.blur);
       tl.to(seed, { attr: { rx: 130, ry: 130 }, opacity: 0.35, duration: 2.2, ease: 'power1.inOut' }, t6);
@@ -609,7 +672,7 @@
       const field = mk('circle', { cx: 500, cy: 262, r: 24, fill: grad(defs, 'fl' + uid, 'radialGradient', { cx: 500, cy: 262, r: 330 }, [[0, '#fff3d0', 0.95], [0.12, '#f6dc9c', 0.8], [0.55, GOLD, 0.32], [1, GOLD, 0]]), opacity: 0 }, svg);
       const ring = mk('circle', { cx: 500, cy: 262, r: 175, fill: 'none', stroke: PAPER, 'stroke-width': 4.5, opacity: 0 }, svg);
       const lw = text(svg, 500, 66, '我', { s: 50 }), ln = text(svg, 500, 332, '你', { s: 44, c: GOLD });
-      const c1 = text(svg, 500, 540, '你在我里面？', { s: 44, ls: '0.2em' }), c2 = text(svg, 500, 540, '我在你里面', { s: 50, c: GOLD, ls: '0.24em' });
+      const c1 = text(svg, 500, 540, '你在我身上？', { s: 44, ls: '0.2em' }), c2 = text(svg, 500, 540, '我在你里面', { s: 50, c: GOLD, ls: '0.24em' });
       const t1 = AT(s.at);
       tl.fromTo(ring, { opacity: 0, scale: 0.85, svgOrigin: '500 262' }, { opacity: 1, scale: 1, svgOrigin: '500 262', duration: 0.9, ease: 'power2.out', immediateRender: false }, t1);
       tl.to(field, { opacity: 1, duration: 0.8 }, t1 + 0.3); SHOW(tl, lw, t1 + 0.3); SHOW(tl, ln, t1 + 0.6); SHOW(tl, c1, t1 + 0.9);

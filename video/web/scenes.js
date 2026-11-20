@@ -61,7 +61,7 @@
   const IN = (t, at, o = {}) => tl.fromTo(t, { opacity: 0, y: o.y ?? 26, scale: o.s ?? 1, filter: `blur(${o.blur ?? 12}px)` },
     { opacity: o.o ?? 1, y: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 1.0, ease: o.ease ?? 'power3.out', stagger: o.st ?? 0, immediateRender: false }, at);
   const OUT = (t, at, o = {}) => tl.to(t, { opacity: 0, y: o.y ?? -22, filter: `blur(${o.blur ?? 10}px)`, duration: o.d ?? 0.7, ease: o.ease ?? 'power2.in', stagger: o.st ?? 0 }, at);
-  const DRAW = (t, at, d = 1, o = {}) => { tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', stagger: o.st ?? 0, immediateRender: false }, at); };
+  const DRAW = (t, at, d = 1, o = {}) => { tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1.01 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', stagger: o.st ?? 0, immediateRender: false }, at); };
   // reveal characters across a spoken span of `dur` seconds
   const type = (sel, at, dur, o = {}) => { const cs = chars(sel); return IN(cs, at, { st: dur / Math.max(1, cs.length), d: o.d ?? 0.8, y: o.y ?? 20, blur: o.blur ?? 12, s: o.s }); };
   const sceneOut = (sel, at, d = 0.8) => tl.to(sel, { autoAlpha: 0, filter: 'blur(14px)', scale: 1.035, duration: d, ease: 'power2.in' }, at);
@@ -121,7 +121,7 @@
   const td = t2 + 0.95, dd = 2.2;                                  // dot runs 354 → 397 while the numbers count
   tl.to(['.life-dot', '.life-dot-glow', '.life-gold'], { opacity: 1, duration: 0.3 }, td);
   tl.fromTo(['.life-dot', '.life-dot-glow'], { attr: { cx: 360 } }, { attr: { cx: 1039 }, duration: dd, ease: 'power2.inOut', immediateRender: false }, td);
-  tl.fromTo('.life-gold', { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: dd, ease: 'power2.inOut', immediateRender: false }, td);
+  tl.fromTo('.life-gold', { strokeDashoffset: 1.01 }, { strokeDashoffset: 0, duration: dd, ease: 'power2.inOut', immediateRender: false }, td);
   IN('.life-year', td, { d: 0.9, y: 30 });
   tl.fromTo('.yr', { textContent: 354 }, { textContent: 397, snap: { textContent: 1 }, duration: dd, ease: 'power2.inOut', immediateRender: false }, td);
   IN('.life-age', td + 0.35, { d: 0.9, y: 20 });
@@ -272,7 +272,7 @@
   tl.fromTo('.g-lbl.l-god', { opacity: 0, scale: 1.4, filter: 'blur(16px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.3, ease: 'expo.out', immediateRender: false }, P(G1, 0.12));
   DRAW('.f-ghost', P(G1, 0.16), 1.3);                               // he reaches up …
   type('.g-m1', P(G1, 0.4), G1.dur * 0.16);
-  tl.to('.f-ghost', { strokeDashoffset: 1, duration: 1.1, ease: 'power2.inOut' }, P(G1, 0.44));   // … and has no words
+  tl.to('.f-ghost', { strokeDashoffset: 1.01, duration: 1.1, ease: 'power2.inOut' }, P(G1, 0.44));   // … and has no words
   const tgd = P(G1, 0.66);                                          // 「只能借神给的话来说」
   tl.to('.g-m1', { opacity: 0.38, y: -8, duration: 0.6 }, tgd);
   DRAW('.f-down', tgd, 1.3); DRAW('.h-down', tgd + 1.15, 0.3);

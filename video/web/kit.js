@@ -28,15 +28,17 @@ window.kit = async function () {
     const els = t => typeof t === 'string' ? $$(t) : [].concat(t);
     const chars = K.chars = sel => els(sel).flatMap(e => e.classList && e.classList.contains('ch') ? [e] : $$('.ch', e));
     const reveal = (t, at) => { for (const el of els(t)) { let p = el.parentElement; while (p && !p.classList.contains('scene') && p.id !== 'stage') { if (+gsap.getProperty(p, 'opacity') === 0) tl.set(p, { opacity: 1 }, Math.max(0, at - 0.01)); p = p.parentElement; } } };
-    K.IN = (t, at, o = {}) => { reveal(t, at); gsap.set(t, { opacity: 0 }); return tl.fromTo(t, { opacity: 0, y: o.y ?? 26, x: o.x ?? 0, scale: o.s ?? 1, filter: `blur(${o.blur ?? 12}px)` }, { opacity: o.o ?? 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 0.9, ease: o.ease ?? 'power3.out', stagger: o.st ?? 0, immediateRender: false }, at); };
-    K.OUT = (t, at, o = {}) => tl.to(t, { opacity: 0, y: o.y ?? -20, filter: `blur(${o.blur ?? 10}px)`, duration: o.d ?? 0.5, ease: 'power2.in', stagger: o.st ?? 0 }, at);
-    K.DRAW = (t, at, d = 1, o = {}) => { reveal(t, at); tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', immediateRender: false }, at); };
-    K.type = (sel, at, dur, o = {}) => { const cs = chars(sel); return K.IN(cs, at, { st: Math.max(0.02, dur) / Math.max(1, cs.length), d: o.d ?? 0.7, y: o.y ?? 18, blur: o.blur ?? 10, s: o.s }); };
-    K.big = (sel, at, o = {}) => { const cs = chars(sel); reveal(cs, at); return tl.fromTo(cs, { opacity: 0, y: o.y ?? 50, scale: o.s ?? 1.12, filter: `blur(${o.blur ?? 22}px)` }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 1.1, ease: 'expo.out', stagger: o.st ?? 0.07, immediateRender: false }, at); };
+    K.IN = (t, at, o = {}) => { reveal(t, at); gsap.set(t, { opacity: 0 }); return tl.fromTo(t, { opacity: 0, y: o.y ?? 14, x: o.x ?? 0, scale: o.s ?? 1, filter: `blur(${o.blur ?? 5}px)` }, { opacity: o.o ?? 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 1.05, ease: o.ease ?? 'power2.out', stagger: o.st ?? 0, immediateRender: false }, at); };
+    K.OUT = (t, at, o = {}) => tl.to(t, { opacity: 0, y: o.y ?? -10, filter: `blur(${o.blur ?? 5}px)`, duration: o.d ?? 0.6, ease: 'power1.in', stagger: o.st ?? 0 }, at);
+    K.DRAW = (t, at, d = 1, o = {}) => { reveal(t, at); tl.set(t, { opacity: o.o ?? 1 }, at); return tl.fromTo(t, { strokeDashoffset: 1.01 }, { strokeDashoffset: 0, duration: d, ease: o.ease ?? 'power2.inOut', immediateRender: false }, at); };
+    K.type = (sel, at, dur, o = {}) => { const cs = chars(sel); return K.IN(cs, at, { st: Math.max(0.02, dur) / Math.max(1, cs.length), d: o.d ?? 0.8, y: Math.min(o.y ?? 10, 10), blur: Math.min(o.blur ?? 4, 4), s: o.s }); };
+    // 大字：逐字浮现（小幅上浮、轻微虚化），不再放大、不再大模糊
+    K.big = (sel, at, o = {}) => { const cs = chars(sel); reveal(cs, at); return tl.fromTo(cs, { opacity: 0, y: Math.min(o.y ?? 16, 16), scale: 1, filter: `blur(${Math.min(o.blur ?? 6, 6)}px)` }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: o.d ?? 1.2, ease: 'power3.out', stagger: Math.min(o.st ?? 0.05, 0.07), immediateRender: false }, at); };
     K.stamp = (sel, at, rot = -9) => { reveal(sel, at); gsap.set(sel, { opacity: 0 }); return tl.fromTo(sel, { opacity: 0, scale: 2.4, rotation: rot + 7 }, { opacity: 0.95, scale: 1, rotation: rot, duration: 0.45, ease: 'back.out(1.6)', immediateRender: false }, at); };
     K.light = (at, v, d = 1.5) => tl.to(BG, { ...v, duration: d, ease: 'sine.inOut' }, at);
-    K.flash = (at, x, y, peak = 0.5, rest = 0.08) => { tl.set(BG, { bx: x, by: y }, at - 0.01); tl.to(BG, { bloom: peak, duration: 0.35, ease: 'power2.out' }, at); tl.to(BG, { bloom: rest, duration: 1.6, ease: 'sine.inOut' }, at + 0.35); };
-    K.scene = (sel, a, b) => { tl.set(sel, { autoAlpha: 1, filter: 'blur(0px)', scale: 1 }, a - 0.02); tl.to(sel, { autoAlpha: 0, filter: 'blur(14px)', scale: 1.03, duration: 0.6, ease: 'power2.in' }, b - 0.6); };
+    K.flash = (at, x, y, peak = 0.5, rest = 0.08) => { tl.set(BG, { bx: x, by: y }, at - 0.01); tl.to(BG, { bloom: Math.min(peak, 0.3), duration: 0.8, ease: 'sine.inOut' }, at); tl.to(BG, { bloom: rest, duration: 2.4, ease: 'sine.inOut' }, at + 0.8); };
+    // 一场退场：轻轻淡出、略微上移（原来是放大 + 大模糊）
+    K.scene = (sel, a, b) => { tl.set(sel, { autoAlpha: 1, filter: 'blur(0px)', scale: 1, y: 0 }, a - 0.02); tl.to(sel, { autoAlpha: 0, filter: 'blur(5px)', y: -8, duration: 0.6, ease: 'power1.in' }, b - 0.6); };
     K.on = (sel, at) => { reveal(sel, at); tl.set(sel, { opacity: 1 }, at); };
     // 片头片尾、右上角小节名
     tl.to('#black', { opacity: 0, duration: 1.6 }, 0.1);

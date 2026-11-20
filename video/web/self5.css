@@ -12,5 +12,5 @@
 /* 片尾 */
 #LZ .z-t{font-size:80px}
 /* 原文卡出来时，一道光从左扫到右 */
-.lq::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(105deg,transparent calc(var(--sw,-30%) - 12%),rgba(255,236,190,.55) var(--sw,-30%),transparent calc(var(--sw,-30%) + 12%));mix-blend-mode:soft-light}
+.lq::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(105deg,transparent calc(var(--sw,-30%) - 18%),rgba(255,236,190,.38) var(--sw,-30%),transparent calc(var(--sw,-30%) + 18%));mix-blend-mode:soft-light}
 .lq{border:1px solid rgba(226,189,118,.5);box-shadow:0 40px 90px rgba(0,0,0,.72),0 0 60px rgba(226,189,118,.18)}
