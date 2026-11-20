@@ -25,7 +25,7 @@ window.lecture = async function (o = {}) {
   const P = (p, n = 0) => atP(EP, p, n);
   const AT = a => typeof a === 'number' ? a : Array.isArray(a) ? P(a[0], a[1]) : a && typeof a === 'object' ? P(a.p, a.n || 0) + (a.d || 0) : P(a);
   const host = document.querySelector('#scenes');
-  if (LEC.some(sc => (sc.items || []).some(it => it.ill))) await window.ILL_LOAD();   // 图解要用的图标
+  if (LEC.some(sc => (sc.items || []).some(it => it.ill || it.anim))) await window.ILL_LOAD();   // 图解、动画要用的图标
   const H = s => String(s);
   // 1) 搭 DOM（先搭好，K.prepare 才会把 .split 拆成逐字、把各项先藏起来）
   const built = LEC.map((sc, i) => {
@@ -71,6 +71,26 @@ window.lecture = async function (o = {}) {
   const starts = built.map(b => AT(b.sc.at));
   for (let i = 1; i < starts.length; i++) if (!(starts[i] > starts[i - 1] + 0.5)) throw new Error(`第 ${i} 场的开始时刻（${starts[i]}）不在上一场（${starts[i - 1]}）之后：` + JSON.stringify(built[i].sc.at));
   const END = EP.total - 6.6;
+  // 一场里最后一个图解、配画是说到它才出来的；离这一场淡出太近，还没看清就没了。这时把下一场往后挪一点（最多 LINGER 秒，
+  // 也不超过下一场长度的三成），让它多停一会儿。下一场里早于新起点的项，跟着新起点一起出来（只会晚、不会早于声音）。
+  const LINGER = o.linger ?? 1.6, NEED = 1.7;
+  const doneAt = sc => {
+    let d = -1;
+    for (const it of sc.items || []) {
+      if (it.ill) for (const x of it.items || []) { const o2 = Array.isArray(x) ? { at: x[2], ...(x[3] || {}) } : x; d = Math.max(d, AT(o2.at) + 0.95); if (o2.sat !== undefined) d = Math.max(d, AT(o2.sat) + 0.6); }
+      if (it.pics) for (const p of it.pics) d = Math.max(d, AT(p[2]) + 1.0, (p[3] || {}).capAt !== undefined ? AT(p[3].capAt) + 0.8 : -1);
+      if (it.pic) d = Math.max(d, AT(it.at) + 1.1, it.capAt !== undefined ? AT(it.capAt) + 0.8 : -1);
+      if (it.done !== undefined) d = Math.max(d, AT(it.done));                       // 动画自己说什么时候才算出完
+    }
+    return d;
+  };
+  for (let i = 0; i + 1 < starts.length; i++) {
+    if (built[i].sc.html || built[i + 1].sc.xfade) continue;
+    const d = doneAt(built[i].sc), short = NEED - (starts[i + 1] - 0.7 - d);
+    if (d < 0 || short <= 0) continue;
+    const room = (i + 2 < starts.length ? starts[i + 2] : END) - starts[i + 1], shift = Math.min(short, LINGER, room * 0.3);
+    if (shift > 0.05) { starts[i + 1] += shift; built[i + 1].late = shift; }
+  }
   window.LEC_TIMES = starts.map((t, i) => [t, i + 1 < starts.length ? starts[i + 1] : END]);   // 每一场的起止（检查截图用）
   built.forEach((b, i) => {
     const a = starts[i] - 0.1, e = i + 1 < built.length ? starts[i + 1] - 0.1 : END;
@@ -79,11 +99,17 @@ window.lecture = async function (o = {}) {
     if (b.sc.light) light(a, b.sc.light, 1.6);
     if (b.sc.run) b.sc.run({ K, P, AT, a, e, sec: b.sec, $: s => b.sec.querySelector(s), $$: s => [...b.sec.querySelectorAll(s)] });
     (b.sc.items || []).forEach((it, k) => {
-      const el = b.els[k], xf = b.sc.xfade && k === 0, at = xf ? a - 0.6 : it.at !== undefined ? AT(it.at) : a + 0.15;
+      const el = b.els[k], xf = b.sc.xfade && k === 0, at0 = xf ? a - 0.6 : it.at !== undefined ? AT(it.at) : a + 0.15;
+      const at = b.late && !xf ? Math.max(at0, a + 0.15) : at0;                           // 这一场被往后挪了：早于新起点的，跟着起点出来
+      const inner = [];
+      if (it.ill) (it.items || []).forEach(x => { const o2 = Array.isArray(x) ? { lab: x[1], at: x[2], ...(x[3] || {}) } : x; inner.push([o2.lab, o2.at]); if (o2.sat !== undefined) inner.push([o2.sub, o2.sat]); });
+      if (it.pics) it.pics.forEach(p => { inner.push([p[1], p[2]]); if ((p[3] || {}).capAt !== undefined) inner.push([p[1], p[3].capAt]); });
+      if (it.capAt !== undefined) inner.push([it.cap, it.capAt]);
+      for (const [lab, x] of inner) { const tx = AT(x); if (tx < a - 0.7 - (b.late || 0) || tx > e - 0.3) throw new Error(`第 ${i} 场「${lab}」的时刻 ${tx.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）`); }
       if (!xf && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
         IN(el, Math.max(a + 0.05, at - 0.6), { y: 40, d: 0.9, blur: 8 });
-        const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at - 1.0, e);
+        const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at0 - 1.0, e);
         if (ts) cs.forEach((c, j) => IN(c, Math.max(at - 0.3, ts[j] - 0.05), { d: 0.45, y: 8, blur: 6 }));
         else type(el.querySelector('.lq-t'), at, Math.max(1.5, (e - at) * 0.7), { d: 0.5, y: 8, blur: 6 });
         (it.hl || []).forEach(([sel, t2, col]) => tl.to(chars(el.querySelector('.lq-t ' + sel)), { color: col || '#b8321c', duration: 0.5, stagger: 0.02 }, AT(t2)));
@@ -102,9 +128,10 @@ window.lecture = async function (o = {}) {
       } else if (it.pic) {
         IN(el, at, { y: 26, s: 0.97, d: 1.1, blur: 8 });
         tl.fromTo(el.querySelector('img'), { scale: 1.0 }, { scale: it.z || 1.12, duration: Math.max(1, e - at), ease: 'none', immediateRender: false }, at);
-        if (it.cap) IN(el.querySelector('.lp-c'), at + 0.5, { y: 12, d: 0.8 });
+        if (it.cap) IN(el.querySelector('.lp-c'), it.capAt !== undefined ? AT(it.capAt) : at + 0.5, { y: 12, d: 0.8 });   // 说明字可以等说到时再出来
       } else if (it.pics) {
-        [...el.children].forEach((p, j) => { const t0 = AT(it.pics[j][2]); IN(p, t0, { y: 26, d: 1.0, blur: 8 }); tl.fromTo(p.querySelector('img'), { scale: 1.0 }, { scale: 1.1, duration: Math.max(1, e - t0), ease: 'none', immediateRender: false }, t0); });
+        [...el.children].forEach((p, j) => { const t0 = AT(it.pics[j][2]), o3 = it.pics[j][3] || {}; IN(p, t0, { y: 26, d: 1.0, blur: 8 }); tl.fromTo(p.querySelector('img'), { scale: 1.0 }, { scale: 1.1, duration: Math.max(1, e - t0), ease: 'none', immediateRender: false }, t0);
+          if (o3.capAt !== undefined && p.querySelector('.lp-c')) IN(p.querySelector('.lp-c'), AT(o3.capAt), { y: 12, d: 0.8 }); });
       } else if (it.fig) {
         if (xf) IN(el, at, { y: 0, d: 0.6, blur: 0, ease: 'sine.inOut' }); else IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
         if (it.spots) {                                                  // 发光的框：第一处淡入，之后平移到下一处

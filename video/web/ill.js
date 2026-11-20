@@ -16,6 +16,7 @@
   const SOLID = { g: '#e2bd76', c: '#eba27c', b: '#9cc7e8', p: '#efe6d2' };
   window.ILL_LOAD = async () => { if (!ICONS) ICONS = await (await fetch('/node_modules/@tabler/icons/tabler-nodes-outline.json')).json(); };
   window.ILL_HAS = name => !!(ICONS && ICONS[name]);
+  window.ILL_NODES = name => ICONS && ICONS[name];                                   // anim.js 里的动画也用这些图标
 
   window.ILL_BUILD = (spec, el, AT) => {
     const q = [], tl = new Proxy({}, { get: (_, k) => (...a) => { q.push([k, a]); return tl; } });
@@ -28,9 +29,11 @@
     const disc = mk('radialGradient', { id: 'id' + uid }, defs); mk('stop', { offset: 0, 'stop-color': '#1c1710', 'stop-opacity': 0.82 }, disc); mk('stop', { offset: 0.8, 'stop-color': '#0d0b08', 'stop-opacity': 0.78 }, disc); mk('stop', { offset: 1, 'stop-color': '#0d0b08', 'stop-opacity': 0.2 }, disc);
     const ray = mk('radialGradient', { id: 'ir' + uid, gradientUnits: 'userSpaceOnUse', cx: 0, cy: 0, r: 1 }, defs); mk('stop', { offset: 0, 'stop-color': '#f6dc9c', 'stop-opacity': 0.5 }, ray); mk('stop', { offset: 1, 'stop-color': '#f6dc9c', 'stop-opacity': 0 }, ray);
     for (const k in COL) { const g = mk('linearGradient', { id: `ig${k}${uid}`, gradientUnits: 'userSpaceOnUse', x1: 0, y1: 0, x2: 24, y2: 24 }, defs); COL[k].forEach(([o, c]) => mk('stop', { offset: o, 'stop-color': c }, g)); }
-    const DRAW = (els, at, d = 1.0) => { gsap.set(els, { strokeDashoffset: 1 }); tl.to(els, { strokeDashoffset: 0, duration: d, ease: 'power2.inOut', stagger: Math.min(0.12, 0.6 / Math.max(1, els.length)) }, at); };
+    const DRAW = (els, at, d = 0.75) => { gsap.set(els, { strokeDashoffset: 1 }); tl.to(els, { strokeDashoffset: 0, duration: d, ease: 'power2.inOut', stagger: Math.min(0.08, 0.3 / Math.max(1, els.length)) }, at); };
     const SHOW = (e, at, d = 0.6, y = 10) => { gsap.set(e, { opacity: 0 }); tl.fromTo(e, { opacity: 0, y }, { opacity: 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at); };
-    const text = (x, y, t, o = {}) => { const e = mk('text', { x, y, 'text-anchor': 'middle', fill: o.c || '#efe6d2', 'font-size': o.s || 34, 'font-family': o.font || 'Noto Serif SC', 'font-weight': o.wt || 700, 'letter-spacing': o.ls || '0.16em' }, svg); e.textContent = t; return e; };
+    const em = t => [...String(t)].reduce((w, ch) => w + (/[\x00-\x7f]/.test(ch) ? 0.56 : 1), 0);   // 多少个字宽
+    const fit = (t, fs, room, ls) => Math.max(22, Math.min(fs, room / (em(t) * (1 + ls))));
+    const text = (x, y, t, o = {}) => { const e = mk('text', { x, y, 'text-anchor': 'middle', fill: o.c || '#efe6d2', 'font-size': o.s || 34, 'font-family': o.font || 'Noto Serif SC', 'font-weight': o.wt || 700, 'letter-spacing': o.ls || '0.16em', stroke: 'rgba(10,8,6,.6)', 'stroke-width': 5, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, svg); e.textContent = t; return e; };   // 描一圈暗边：压在亮的画上也看得清
     // 一个图标：放在 (x, y)（中心），边长 s
     const icon = (name, x, y, s, c = 'g', parent = svg) => {
       const nodes = ICONS && ICONS[name]; if (!nodes) throw new Error('没有这个图标：' + name);
@@ -48,9 +51,18 @@
     const items = (spec.items || []).map(it => Array.isArray(it) ? { i: it[0], lab: it[1], at: it[2], ...(it[3] || {}) } : it);
     const n = items.length, kind = spec.ill;
     const cy = spec.cy ?? (H / 2 - 36);
-    const xs = kind === 'pair' || kind === 'vs' ? [260, 740] : kind === 'hero' ? [500] : items.map((_, i) => 500 + (i - (n - 1) / 2) * (n > 1 ? Math.min(260, 820 / (n - 1)) : 0));
+    // 一排的间距：标签长就拉开一点（但两头的圆框不能出画），再放不下就缩字
+    const s0 = it => it.s || (kind === 'hero' ? 190 : n >= 5 ? 100 : n === 4 ? 130 : kind === 'pair' || kind === 'vs' ? 165 : 145);
+    let sp = n > 1 ? Math.min(260, 820 / (n - 1)) : 0;
+    if (n > 1 && kind !== 'pair' && kind !== 'vs') {
+      const need = Math.max(...items.map(it => Math.max(it.lab ? em(it.lab) * 1.16 * 34 : 0, it.sub ? em(it.sub) * 1.06 * 25 : 0))) + 26;
+      const cap = (984 - 2 * Math.max(...items.map(it => s0(it) * 0.74 + 12))) / (n - 1);
+      sp = Math.max(sp, Math.min(need, cap));
+    }
+    const room = kind === 'pair' || kind === 'vs' ? 456 : kind === 'hero' ? 900 : sp - 40;   // 一排的标签之间至少留 40 的空
+    const xs = kind === 'pair' || kind === 'vs' ? [260, 740] : kind === 'hero' ? [500] : items.map((_, i) => 500 + (i - (n - 1) / 2) * sp);
     const placed = items.map((it, i) => {
-      const s = it.s || (kind === 'hero' ? 190 : n >= 5 ? 100 : n === 4 ? 130 : kind === 'pair' || kind === 'vs' ? 165 : 145), x = it.cx ?? xs[i], y = it.cy ?? cy, c = it.c || 'g', t = AT(it.at);
+      const s = s0(it), x = it.cx ?? xs[i], y = it.cy ?? cy, c = it.c || 'g', t = AT(it.at);
       let hl = null;
       if (kind === 'hero' || it.glow !== undefined) { hl = mk('circle', { cx: x, cy: y, r: s * 1.15, fill: `url(#ih${uid})`, opacity: 0 }, svg); svg.insertBefore(hl, svg.firstChild.nextSibling); }
       if (kind === 'hero') {
@@ -65,7 +77,7 @@
         const R = s * 0.74, back = mk('circle', { cx: x, cy: y, r: R, fill: `url(#id${uid})`, opacity: 0 }, svg);
         ring = mk('circle', { cx: x, cy: y, r: R, fill: 'none', stroke: SOLID[c], 'stroke-width': 2.6, 'stroke-opacity': 0.9, pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1, transform: `rotate(-90 ${x} ${y})` }, svg);
         const ring2 = mk('circle', { cx: x, cy: y, r: R + 9, fill: 'none', stroke: SOLID[c], 'stroke-width': 1, 'stroke-opacity': 0.45, 'stroke-dasharray': '2 7' }, svg);
-        tl.to(back, { opacity: 1, duration: 0.6 }, t - 0.35); DRAW([ring], t - 0.3, 0.9); SHOW(ring2, t - 0.1, 0.8, 0);
+        tl.to(back, { opacity: 1, duration: 0.5 }, t - 0.35); DRAW([ring], t - 0.3, 0.7); SHOW(ring2, t - 0.1, 0.7, 0);
         tl.fromTo(ring2, { rotation: 0 }, { rotation: 90, svgOrigin: `${x} ${y}`, duration: 30, ease: 'none', immediateRender: false }, t - 0.1);
       }
       const ic = icon(it.i, x, y, it.bare ? s : s * 0.62, c);
@@ -73,8 +85,8 @@
       if (hl) tl.to(hl, { opacity: 1, duration: 1.2 }, it.glow !== undefined ? AT(it.glow) : t + 0.4);
       let lab = null, sub = null;
       const below = it.bare ? s / 2 : s * 0.74 + 9;
-      if (it.lab) { lab = text(x, y + below + 50, it.lab, { c: c === 'g' ? '#f0d79c' : SOLID[c], s: it.ls || (it.lab.length > 6 ? 32 : 40) }); SHOW(lab, t + 0.25); }
-      if (it.sub) { sub = text(x, y + below + 92, it.sub, { c: '#e2d6bd', s: 28, wt: 400, font: 'LXGW WenKai', ls: '0.06em' }); SHOW(sub, it.sat !== undefined ? AT(it.sat) : t + 0.6); }
+      if (it.lab) { lab = text(x, y + below + 50, it.lab, { c: c === 'g' ? '#f0d79c' : SOLID[c], s: it.ls || fit(it.lab, em(it.lab) > 6 ? 34 : 40, room, 0.16) }); SHOW(lab, t + 0.15); }
+      if (it.sub) { sub = text(x, y + below + 92, it.sub, { c: '#e2d6bd', s: fit(it.sub, 28, room, 0.06), wt: 400, font: 'LXGW WenKai', ls: '0.06em' }); SHOW(sub, it.sat !== undefined ? AT(it.sat) : t + 0.45); }
       if (it.x !== undefined) { const X = mk('path', { d: `M${x - s * 0.55},${y - s * 0.55} L${x + s * 0.55},${y + s * 0.55} M${x + s * 0.55},${y - s * 0.55} L${x - s * 0.55},${y + s * 0.55}`, fill: 'none', stroke: '#eba27c', 'stroke-width': 7, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, svg); DRAW([X], AT(it.x), 0.45); }
       if (it.dim !== undefined) tl.to([ic.g, lab, sub].filter(Boolean), { opacity: 0.3, duration: 0.7 }, AT(it.dim));
       return { x, y, s, t, it };
@@ -82,7 +94,8 @@
     // 关系：箭头、等号、不等号……
     const relAt = i => (spec.relAt !== undefined ? AT(spec.relAt) : placed[i + 1] ? placed[i + 1].t - 0.15 : placed[i].t + 0.6);
     const arrow = (x1, x2, y, at, c = 'g') => {
-      const p = mk('path', { d: `M${x1},${y} L${x2},${y} M${x2 - 16},${y - 13} L${x2},${y} L${x2 - 16},${y + 13}`, fill: 'none', stroke: SOLID[c], 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, svg);
+      const k = x2 >= x1 ? 1 : -1;                                       // 箭头朝哪边：往左画的箭头，尖也要朝左
+      const p = mk('path', { d: `M${x1},${y} L${x2},${y} M${x2 - 16 * k},${y - 13} L${x2},${y} L${x2 - 16 * k},${y + 13}`, fill: 'none', stroke: SOLID[c], 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, svg);
       DRAW([p], at, 0.6);
     };
     if ((kind === 'pair' || kind === 'vs') && n === 2) {

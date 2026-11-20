@@ -40,6 +40,20 @@
   const DRAW = (tl, e, at, d = 1.2) => { const t = e._p || e; gsap.set(t, { strokeDashoffset: 1 }); tl.to(t, { strokeDashoffset: 0, duration: d, ease: 'power2.inOut' }, at); };
   const SHOW = (tl, e, at, d = 0.7, o = {}) => { gsap.set(e, { opacity: 0 }); tl.fromTo(e, { opacity: 0, y: o.y ?? 12 }, { opacity: o.o ?? 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at); };
   const grad = (defs, id, kind, attrs, stops) => { const g = mk(kind, { id, gradientUnits: 'userSpaceOnUse', ...attrs }, defs); stops.forEach(([o, c, a]) => mk('stop', { offset: o, 'stop-color': c, 'stop-opacity': a ?? 1 }, g)); return `url(#${id})`; };
+  // 线条图标（Tabler，ill.js 载入）：中心 (x, y)，边长 sz；返回一个组，组上的 _p 是所有线（描线用）
+  const icon = (par, name, x, y, sz, o = {}) => {
+    const nodes = window.ILL_NODES && window.ILL_NODES(name); if (!nodes) throw new Error('没有这个图标：' + name);
+    const svg = par.ownerSVGElement || par, uid = svg._uid, k = sz / 24, sw = (o.w || 3.4) / k;
+    if (!svg._fi) { const f = mk('filter', { id: 'fi' + uid, x: '-50%', y: '-50%', width: '200%', height: '200%' }, svg.querySelector('defs')); mk('feGaussianBlur', { stdDeviation: 0.9 }, f); svg._fi = 1; }
+    const outer = mk('g', {}, par), g = mk('g', { transform: `translate(${x - sz / 2},${y - sz / 2}) scale(${k})` }, outer), ps = [], col = o.c || GOLD;
+    for (const [tag, at] of nodes) {
+      if (at.stroke === 'none') continue;
+      const a2 = { ...at, fill: 'none', stroke: col, 'stroke-width': sw, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 };
+      ps.push(mk(tag, { ...a2, 'stroke-width': sw * 2.3, opacity: 0.45, filter: `url(#fi${uid})` }, g)); ps.push(mk(tag, a2, g));
+    }
+    outer._p = ps; return outer;
+  };
+  const circ = (cx, cy, r) => `M${cx + r},${cy} A${r},${r} 0 1 1 ${cx - r},${cy} A${r},${r} 0 1 1 ${cx + r},${cy}`;
   const BOTTLE = 'M470,60 L470,150 C470,195 330,215 330,300 L330,498 Q330,520 352,520 L648,520 Q670,520 670,498 L670,300 C670,215 530,195 530,150 L530,60';
 
   // 记录器：动画函数在搭页面时就执行（这样 SVG 里的字能赶上字体预载）；“说到哪句话”的时刻那时已经能算，
@@ -83,7 +97,9 @@
         const t1o = AT(s.over);
         drops.forEach(([d, side, i]) => { const dl = t1o + i * 0.11; tl.set(d, { opacity: 1 }, dl);
           tl.fromTo(d, { x: 0, y: 0 }, { x: side * (60 + (i * 37) % 160), y: 420 + (i * 53) % 90, duration: 1.4, ease: 'power2.in', immediateRender: false }, dl); tl.to(d, { opacity: 0, duration: 0.4 }, dl + 1.1); });
-        const q = text(svg, 500, 36, '多出来的，去哪了？', { s: 38, c: CORAL, ls: '0.12em' }); SHOW(tl, q, t1o + 0.8);
+        // 问句放在“神？”底下（瓶口上面要留给溢出来的水珠）
+        const q1 = text(svg, 800, 392, '多出来的，', { s: 36, c: CORAL, ls: '0.12em' }), q2 = text(svg, 800, 440, '去哪了？', { s: 36, c: CORAL, ls: '0.12em' });
+        SHOW(tl, q1, t1o + 0.5); SHOW(tl, q2, t1o + 0.8);
       }
     },
     // 楼和地基：楼画出来，地基亮起来——是地基托着楼
@@ -203,7 +219,9 @@
         for (let i = 0; i < 70; i++) { const c = cr[(i * 7) % cr.length], [x, y] = c.mid, d = tlit + 0.5 + i * (i < 20 ? 0.09 : 0.2);
           const pt = mk('circle', { cx: x, cy: y, r: 2.5 + r2() * 4, fill: '#fff4d6', opacity: 0, filter: `url(#g${uid})` }, art);
           tl.to(pt, { opacity: 0.95, duration: 0.3 }, d); tl.to(pt, { y: -(160 + r2() * 260), x: (r2() - 0.5) * 160, duration: 2.8, ease: 'power1.out' }, d); tl.to(pt, { opacity: 0, duration: 0.9 }, d + 1.9); }
-        const t = text(svg, 500, 548, '罐子一直在裂，宝贝一直没丢', { s: 32, c: GOLD, ls: '0.16em' }); SHOW(tl, t, tlit + 0.8);
+        // 这一句放在罐子右边（镜头推近以后，罐子上下都顶到边了）
+        const ta = text(svg, 848, 246, '罐子一直在裂，', { s: 34, c: PAPER, ls: '0.16em' }), tb = text(svg, 848, 300, '宝贝一直没丢。', { s: 34, c: GOLD, ls: '0.16em' });
+        SHOW(tl, ta, tlit - 0.6); SHOW(tl, tb, tlit + 0.3);
       }
       const cap = text(svg, 985, 26, '苏巴朗《四个器皿的静物》 约1650', { s: 15, c: 'rgba(241,232,214,.55)', a: 'end', wt: 400, font: 'Noto Sans SC', ls: '0.1em' }); SHOW(tl, cap, t0 + 0.6, 0.8, { y: 0 });
     },
@@ -444,6 +462,164 @@
         tl.fromTo(t, { opacity: 0, scale: 0.6, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', immediateRender: false }, AT(w) - 0.05);
       });
       tl.to(sun, { attr: { r: 210 }, duration: 3, ease: 'sine.inOut' }, AT(s.items[n - 1]));
+    },
+
+    // 作曲家和曲子：五线谱上一个一个音符出来，每个音符都牵着一根金线连回作曲家（他的心思在每个音符里）→ 框住曲子：
+    // 作曲家装不进去 → 曲子奏完了，作曲家还在；他脑子里还有许多曲子 → 没有作曲家，一个音也没有
+    composer({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 480);
+      const halo = mk('ellipse', { cx: 165, cy: 250, rx: 165, ry: 190, fill: grad(defs, 'ch' + uid, 'radialGradient', { cx: 165, cy: 230, r: 180 }, [[0, '#ffe6a6', 0.6], [0.6, GOLD, 0.18], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const man = line(svg, circ(165, 172, 50) + ' M66,340 C72,268 114,244 165,244 C216,244 258,268 264,340', { c: PAPER, w: 5 });
+      const pen = line(svg, 'M240,300 L294,214', { c: GOLD, w: 4 });
+      const lab = text(svg, 165, 404, '作曲家', { s: 42, c: GOLD, ls: '0.2em' });
+      const X0 = 330, X1 = 962, Y0 = 150, G = 32;
+      const staff = line(svg, [0, 1, 2, 3, 4].map(i => `M${X0},${Y0 + i * G} L${X1},${Y0 + i * G}`).join(' '), { c: PAPER, w: 2.2, go: 0.18 });
+      const title = text(svg, 646, 50, '一首交响乐', { s: 42, c: GOLD, ls: '0.24em' });
+      const mel = [2, 4, 3, 5, 4, 6, 5, 3, 4, 2, 3, 1];
+      const notes = mel.map((q, i) => {
+        const x = X0 + 52 + i * ((X1 - X0 - 104) / (mel.length - 1)), y = Y0 + 4 * G - q * G / 2, up = q < 4;
+        const g = mk('g', { opacity: 0 }, svg);
+        mk('ellipse', { cx: x, cy: y, rx: 15.5, ry: 10.5, transform: `rotate(-22 ${x} ${y})`, fill: PAPER }, g);
+        mk('path', { d: up ? `M${x + 14},${y - 4} L${x + 14},${y - 80}` : `M${x - 14},${y + 4} L${x - 14},${y + 80}`, stroke: PAPER, 'stroke-width': 3 }, g);
+        return { g, x, y };
+      });
+      const threads = notes.map(({ x, y }, i) => line(svg, `M208,150 C${300 + i * 20},${40 - (i % 3) * 10} ${x - 50},${y - 120} ${x},${y - 12}`, { c: GOLD, w: 1.4, go: 0.55 }));
+      const sweep = mk('rect', { x: X0 - 90, y: Y0 - 60, width: 90, height: 4 * G + 120, fill: grad(defs, 'cs' + uid, 'linearGradient', { x1: 0, y1: 0, x2: 90, y2: 0 }, [[0, GOLD, 0], [0.5, '#fff1c6', 0.55], [1, GOLD, 0]]), opacity: 0, style: 'mix-blend-mode:screen' }, svg);
+      const frame = line(svg, `M${X0 - 24},${Y0 - 72} L${X1 + 18},${Y0 - 72} L${X1 + 18},${Y0 + 4 * G + 92} L${X0 - 24},${Y0 + 4 * G + 92} Z`, { c: PAPER, w: 2.6, go: 0.2 });
+      const arrow = line(svg, 'M262,236 L298,236 M286,226 L298,236 L286,246', { c: PAPER, w: 3 });
+      const no = line(svg, 'M266,212 L298,260 M298,212 L266,260', { c: CORAL, w: 5.5, go: 0.5 });
+      const t0 = AT(s.at), tn = AT(s.notes);
+      DRAW(tl, staff, t0, 1.2); SHOW(tl, title, t0 + 0.3);
+      DRAW(tl, man, tn - 0.4, 1.1); DRAW(tl, pen, tn + 0.4, 0.5); SHOW(tl, lab, AT(s.name));
+      notes.forEach((n, i) => { tl.fromTo(n.g, { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.45, ease: 'back.out(2)', immediateRender: false }, tn + 0.3 + i * 0.2); DRAW(tl, threads[i], tn + 0.6 + i * 0.2, 0.8); });
+      if (s.sweep !== undefined) { const ts = AT(s.sweep); tl.set(sweep, { opacity: 1 }, ts); tl.fromTo(sweep, { x: 0 }, { x: X1 - X0 + 110, duration: 2.6, ease: 'none', immediateRender: false }, ts); tl.set(sweep, { opacity: 0 }, ts + 2.6);
+        notes.forEach(n => { const t = ts + (n.x - X0 + 90) / (X1 - X0 + 110) * 2.6; tl.to(n.g, { scale: 1.25, svgOrigin: `${n.x} ${n.y}`, duration: 0.18, ease: 'power2.out' }, t); tl.to(n.g, { scale: 1, svgOrigin: `${n.x} ${n.y}`, duration: 0.35 }, t + 0.18); }); }
+      const tni = AT(s.notin); DRAW(tl, frame, tni, 1.0); DRAW(tl, arrow, tni + 0.6, 0.5); DRAW(tl, no, tni + 1.2, 0.45);
+      const tst = AT(s.still);
+      tl.to(notes.map(n => n.g), { opacity: 0.22, duration: 0.8, stagger: 0.05 }, tst); tl.to(threads, { opacity: 0, duration: 0.8 }, tst); tl.to([frame, arrow, no], { opacity: 0, duration: 0.7 }, tst);
+      tl.to(halo, { opacity: 1, duration: 1.2 }, tst + 0.3);
+      if (s.more !== undefined) {                                      // 脑子里还有好多曲子：小音符一串一串往上飘
+        const tm = AT(s.more), r = rng(9);
+        for (let i = 0; i < 20; i++) {
+          const g = mk('g', { opacity: 0 }, svg), x = 130 + r() * 70, y = 128;
+          mk('ellipse', { cx: x, cy: y, rx: 8.5, ry: 6, transform: `rotate(-22 ${x} ${y})`, fill: GOLD }, g); mk('path', { d: `M${x + 7.5},${y - 2} L${x + 7.5},${y - 36}`, stroke: GOLD, 'stroke-width': 2 }, g);
+          const d = tm + i * 0.16, dx = (r() - 0.5) * 300, dy = -(40 + r() * 80);
+          tl.fromTo(g, { opacity: 0, x: 0, y: 0 }, { opacity: 0.95, x: dx * 0.4, y: dy * 0.4, duration: 0.6, ease: 'power1.out', immediateRender: false }, d);
+          tl.to(g, { x: dx, y: dy, opacity: 0, duration: 1.8, ease: 'power1.in' }, d + 0.6);
+        }
+      }
+      const tno = AT(s.none); tl.to([man, pen, lab, halo], { opacity: 0.12, duration: 1.0 }, tno);
+      const te = AT(s.empty); tl.to(notes.map(n => n.g), { opacity: 0, duration: 0.6 }, te); tl.to([staff, title], { opacity: 0.14, duration: 1.0 }, te + 0.2);
+    },
+    // 托住：一个方框是世界；神不在框外远远看着；祂把手从框外伸进来，掌心托住宇宙、地球、每一个人 → 手一拿开，什么都不剩
+    uphold({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 520);
+      const box = line(svg, 'M250,24 L750,24 L750,470 L250,470 Z', { c: PAPER, w: 3, go: 0.2 });
+      const bl = text(svg, 272, 68, '世界', { s: 32, a: 'start', ls: '0.2em' });
+      const far = mk('circle', { cx: 880, cy: 96, r: 16, fill: '#fff1c6', opacity: 0, filter: `url(#${glowId})` }, svg);
+      const farX = line(svg, 'M850,66 L910,126 M910,66 L850,126', { c: CORAL, w: 5, go: 0.5 });
+      // 手（侧面，掌心向上：左边是大拇指，右边四指微微弯起）；手腕从框外左下角伸进来，越往外越淡
+      const fade = mk('mask', { id: 'um' + uid, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: 1000, height: 520 }, defs);
+      mk('rect', { x: 0, y: 0, width: 1000, height: 520, fill: grad(defs, 'uf' + uid, 'linearGradient', { x1: 60, y1: 0, x2: 260, y2: 0 }, [[0, '#000'], [1, '#fff']]) }, fade);
+      const hand = mk('g', { opacity: 0, mask: `url(#um${uid})` }, svg);
+      const hg = mk('ellipse', { cx: 540, cy: 380, rx: 300, ry: 120, fill: grad(defs, 'uh' + uid, 'radialGradient', { cx: 540, cy: 380, r: 300 }, [[0, '#ffe6a6', 0.45], [1, GOLD, 0]]), opacity: 0 }, hand);
+      const hk = mk('g', { transform: 'translate(227,262) scale(1.3)' }, hand);
+      const HAND = 'M-170,330 C-100,270 40,180 130,150 C210,138 300,132 372,118 C402,112 418,96 410,78 C404,66 388,64 380,72 C350,92 280,100 210,100 C170,100 145,96 132,86 C122,78 120,58 112,44 C106,34 94,34 92,46 C90,62 92,84 80,98 C40,128 -80,190 -170,250';
+      const body = mk('path', { d: HAND, fill: 'rgba(226,189,118,.12)', stroke: 'none', opacity: 0 }, hk);
+      const palm = line(hk, HAND, { c: GOLD, w: 3.6, go: 0.6 });
+      const crease = line(hk, 'M340,108 C360,104 378,96 392,86 M298,114 C322,112 342,108 357,102', { c: GOLD, w: 1.8, go: 0.3 });
+      const T0 = AT(s.at); DRAW(tl, box, T0, 1.0); SHOW(tl, bl, T0 + 0.5);
+      if (s.far !== undefined) { const tf = AT(s.far); tl.to(far, { opacity: 1, duration: 0.6 }, tf); DRAW(tl, farX, tf + 0.9, 0.45); }
+      const th = AT(s.hand);
+      tl.to([far, farX], { opacity: 0, duration: 0.6 }, th);
+      tl.fromTo(hand, { opacity: 0, x: -150, y: 90 }, { opacity: 1, x: 0, y: 0, duration: 1.4, ease: 'power2.out', immediateRender: false }, th);
+      DRAW(tl, palm, th, 1.3); DRAW(tl, crease, th + 1.0, 0.5); tl.to(body, { opacity: 1, duration: 1.0 }, th + 0.6); tl.to(hg, { opacity: 1, duration: 1.2 }, th + 0.6);
+      const pos = [[440, 318], [568, 290], [696, 316]];
+      const groups = (s.items || []).map(([ic, lb, at], i) => {
+        const g = mk('g', {}, svg), [x, y] = pos[i], t = AT(at);
+        const glow = mk('circle', { cx: x, cy: y, r: 66, fill: grad(defs, 'ug' + uid + i, 'radialGradient', { cx: x, cy: y, r: 66 }, [[0, '#ffe6a6', 0.4], [1, GOLD, 0]]), opacity: 0 }, g);
+        const ico = icon(g, ic, x, y, 96, { c: i === 1 ? '#cfe8fb' : GOLD });
+        const l = text(g, x, y - 68, lb, { s: 30, c: PAPER, ls: '0.12em' });
+        DRAW(tl, ico, t - 0.05, 0.8); tl.to(glow, { opacity: 1, duration: 0.8 }, t + 0.2); SHOW(tl, l, t + 0.2);
+        return g;
+      });
+      const ta = AT(s.away);
+      tl.to(hand, { x: -170, y: 120, opacity: 0, duration: 1.1, ease: 'power2.in' }, ta);
+      groups.forEach((g, i) => tl.to(g, { y: 70 + i * 12, opacity: 0.35, duration: 1.2, ease: 'power2.in' }, ta + 0.35 + i * 0.08));
+      const tn = AT(s.none); tl.to(groups, { opacity: 0, duration: 0.8 }, tn); tl.to([box, bl], { opacity: 0.25, duration: 1.0 }, tn + 0.2);
+    },
+    // 黑屋子、窗帘、太阳：外面大太阳 → 窗帘拉上，屋里黑 → 他跪着求太阳进来 → 太阳从来没走开（窗帘边上透着光）→ 窗帘一拉开，光照进来
+    curtain({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId, soft } = base(el, 500);
+      mk('rect', { x: 540, y: 40, width: 340, height: 340 }, mk('clipPath', { id: 'cw' + uid }, defs));
+      const room = mk('ellipse', { cx: 470, cy: 300, rx: 540, ry: 300, fill: grad(defs, 'rm' + uid, 'radialGradient', { cx: 470, cy: 300, r: 540 }, [[0, '#ffe6a6', 0.38], [0.6, GOLD, 0.12], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const sky = mk('g', { 'clip-path': `url(#cw${uid})`, opacity: 0 }, svg);
+      mk('rect', { x: 540, y: 40, width: 340, height: 340, fill: grad(defs, 'sk' + uid, 'linearGradient', { x1: 0, y1: 40, x2: 0, y2: 380 }, [[0, '#ffe9b8'], [1, '#e8b862']]) }, sky);
+      const sun = mk('circle', { cx: 730, cy: 170, r: 72, fill: '#fffaf0', filter: `url(#${glowId})` }, sky);
+      const beam = mk('path', { d: 'M540,42 L170,450 L830,450 L880,380 L880,42 Z', fill: grad(defs, 'bm' + uid, 'linearGradient', { x1: 880, y1: 42, x2: 240, y2: 450 }, [[0, '#fff1c6', 0.8], [1, '#f3d58e', 0.16]]), opacity: 0, style: 'mix-blend-mode:screen', filter: `url(#${soft})` }, svg);
+      const floor = line(svg, 'M40,450 L960,450', { c: PAPER, w: 2, go: 0.15 });
+      const win = line(svg, 'M540,40 L880,40 L880,380 L540,380 Z M710,40 L710,380 M540,210 L880,210', { c: PAPER, w: 3.5 });
+      const rod = line(svg, 'M510,26 L910,26', { c: PAPER, w: 3 });
+      const cloth = grad(defs, 'cl' + uid, 'linearGradient', { x1: 0, y1: 0, x2: 44, y2: 0, spreadMethod: 'reflect' }, [[0, '#2c1d16'], [0.5, '#4a332b'], [1, '#2c1d16']]);
+      const panel = (x0, x1) => { const g = mk('g', {}, svg); mk('rect', { x: x0, y: 28, width: x1 - x0, height: 366, fill: cloth }, g);
+        for (let x = x0 + 18; x < x1 - 6; x += 24) mk('path', { d: `M${x},30 L${x + 3},392`, stroke: '#140c08', 'stroke-width': 3, opacity: 0.55 }, g);
+        mk('rect', { x: x0, y: 28, width: x1 - x0, height: 366, fill: 'none', stroke: CORAL, 'stroke-width': 3, opacity: 0, class: 'edge' }, g); return g; };
+      const L = panel(530, 712), R = panel(708, 890);
+      // 窗帘边上透进来的光（压在窗帘上面：两边、中缝、上沿）
+      const leak = line(svg, 'M530,30 L530,392 M890,30 L890,392 M710,32 L710,392 M532,28 L888,28', { c: '#fff1c6', w: 2.6, gc: '#ffc860', gw: 18, go: 0.9 });
+      gsap.set(leak, { opacity: 0 }); gsap.set(leak._p, { strokeDashoffset: 0 });   // 这几道光不用描，整道淡入
+      // 跪着祷告的人（侧面，面朝窗户，双手合在脸前）
+      const person = line(svg, circ(300, 236, 24) + ' M296,262 C292,300 290,340 292,372 C300,402 306,426 312,448 L214,448 M296,290 C318,304 332,314 336,320 C342,304 344,288 340,270', { c: '#efe6d2', w: 4.5 });
+      const say1 = text(svg, 300, 110, '“太阳啊，', { s: 34, c: PAPER, font: 'LXGW WenKai', wt: 400, ls: '0.06em' }), say2 = text(svg, 300, 156, '求你到我的房间里来。”', { s: 34, c: PAPER, font: 'LXGW WenKai', wt: 400, ls: '0.06em' });
+      const t0 = AT(s.at); DRAW(tl, floor, t0, 1.0); DRAW(tl, win, t0 + 0.2, 1.2); DRAW(tl, rod, t0 + 0.4, 0.8); DRAW(tl, person, t0 + 0.4, 1.0);
+      gsap.set(L, { scaleX: 0.15, svgOrigin: '530 28' }); gsap.set(R, { scaleX: 0.15, svgOrigin: '890 28' });
+      const ts = AT(s.sun); tl.to(sky, { opacity: 1, duration: 1.2 }, ts); tl.to(room, { opacity: 0.6, duration: 1.2 }, ts);
+      const tc = AT(s.close);
+      tl.to(L, { scaleX: 1, svgOrigin: '530 28', duration: 1.4, ease: 'power2.inOut' }, tc); tl.to(R, { scaleX: 1, svgOrigin: '890 28', duration: 1.4, ease: 'power2.inOut' }, tc);
+      tl.to(room, { opacity: 0, duration: 1.2 }, tc + 0.2); tl.to(leak, { opacity: 0.55, duration: 1.0 }, tc + 1.2);
+      const tp = AT(s.pray); SHOW(tl, say1, tp); SHOW(tl, say2, tp + 0.6);
+      const tn = AT(s.never); tl.to(leak, { opacity: 1, duration: 1.0 }, tn); tl.fromTo(sun, { scale: 1 }, { scale: 1.3, svgOrigin: '730 170', duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: 3, immediateRender: false }, tn);
+      const tw = AT(s.why); tl.to([...L.querySelectorAll('.edge'), ...R.querySelectorAll('.edge')], { opacity: 0.9, duration: 0.5, yoyo: true, repeat: 1 }, tw);
+      const to = AT(s.open);
+      tl.to(L, { scaleX: 0.13, svgOrigin: '530 28', duration: 1.6, ease: 'power2.inOut' }, to); tl.to(R, { scaleX: 0.13, svgOrigin: '890 28', duration: 1.6, ease: 'power2.inOut' }, to);
+      tl.to(leak, { opacity: 0, duration: 0.8 }, to + 0.3); tl.to(beam, { opacity: 1, duration: 1.6 }, to + 0.4); tl.to(room, { opacity: 1, duration: 1.6 }, to + 0.5);
+      tl.to(person._p, { stroke: '#f3d58e', duration: 1.2 }, to + 0.8); tl.to([say1, say2], { opacity: 0.3, duration: 0.8 }, to + 0.6);
+    },
+    // 一层一层的套：神在人里面，人在世界里面；神被包在最中间，像一个果核 → 时间一长，神的声音和自己的声音混在一起，分不清
+    core({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 540);
+      const mix = mk('circle', { cx: 500, cy: 280, r: 150, fill: grad(defs, 'cm' + uid, 'radialGradient', { cx: 500, cy: 280, r: 150 }, [[0, '#ffe6a6', 0.6], [0.7, GOLD, 0.24], [1, GOLD, 0.06]]), opacity: 0 }, svg);
+      const outer = line(svg, circ(500, 280, 252), { c: PAPER, w: 3, go: 0.2 });
+      const mid = line(svg, circ(500, 280, 150), { c: PAPER, w: 3.6 });
+      const seed = mk('ellipse', { cx: 500, cy: 280, rx: 22, ry: 22, fill: '#ffe6a6', opacity: 0, filter: `url(#${glowId})` }, svg);
+      const lw = text(svg, 300, 96, '世界', { s: 34, a: 'end', ls: '0.3em' }), lp = text(svg, 382, 166, '人', { s: 36, a: 'end' }), lg = text(svg, 500, 340, '神', { s: 36, c: GOLD });
+      const lk = text(svg, 534, 266, '果核', { s: 30, c: GOLD, a: 'start' });
+      const t1 = AT(s.at); DRAW(tl, mid, t1, 1.1); SHOW(tl, lp, t1 + 0.4); tl.to(seed, { opacity: 1, duration: 0.8 }, t1 + 0.2); SHOW(tl, lg, t1 + 0.5);
+      const t2 = AT(s.world); DRAW(tl, outer, t2, 1.2); SHOW(tl, lw, t2 + 0.4);
+      if (s.mid !== undefined) { const t3 = AT(s.mid); tl.fromTo(mid, { scale: 1 }, { scale: 0.93, svgOrigin: '500 280', duration: 0.5, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, t3); tl.fromTo(outer, { scale: 1 }, { scale: 0.96, svgOrigin: '500 280', duration: 0.5, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, t3 + 0.15); }
+      const t4 = AT(s.seed); tl.to(seed, { attr: { rx: 18, ry: 31 }, rotation: -24, svgOrigin: '500 280', duration: 0.9, ease: 'back.out(2)' }, t4); SHOW(tl, lk, t4 + 0.2);
+      const bits = (s.self || []).map(([w, at], i) => { const [x, y] = [[300, 290], [700, 290], [500, 482]][i]; const t = text(svg, x, y, w, { s: 30, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 }); SHOW(tl, t, AT(at)); return t; });
+      const t6 = AT(s.blur);
+      tl.to(seed, { attr: { rx: 130, ry: 130 }, opacity: 0.35, duration: 2.2, ease: 'power1.inOut' }, t6);
+      tl.to(mix, { opacity: 1, duration: 2.0 }, t6 + 0.3); tl.to([lg, lk], { opacity: 0.25, duration: 1.2 }, t6 + 0.5); tl.to(bits, { fill: GOLD, duration: 1.4 }, t6 + 0.6);
+    },
+    // 反过来：先是“你在我里面”（我这个圈，里面一个金点）→ 金点涨开，成了没有边的光；我缩成光里的一个小圈 →“我在你里面”
+    flip({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 560);
+      const field = mk('circle', { cx: 500, cy: 262, r: 24, fill: grad(defs, 'fl' + uid, 'radialGradient', { cx: 500, cy: 262, r: 330 }, [[0, '#fff3d0', 0.95], [0.12, '#f6dc9c', 0.8], [0.55, GOLD, 0.32], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const ring = mk('circle', { cx: 500, cy: 262, r: 175, fill: 'none', stroke: PAPER, 'stroke-width': 4.5, opacity: 0 }, svg);
+      const lw = text(svg, 500, 66, '我', { s: 50 }), ln = text(svg, 500, 332, '你', { s: 44, c: GOLD });
+      const c1 = text(svg, 500, 540, '你在我里面？', { s: 44, ls: '0.2em' }), c2 = text(svg, 500, 540, '我在你里面', { s: 50, c: GOLD, ls: '0.24em' });
+      const t1 = AT(s.at);
+      tl.fromTo(ring, { opacity: 0, scale: 0.85, svgOrigin: '500 262' }, { opacity: 1, scale: 1, svgOrigin: '500 262', duration: 0.9, ease: 'power2.out', immediateRender: false }, t1);
+      tl.to(field, { opacity: 1, duration: 0.8 }, t1 + 0.3); SHOW(tl, lw, t1 + 0.3); SHOW(tl, ln, t1 + 0.6); SHOW(tl, c1, t1 + 0.9);
+      const tf = AT(s.flip);
+      tl.to(field, { attr: { r: 330 }, duration: 2.0, ease: 'power2.inOut' }, tf);
+      tl.to(ring, { attr: { r: 58 }, duration: 2.0, ease: 'power2.inOut' }, tf);
+      tl.to(lw, { attr: { y: 280 }, duration: 2.0, ease: 'power2.inOut' }, tf);
+      tl.to(ln, { attr: { y: 46 }, duration: 2.0, ease: 'power2.inOut' }, tf);
+      tl.to(c1, { opacity: 0, duration: 0.6 }, tf);
+      SHOW(tl, c2, AT(s.me));
     },
   };
 })();
