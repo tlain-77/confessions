@@ -323,7 +323,7 @@
       const box = line(svg, 'M110,90 L890,90 L890,470 L110,470 Z', { c: PAPER, w: 3 });
       const lab = text(svg, 150, 135, '宇宙', { s: 30, a: 'start', c: PAPER, wt: 400 });
       const blob = mk('ellipse', { cx: 500, cy: 280, rx: 100, ry: 100, fill: `url(#t${glowId})`, opacity: 0 }, svg);
-      DRAW(tl, box, AT(s.at), 1.2); SHOW(tl, lab, AT(s.spread) - 0.1); tl.to(blob, { opacity: 1, duration: 0.8 }, AT(s.at) + 0.4);
+      DRAW(tl, box, AT(s.at), 1.2); SHOW(tl, lab, AT(s.spread) + 0.75);   // “摊在整个宇宙”说到“宇宙”时 tl.to(blob, { opacity: 1, duration: 0.8 }, AT(s.at) + 0.4);
       tl.to(blob, { attr: { rx: 375, ry: 12 }, opacity: 0.55, duration: 2.2, ease: 'power2.inOut' }, AT(s.spread));
       const t1 = text(svg, 500, 230, '每个地方，分到薄薄的一层？', { s: 36, c: '#d8ecfa' }); SHOW(tl, t1, AT(s.spread) + 1.4);
       const x = line(svg, 'M170,130 L830,430', { c: CORAL, w: 7 }); DRAW(tl, x, AT(s.no), 0.5);
