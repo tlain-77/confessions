@@ -2,6 +2,7 @@
 // 每一场从它的 at 开始，到下一场开始时淡出；场里每一项在它的 at（录音里说到某句话的时刻）出现。
 // at 的写法：'某句话'（录音里第一次说到）、['某句话', n]（第 n+1 次说到）、{ p: '某句话', n, d }（再提前 / 推后 d 秒）、数字（秒）。
 // 场景表一项：{ at, cls: 'left' | 'right' | 'top', light: {light, rays}, items: [...] }，或 { at, html, run: (ctx) => {} } 自己写。
+// xfade: 1 —— 这一场的第一项（一般是示意图）跟上一场同一个位置的东西直接交叉淡化（提前 0.6 秒出来），中间不暗一下。
 // 每一项：
 //   { q: '“原文……”', k: '卷一 · 第二章 · 第一句', sm: 1 }        原文卡；字跟着录音逐字出
 //   { t: '要点句', c: 'big kai gold sm lbl coral dim wrap', at, type: 秒 }   要点句；type：按这么多秒打出来
@@ -67,11 +68,12 @@ window.lecture = async function (o = {}) {
   built.forEach((b, i) => {
     const a = starts[i] - 0.1, e = i + 1 < built.length ? starts[i + 1] - 0.1 : END;
     scene(b.sec, a, e);
+    if (b.sc.xfade) tl.set(b.sec, { autoAlpha: 1, filter: 'blur(0px)', scale: 1 }, a - 0.62);
     if (b.sc.light) light(a, b.sc.light, 1.6);
     if (b.sc.run) b.sc.run({ K, P, AT, a, e, sec: b.sec, $: s => b.sec.querySelector(s), $$: s => [...b.sec.querySelectorAll(s)] });
     (b.sc.items || []).forEach((it, k) => {
-      const el = b.els[k], at = it.at !== undefined ? AT(it.at) : a + 0.15;
-      if (at < a - 0.01 || at > e) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
+      const el = b.els[k], xf = b.sc.xfade && k === 0, at = xf ? a - 0.6 : it.at !== undefined ? AT(it.at) : a + 0.15;
+      if (!xf && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
         IN(el, Math.max(a + 0.05, at - 0.6), { y: 40, d: 0.9, blur: 8 });
         const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at - 1.0, e);
@@ -91,7 +93,7 @@ window.lecture = async function (o = {}) {
       } else if (it.rows) {
         [...el.children].forEach((r, j) => { IN(r.querySelector('i'), AT(it.rows[j][2]), { y: 16, d: 0.7 }); IN(r.querySelector('b'), AT(it.rows[j][3]), { y: 16, d: 0.7, blur: 6 }); });
       } else if (it.fig) {
-        IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
+        if (xf) IN(el, at, { y: 0, d: 0.6, blur: 0, ease: 'sine.inOut' }); else IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
         if (it.spots) {                                                  // 发光的框：第一处淡入，之后平移到下一处
           const sp = el.querySelector('.lf-spot'), box = r => ({ left: r[1] + '%', top: r[2] + '%', width: r[3] + '%', height: r[4] + '%' });
           gsap.set(sp, { ...box(it.spots[0]), opacity: 0 });
