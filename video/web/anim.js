@@ -217,7 +217,7 @@
         const a = (i / 90) * Math.PI * 2, R = 54 + (i % 5) * 13; dots.push([d, x, y, 500 + Math.cos(a) * R, 280 + Math.sin(a) * R]);
       }
       dots.forEach(([d], i) => tl.to(d, { opacity: 0.8, duration: 0.6 }, AT(s.at) + (i % 16) * 0.05));
-      dots.forEach(([d, x, y, tx, ty], i) => tl.to(d, { attr: { cx: tx, cy: ty }, duration: 2.2, ease: 'power3.inOut' }, AT(s.gather) + (i % 8) * 0.04));
+      dots.forEach(([d, x, y, tx, ty], i) => tl.to(d, { attr: { cx: tx, cy: ty }, duration: 1.8, ease: 'power3.inOut' }, AT(s.gather) + (i % 8) * 0.04));
       const core = mk('circle', { cx: 500, cy: 280, r: 30, fill: '#fff1c8', opacity: 0, filter: `url(#${glowId})` }, svg);
       tl.to(core, { opacity: 1, attr: { r: 46 }, duration: 1.0 }, AT(s.gather) + 1.4);
       const t1 = text(svg, 500, 40, '散了一地', { s: 34, c: CORAL }), t2 = text(svg, 500, 540, '神来，是把人重新收拢起来', { s: 36, c: GOLD });
