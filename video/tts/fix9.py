@@ -24,6 +24,13 @@ FIX = [
     ('f07', 662.29, 666.31, '如此你便为世界各部分所分割，', 'quote'),              # “如此”念成了“因此”（跟后半句连着，一起换）
 ]
 han = lambda s: re.sub(r'[^一-鿿0-9]', '', s)
+def choose(takes, target):
+    """挑哪一版：读音对的里面，时长最接近原来那一段的（语速最像本人；长了最多压快 10%）；
+    加速版合成出来常常一下子短很多，听着赶，所以不按“放得下”挑。takes: (序号, 读音对不对, 时长, 速度)"""
+    import math
+    ok = [t for t in takes if t[1]] or takes
+    fit = [t for t in ok if t[2] / target <= 1.10] or sorted(ok, key=lambda t: t[2])[:1]
+    return min(fit, key=lambda t: abs(math.log(t[2] / target)))
 os.makedirs('rec/fix9', exist_ok=True)
 
 def edges(x, sr, a, b):
@@ -60,11 +67,19 @@ if sys.argv[1] == 'synth':
             d = len(y) / ysr; got = asr(y, ysr); ok = py(got) == py(text)
             print(f'{fid} take{k} speed {sp} {d:.2f}s (slot {target:.2f}s)  {"OK " if ok else "?? "}{got}', flush=True)
             sf.write(f'rec/fix9/{fid}_t{k}.wav', y, ysr); takes.append((k, ok, d, sp))
-        # 读音对、放得下的里面，挑时长居中的那一版（最像正常语速）；都放不下就挑最短的
-        good = [t for t in takes if t[1] and t[2] <= target + 0.02] or [t for t in takes if t[1]] or takes
-        good.sort(key=lambda t: t[2]); pick = good[len(good) // 2] if all(t[2] <= target + 0.02 for t in good) else good[0]
+        pick = choose(takes, target)
         import shutil; shutil.copy(f'rec/fix9/{fid}_t{pick[0]}.wav', f'rec/fix9/{fid}.wav')
         print(f'{fid} PICK take{pick[0]} {pick[2]:.2f}s  [{A:.2f}–{B:.2f}] edge dB {da:.0f}/{dbb:.0f}  {"" if pick[1] else "（读音没对上，要听）"}', flush=True)
+
+if sys.argv[1] == 'repick':                                                   # 按 choose() 的规则，从合成记录里重新挑
+    import shutil
+    rows = re.findall(r'^(f\d+) take(\d+) speed ([\d.]+) ([\d.]+)s \(slot ([\d.]+)s\)  (OK|\?\?)', open('out/fix9_synth.log', encoding='utf-8').read(), re.M)
+    by = {}
+    for fid, k, sp, d, slot, ok in rows: by.setdefault(fid, []).append(((int(k), ok == 'OK', float(d), float(sp)), float(slot)))
+    for fid, v in by.items():
+        takes = [t for t, _ in v]; pick = choose(takes, v[0][1])
+        shutil.copy(f'rec/fix9/{fid}_t{pick[0]}.wav', f'rec/fix9/{fid}.wav')
+        print(f'{fid} PICK take{pick[0]} {pick[2]:.2f}s (slot {v[0][1]:.2f}s, x{pick[2] / v[0][1]:.2f})')
 
 if sys.argv[1] == 'splice':
     x, sr = sf.read(VOICE, dtype='float64'); y = x.copy(); log = []
@@ -75,7 +90,7 @@ if sys.argv[1] == 'splice':
         A, B, da, dbb = edges(x, sr, a, b); i, j = int(A * sr), int(B * sr); n = j - i
         t, tsr = sf.read(f'rec/fix9/{fid}.wav', dtype='float64'); t = resample_poly(t, sr, tsr)
         if len(t) > n - int(0.06 * sr):                                     # 长了：略微加速塞进去（最多 15%）
-            r = len(t) / (n - int(0.06 * sr)); assert r < 1.15, (fid, r)
+            r = len(t) / (n - int(0.06 * sr)); assert r < 1.13, (fid, r)
             with tempfile.TemporaryDirectory() as td:
                 sf.write(f'{td}/a.wav', t, sr); subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', f'{td}/a.wav', '-af', f'atempo={r:.4f}', f'{td}/b.wav'], check=True)
                 t, _ = sf.read(f'{td}/b.wav', dtype='float64')
