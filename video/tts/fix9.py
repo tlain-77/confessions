@@ -18,9 +18,9 @@ FIX = [
     ('f01', 86.65, 89.07, '讲第二条诫命的时候说', 'say'),                          # 念成了“讲第二条见面的时候说”
     ('f02', 139.51, 143.94, '是否你充塞天地后，还有不能被天地包容的部分？', 'quote'),   # 念成了“还有不被天地所包容的地方”
     ('f03', 207.59, 210.95, '因为你充塞一切，亦即是包容一切？', 'quote'),           # “亦即是”念成了“一是”（两句连着念，一起换）
-    ('f04', 304.60, 308.11, '神也没有被这只瓶子固定住。', 'say'),                  # 说乱了重来：“神也没有被，就是，被这个瓶子固定住”
+    ('f04', 304.60, 308.11, '神也没有被这只瓶子固定住。', 'say', 'c'),             # 说乱了重来：“神也没有被，就是，被这个瓶子固定住”（合成的短很多，放在中间，前后停顿各一半）
     ('f05', 396.36, 398.00, '托着你的那一位，', 'say'),                            # “那位托着你的那位”
-    ('f06', 658.94, 661.95, '因之占有你的部分多，', 'quote'),                      # 念成了“因之占的比你的部分要多”
+    ('f06', 658.94, 661.95, '因之占有你的部分多，', 'quote', 'c'),                 # 念成了“因之占的比你的部分要多”（放在中间）
     ('f07', 662.29, 666.31, '如此你便为世界各部分所分割，', 'quote'),              # “如此”念成了“因此”（跟后半句连着，一起换）
 ]
 han = lambda s: re.sub(r'[^一-鿿0-9]', '', s)
@@ -55,7 +55,7 @@ if sys.argv[1] == 'synth':
     from pypinyin import lazy_pinyin
     py = lambda t: ' '.join(lazy_pinyin(han(t)))      # 只比读音（不比声调、同音字）
     only = sys.argv[2:]
-    for fid, a, b, text, rk in FIX:
+    for fid, a, b, text, rk, *_ in FIX:
         if only and fid not in only: continue
         Z.ref = lambda rk=rk: refs[rk]
         A, B, da, dbb = edges(x, sr, a, b); target = B - A - 0.08
@@ -86,7 +86,7 @@ if sys.argv[1] == 'splice':
     def rms(v): v = v[np.abs(v) > 0.03 * np.abs(v).max()] if len(v) and np.abs(v).max() > 0 else v; return np.sqrt(np.mean(v ** 2)) if len(v) else 0
     from scipy.ndimage import maximum_filter1d, uniform_filter1d
     import subprocess, tempfile
-    for fid, a, b, text, rk in FIX:
+    for fid, a, b, text, rk, *al in FIX:
         A, B, da, dbb = edges(x, sr, a, b); i, j = int(A * sr), int(B * sr); n = j - i
         t, tsr = sf.read(f'rec/fix9/{fid}.wav', dtype='float64'); t = resample_poly(t, sr, tsr)
         if len(t) > n - int(0.06 * sr):                                     # 长了：略微加速塞进去（最多 15%）
@@ -98,7 +98,7 @@ if sys.argv[1] == 'splice':
         thr = np.abs(x[i:j]).max()                                              # 峰值不超过原来这段，平滑限幅
         env = maximum_filter1d(np.abs(t), int(0.01 * sr)); g = uniform_filter1d(np.minimum(1, thr / np.maximum(env, 1e-9)), int(0.005 * sr))
         t = t * np.minimum(g, uniform_filter1d(g, int(0.02 * sr)))
-        new = np.zeros(n); o = int(0.03 * sr); new[o:o + len(t)] = t[:n - o]
+        new = np.zeros(n); o = int(0.03 * sr) if not al else max(int(0.03 * sr), (n - len(t)) // 2); new[o:o + len(t)] = t[:n - o]
         f = int(0.015 * sr); ramp = np.linspace(0, 1, f)                      # 接口处 15 毫秒交叉淡化
         seg = new.copy(); seg[:f] = seg[:f] * ramp + x[i:i + f] * (1 - ramp); seg[-f:] = seg[-f:] * ramp[::-1] + x[j - f:j] * (1 - ramp[::-1])
         y[i:j] = seg; log.append(dict(id=fid, a=round(A, 3), b=round(B, 3), text=text, tts_s=round(len(t) / sr, 2)))
