@@ -64,3 +64,11 @@
 .lr b{font-weight:900;font-size:62px;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
 /* 示意图上的发光框 */
 .lf-spot{position:absolute;box-sizing:border-box;border:4px solid rgba(240,200,120,.95);border-radius:18px;box-shadow:0 0 26px rgba(240,190,90,.75),inset 0 0 22px rgba(240,190,90,.35);pointer-events:none}
+/* 画框里的画（pic）、并排的画（pics） */
+.lp{margin:8px 0;display:flex;flex-direction:column;align-items:center}
+.lp-f{position:relative;width:var(--pw,980px);height:var(--ph,520px);overflow:hidden;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.75),0 0 0 1px rgba(255,230,170,.35),0 0 0 7px rgba(14,11,8,.85),0 0 0 8px rgba(226,189,118,.45)}
+.lp-f img{display:block;width:100%;height:100%;object-fit:cover;will-change:transform}
+.lp-c{margin-top:20px;font-family:var(--kai);font-size:44px;line-height:1.4;color:var(--paper);text-shadow:0 2px 18px rgba(0,0,0,.7);text-align:center}
+.lps{display:flex;gap:56px;justify-content:center;margin:8px 0}
+.lps .lp-f{width:var(--pw,620px);height:var(--ph,420px)}
+.lps .lp-c{font-size:40px}

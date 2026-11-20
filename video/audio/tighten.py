@@ -5,9 +5,12 @@ out: rec/part{n}_tight.wav, out/aligned_part{n}_tight.json
 """
 import sys, json, os
 SRC = os.environ.get('SRC', '_fixed')   # 默认用补录过口误的版本
+CUTSRC = os.environ.get('CUTSRC', SRC)   # 在哪一版上找停顿、定剪口（默认就是要剪的那一版）。换了降噪、想让时间轴一点不变时，指向原来那一版
 import numpy as np, soundfile as sf
 p = sys.argv[1]; extra = [tuple(map(float, r.split('-'))) for r in sys.argv[2].split(',')] if len(sys.argv) > 2 else []
 x, sr = sf.read(f'rec/part{p}{SRC}.wav', dtype='float64')
+xc = x if CUTSRC == SRC else sf.read(f'rec/part{p}{CUTSRC}.wav', dtype='float64')[0]
+assert len(xc) == len(x), (len(xc), len(x))
 # 第一步：口头语（如“嗯”）整段剪掉
 hard = sorted(extra); extra = []
 def remap0(t):
@@ -31,9 +34,9 @@ def splice(x, cuts):
     add(pos, len(x))
     return np.concatenate(out)
 if hard:
-    x = splice(x, hard)
+    x = splice(x, hard); xc = splice(xc, hard) if xc is not x else x
 hop = int(0.01 * sr); win = int(0.03 * sr); n = (len(x) - win) // hop
-db = np.array([20 * np.log10(np.sqrt(np.mean(x[i * hop:i * hop + win] ** 2)) + 1e-9) for i in range(n)])
+db = np.array([20 * np.log10(np.sqrt(np.mean(xc[i * hop:i * hop + win] ** 2)) + 1e-9) for i in range(n)])
 p10, p90 = np.percentile(db, [10, 90]); thr = max(p10 + 10, p90 - 30)
 sil = db < thr
 for a, b in extra: sil[int(a / 0.01):int(b / 0.01)] = True          # 要剪掉的口头语，当作停顿处理

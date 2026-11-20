@@ -15,6 +15,9 @@
 //   { anim: 'bottle' | 'building' | 'breaking' | 'jar' | 'gather' | 'cake' | …, at, 各步的时刻…, w: 宽 }   动画插图（anim.js）
 //   { rows: [['左', '右', 左的时刻, 右的时刻], ...] }               一行一行的对句（四面受敌 / 却不被困住）
 //   fig 还可以加 w（图宽）、spots: [[时刻, 左%, 上%, 宽%, 高%], ...]（一个发光的框，说到哪部分就移到哪部分）
+//   { ill: 'pair' | 'row' | 'flow' | 'vs' | 'hero', items: [...], rel, cap }   图解（ill.js：线条图标拼的小图，说到哪个出哪个）
+//   { pic: '画名', cap: '小字', at, w, h, fx, fy, z }        一幅画装在画框里（web/img/画名.jpg），慢慢推近；fx/fy 是推向哪里（0–1），z 推多近
+//   { pics: [['画名', '小字', 时刻, {fx, fy}], ...], h }     两三幅画并排（对照），各自说到时出来
 //   每一项还可以加 flash: 1（光闪一下）、dim: at（到这时变淡，让位给后面的）
 window.lecture = async function (o = {}) {
   const K = await kit(); const EP = K.EP, LEC = window.LEC;
@@ -22,6 +25,7 @@ window.lecture = async function (o = {}) {
   const P = (p, n = 0) => atP(EP, p, n);
   const AT = a => typeof a === 'number' ? a : Array.isArray(a) ? P(a[0], a[1]) : a && typeof a === 'object' ? P(a.p, a.n || 0) + (a.d || 0) : P(a);
   const host = document.querySelector('#scenes');
+  if (LEC.some(sc => (sc.items || []).some(it => it.ill))) await window.ILL_LOAD();   // 图解要用的图标
   const H = s => String(s);
   // 1) 搭 DOM（先搭好，K.prepare 才会把 .split 拆成逐字、把各项先藏起来）
   const built = LEC.map((sc, i) => {
@@ -37,6 +41,9 @@ window.lecture = async function (o = {}) {
       else if (it.tri) { d.className = 'l3'; d.innerHTML = it.tri.map(c => `<div><b>${H(c.b)}</b><span>${H(c.s || '')}</span></div>`).join(''); }
       else if (it.n) { d.className = 'ln'; d.innerHTML = H(it.n); }
       else if (it.anim) { it._replay = window.ANIM_BUILD(it.anim, d, it, AT); if (it.w) d.style.setProperty('--aw', it.w + 'px'); }   // 动画插图（anim.js）：先画好，动画等时间轴建好再挂
+      else if (it.ill) { it._replay = window.ILL_BUILD(it, d, AT); }   // 图解（ill.js）
+      else if (it.pic) { d.className = 'lp'; d.style.setProperty('--pw', (it.w || 980) + 'px'); d.style.setProperty('--ph', (it.h || 520) + 'px'); d.innerHTML = `<div class="lp-f"><img src="img/${it.pic}.jpg" style="object-position:${(it.fx ?? 0.5) * 100}% ${(it.fy ?? 0.5) * 100}%"></div>` + (it.cap ? `<div class="lp-c">${H(it.cap)}</div>` : ''); }
+      else if (it.pics) { d.className = 'lps'; d.style.setProperty('--ph', (it.h || 420) + 'px'); if (it.w) d.style.setProperty('--pw', it.w + 'px'); d.innerHTML = it.pics.map(p => `<div class="lp"><div class="lp-f"><img src="img/${p[0]}.jpg" style="object-position:${((p[3] || {}).fx ?? 0.5) * 100}% ${((p[3] || {}).fy ?? 0.5) * 100}%"></div>${p[1] ? `<div class="lp-c">${H(p[1])}</div>` : ''}</div>`).join(''); }
       else if (it.rows) { d.className = 'lr'; d.innerHTML = it.rows.map(r => `<div><i>${H(r[0])}</i><b>${H(r[1])}</b></div>`).join(''); }
       else { d.className = 'll ' + (it.c || '') + (it.type || /big|h2/.test(it.c || '') ? ' split' : ''); d.innerHTML = H(it.t); }
       sec.appendChild(d); return d;
@@ -88,10 +95,16 @@ window.lecture = async function (o = {}) {
           if (spec[j].sat !== undefined && sp) { IN(b, t0, { y: 24, d: 0.8 }); IN(sp, AT(spec[j].sat), { y: 14, d: 0.7 }); }
           else IN(p, t0, { y: 24, d: 0.8 });
         });
-      } else if (it.anim) {
+      } else if (it.anim || it.ill) {
         IN(el, Math.max(a + 0.05, at - 0.3), { y: 20, d: 0.8, blur: 6 }); it._replay(tl);
       } else if (it.rows) {
         [...el.children].forEach((r, j) => { IN(r.querySelector('i'), AT(it.rows[j][2]), { y: 16, d: 0.7 }); IN(r.querySelector('b'), AT(it.rows[j][3]), { y: 16, d: 0.7, blur: 6 }); });
+      } else if (it.pic) {
+        IN(el, at, { y: 26, s: 0.97, d: 1.1, blur: 8 });
+        tl.fromTo(el.querySelector('img'), { scale: 1.0 }, { scale: it.z || 1.12, duration: Math.max(1, e - at), ease: 'none', immediateRender: false }, at);
+        if (it.cap) IN(el.querySelector('.lp-c'), at + 0.5, { y: 12, d: 0.8 });
+      } else if (it.pics) {
+        [...el.children].forEach((p, j) => { const t0 = AT(it.pics[j][2]); IN(p, t0, { y: 26, d: 1.0, blur: 8 }); tl.fromTo(p.querySelector('img'), { scale: 1.0 }, { scale: 1.1, duration: Math.max(1, e - t0), ease: 'none', immediateRender: false }, t0); });
       } else if (it.fig) {
         if (xf) IN(el, at, { y: 0, d: 0.6, blur: 0, ease: 'sine.inOut' }); else IN(el, at, { y: 30, s: 0.97, d: 1.2, blur: 10 });
         if (it.spots) {                                                  // 发光的框：第一处淡入，之后平移到下一处

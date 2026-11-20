@@ -28,3 +28,12 @@ video/rec/part7_tight.wav
 video/rec/self5_voice.wav
 video/rec/self5_voice_fixed.wav
 video/rec/fix9/*_t[0-9].wav
+# 去混响版（降噪限 35 dB + 向下扩展）的中间文件
+video/rec/part6_clean35.wav
+video/rec/part6_df35.wav
+video/rec/part6_tight_prev.wav
+video/rec/part7_clean35.wav
+video/rec/part7_clean35m.wav
+video/rec/part7_df35.wav
+video/rec/self4_voice_dry.wav
+video/rec/self5_voice_dry.wav
