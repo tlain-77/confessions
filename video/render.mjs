@@ -18,12 +18,19 @@ await Promise.all(Array.from({ length: workers }, async (_, w) => {
     catch (e) { try { await b.close(); } catch {} throw e; }
     return { b, page }; };
   const open = async upto => { for (let k = 0; ; k++) { try { return await open1(upto); } catch (e) { if (k >= 4) throw e; console.log(`  worker ${w}: reopen failed (${String(e.message).split('\n')[0].slice(0, 60)}), retry ${k + 1}`); await new Promise(r => setTimeout(r, 3000)); } } };
-  let { b, page } = await open(from);
+  let { b, page } = await open(from); let last = 0;
   for (let f = f0 + w; f < f1; f += workers) {
     for (let k = 0; ; k++) {
       try {
         await page.evaluate(x => window.seek(x), f / fps);
-        await page.screenshot({ path: `${dir}/f_${String(f - f0).padStart(6, '0')}.jpg`, type: 'jpeg', quality: 97 });
+        let buf = await page.screenshot({ type: 'jpeg', quality: 97 });
+        // 机器忙的时候偶尔截到一帧全黑（合成器没画好）：比这个 worker 上一帧小得多（黑帧压出来只有几 KB），等一下、重新定位再截，最多两次
+        for (let k2 = 0; k2 < 2 && last && buf.length < last * 0.3; k2++) {
+          console.log(`  worker ${w}: frame ${f} looks blank (${buf.length} vs ${last} bytes), retake`);
+          await new Promise(r => setTimeout(r, 800)); await page.evaluate(x => window.seek(x), f / fps);
+          const b2 = await page.screenshot({ type: 'jpeg', quality: 97 }); if (b2.length > buf.length) buf = b2;
+        }
+        fs.writeFileSync(`${dir}/f_${String(f - f0).padStart(6, '0')}.jpg`, buf); last = buf.length;
         break;
       } catch (e) {
         if (k >= 5) throw e;
