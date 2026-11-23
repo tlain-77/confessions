@@ -1,0 +1,9 @@
+/* 本人录制 · 第五讲（卷一第四章下）：片头、三栏对照、片尾、原文卡的扫光 */
+.ll.latin{font-family:var(--latin);font-weight:500;letter-spacing:.34em;color:var(--paper2)}
+.lc2.n3 > div{width:470px}
+.lc2.n3 b{font-size:56px}
+.l3 b{white-space:nowrap}
+/* 片尾 */
+#LZ .z-t{font-size:76px}
+/* 原文卡出来时，一道光从左扫到右 */
+.lq::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(105deg,transparent calc(var(--sw,-30%) - 18%),rgba(255,236,190,.38) var(--sw,-30%),transparent calc(var(--sw,-30%) + 18%));mix-blend-mode:soft-light}
