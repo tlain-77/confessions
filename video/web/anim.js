@@ -684,5 +684,189 @@
       tl.to(c1, { opacity: 0, duration: 0.6 }, tf);
       SHOW(tl, c2, AT(s.me));
     },
+    // 车轮和轴：轮子架在两条腿上，转起来、越转越快；中间那根轴一动不动（发着光）。轴一拿掉，轮子往下一坠，晃两下，停了
+    wheel({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 560);
+      const cx = 500, cy = 262, R = 206, O = `${cx} ${cy}`;
+      const floor = line(svg, 'M170,528 L830,528', { c: PAPER, w: 2, go: 0.15 });
+      const stand = line(svg, `M${cx},${cy} L${cx - 96},528 M${cx},${cy} L${cx + 96},528`, { c: PAPER, w: 3, go: 0.2 });
+      const spin = mk('g', {}, svg); gsap.set(spin, { svgOrigin: O });
+      const rim = line(spin, circ(cx, cy, R) + ' ' + circ(cx, cy, R - 18), { c: GOLD, w: 3.6 });
+      let d = ''; for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6, c = Math.cos(a), si = Math.sin(a); d += `M${(cx + c * 40).toFixed(1)},${(cy + si * 40).toFixed(1)} L${(cx + c * (R - 18)).toFixed(1)},${(cy + si * (R - 18)).toFixed(1)} `; }
+      const spokes = line(spin, d, { c: GOLD, w: 2.8 });
+      const hub = line(spin, circ(cx, cy, 40), { c: GOLD, w: 3.4 });
+      const mark = mk('circle', { cx: cx + R - 9, cy, r: 7, fill: CORAL, opacity: 0 }, spin);          // 轮缘上一个记号：看得出在转
+      const arc = (r, a0, a1) => `M${(cx + r * Math.cos(a0)).toFixed(1)},${(cy + r * Math.sin(a0)).toFixed(1)} A${r},${r} 0 0 1 ${(cx + r * Math.cos(a1)).toFixed(1)},${(cy + r * Math.sin(a1)).toFixed(1)}`;
+      const blur = line(svg, [R + 24, R + 38].map(r => arc(r, -1.0, 0.1) + ' ' + arc(r, 2.1, 3.2)).join(' '), { c: GOLD, w: 2, go: 0.25 });   // 转快了，边上几道淡弧
+      gsap.set(blur, { opacity: 0 }); gsap.set(blur._p, { strokeDashoffset: 0 });
+      const halo = mk('circle', { cx, cy, r: 70, fill: grad(defs, 'wh' + uid, 'radialGradient', { cx, cy, r: 70 }, [[0, '#fff1c6', 0.9], [0.45, GOLD, 0.3], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const axle = mk('circle', { cx, cy, r: 13, fill: '#fff4d8', filter: `url(#${glowId})`, opacity: 0 }, svg);
+      const lw = text(svg, 120, 120, '轮子在转', { s: 34, a: 'start', ls: '0.14em' });
+      const lead = line(svg, `M${cx + 20},${cy - 16} L${cx + 118},${cy - 150} L${cx + 250},${cy - 150}`, { c: '#fff1c6', w: 2, go: 0.3 });
+      const la = text(svg, cx + 262, cy - 140, '轴 · 不动', { s: 36, a: 'start', c: GOLD, ls: '0.14em' });
+      const t0 = AT(s.at);
+      DRAW(tl, floor, t0, 0.8); DRAW(tl, rim, t0 + 0.1, 1.3); DRAW(tl, spokes, t0 + 0.5, 1.0); DRAW(tl, hub, t0 + 0.6, 0.8); DRAW(tl, stand, t0 + 0.4, 0.9);
+      tl.to(axle, { opacity: 1, duration: 0.6 }, t0 + 0.9); tl.to(mark, { opacity: 1, duration: 0.5 }, t0 + 1.2);
+      const t1 = AT(s.spin), t2 = AT(s.fast), t3 = AT(s.axle), t4 = AT(s.none), t5 = AT(s.stop);
+      SHOW(tl, lw, t1);
+      // 先慢后快：一段一段接着转（都是绝对角度，逐帧定位也对）
+      const r1 = 150, r2 = r1 + 330 * (t4 - t2);
+      tl.fromTo(spin, { rotation: 0 }, { rotation: r1, duration: Math.max(0.6, t2 - t1), ease: 'sine.in', immediateRender: false }, t1);
+      tl.fromTo(spin, { rotation: r1 }, { rotation: r2, duration: t4 - t2, ease: 'none', immediateRender: false }, t2);
+      tl.to(blur, { opacity: 0.8, duration: 0.6 }, t2 + 0.2);
+      DRAW(tl, lead, t3, 0.7); SHOW(tl, la, t3 + 0.5); tl.to(halo, { opacity: 1, duration: 0.8 }, t3 + 0.2);
+      tl.fromTo(axle, { scale: 1 }, { scale: 1.35, svgOrigin: O, duration: 0.7, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, t3 + 0.4);
+      // 轴拿掉：轴和架子淡掉，轮子减速、往下一坠，左右晃两下
+      tl.to([axle, halo, stand, lead, la], { opacity: 0, duration: 0.6 }, t4);
+      tl.to(blur, { opacity: 0, duration: 0.5 }, t4);
+      tl.fromTo(spin, { rotation: r2 }, { rotation: r2 + 150, duration: 1.6, ease: 'power2.out', immediateRender: false }, t4);
+      tl.fromTo(spin, { y: 0 }, { y: 54, duration: 0.9, ease: 'power2.in', immediateRender: false }, t4 + 0.2);
+      tl.fromTo(spin, { x: 0 }, { x: -14, duration: 0.28, ease: 'sine.inOut', yoyo: true, repeat: 3, immediateRender: false }, t4 + 1.05);
+      tl.to([spin, lw], { opacity: 0.38, duration: 0.9 }, Math.max(t4 + 1.3, t5));
+    },
+    // 人的心忽冷忽热（一根上下乱跳的线），神的应许是一根平平稳稳的金线。要是神也跟着变——金线跟着跳、一路往下掉
+    lines({ tl, el, AT, s }) {
+      const { svg } = base(el, 500);
+      const r = rng(11), X0 = 90, X1 = 720, Y = 330, n = 8;
+      const P = []; for (let i = 0; i <= n; i++) P.push([X0 + (X1 - X0) * i / n, Y + (i % 2 ? -1 : 1) * (38 + r() * 64)]);
+      const path = pts => { let d = `M${pts[0][0]},${pts[0][1]}`; for (let i = 0; i < pts.length - 1; i++) { const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)]; d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0]},${p2[1].toFixed(1)}`; } return d; };
+      const heart = line(svg, path(P), { c: CORAL, w: 4, go: 0.45 });
+      const lh = text(svg, X1 + 26, P[n][1] + 10, '以色列人的心', { s: 30, a: 'start', c: CORAL, ls: '0.06em' });
+      const lu = text(svg, X1 + 26, P[n][1] + 10, '我们的心', { s: 32, a: 'start', c: CORAL, ls: '0.1em' });
+      const follow = line(svg, path(P.map(([x, y], i) => [x, y - 12 + i * i * 3.2])), { c: GOLD, w: 3, go: 0.3 });
+      const steady = line(svg, `M${X0},140 L${X1},140`, { c: GOLD, w: 4.6, go: 0.75 });
+      const ls = text(svg, X1 + 26, 150, '神的应许', { s: 36, a: 'start', c: GOLD, ls: '0.1em' });
+      const ll = text(svg, X1 + 26, 196, '祂的爱', { s: 32, a: 'start', c: GOLD, ls: '0.1em' });
+      let hi = 1, lo = 2; P.forEach((p, i) => { if (i && i < n && p[1] < P[hi][1]) hi = i; if (i && i < n && p[1] > P[lo][1]) lo = i; });
+      const lhot = text(svg, P[hi][0], P[hi][1] - 28, '热', { s: 34, c: '#ffcfb0' }), lcold = text(svg, P[lo][0], P[lo][1] + 58, '冷', { s: 34, c: '#bcd9f0' });
+      const t0 = AT(s.at); DRAW(tl, heart, t0, 2.4); SHOW(tl, lh, t0 + 1.8);
+      const tf = AT(s.follow); DRAW(tl, follow, tf, 1.8);
+      const td = AT(s.done); tl.to(follow, { y: 90, opacity: 0, duration: 1.2, ease: 'power2.in' }, td);
+      const tsd = AT(s.steady); DRAW(tl, steady, tsd, 1.4); SHOW(tl, ls, tsd + 0.6);
+      SHOW(tl, ll, AT(s.love));
+      const tu = AT(s.us); tl.to(lh, { opacity: 0, duration: 0.5 }, tu); SHOW(tl, lu, tu + 0.3);
+      SHOW(tl, lhot, AT(s.hot)); SHOW(tl, lcold, AT(s.cold));
+      const tt = AT(s.temp); tl.fromTo(steady._p[0], { opacity: 0.54 }, { opacity: 1, duration: 0.8, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, tt);
+      tl.to([heart, lu, lhot, lcold], { opacity: 0.45, duration: 1.0 }, tt + 0.3);
+    },
+    // 深海剖面：海面上浪大、小船颠；一个小光点往下沉，几百米下面，水是静的
+    deep({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 560);
+      const W0 = 80, W1 = 800, TOP = 150, BOT = 540;
+      const cl = mk('clipPath', { id: 'dc' + uid }, defs); mk('rect', { x: W0, y: 20, width: W1 - W0, height: BOT - 20 }, cl);
+      const g = mk('g', { 'clip-path': `url(#dc${uid})` }, svg);
+      const sea = mk('rect', { x: W0, y: TOP, width: W1 - W0, height: BOT - TOP, fill: grad(defs, 'ds' + uid, 'linearGradient', { x1: 0, y1: TOP, x2: 0, y2: BOT }, [[0, '#7aa8cf', 0.42], [0.3, '#2c5079', 0.5], [1, '#07111f', 0.7]]), opacity: 0 }, g);
+      const fade = mk('linearGradient', { id: 'dm' + uid, x1: 0, y1: 0, x2: 1, y2: 0 }, defs);
+      [[0, 0], [0.1, 1], [0.9, 1], [1, 0]].forEach(([o, a]) => mk('stop', { offset: o, 'stop-color': '#fff', 'stop-opacity': a }, fade));
+      const mask = mk('mask', { id: 'dk' + uid, maskUnits: 'userSpaceOnUse', x: W0, y: 0, width: W1 - W0, height: BOT }, defs); mk('rect', { x: W0, y: 0, width: W1 - W0, height: BOT, fill: `url(#dm${uid})` }, mask);
+      const L = 220, A = 22, wave = (y, a) => { let d = `M${W0 - L * 2},${y}`; for (let x = W0 - L * 2; x < W1 + L * 2; x += L) d += ` q${L / 4},${-a * 2} ${L / 2},0 t${L / 2},0`; return d; };
+      const waves = mk('g', { mask: `url(#dk${uid})` }, g);
+      const w1 = line(waves, wave(TOP, A), { c: '#d6ecfb', w: 3.2, go: 0.5 }), w2 = line(waves, wave(TOP + 26, A * 0.6), { c: '#a9cbe6', w: 2, go: 0.3 });
+      const boat = mk('g', {}, svg), bx = 400, by = TOP - 8;
+      line(boat, `M${bx - 50},${by} L${bx + 50},${by} L${bx + 34},${by + 22} L${bx - 34},${by + 22} Z M${bx},${by} L${bx},${by - 78} M${bx + 3},${by - 74} L${bx + 44},${by - 12} L${bx + 3},${by - 12} Z`, { c: PAPER, w: 3 });
+      gsap.set(boat, { svgOrigin: `${bx} ${by + 10}`, opacity: 0 }); gsap.set(boat.querySelectorAll('path'), { strokeDashoffset: 0 });
+      // 右边的深度尺
+      let rd = `M${W1 + 46},${TOP} L${W1 + 46},${BOT - 20}`; const marks = [0, 100, 200, 300].map((m, i) => { const y = TOP + i * 112; rd += ` M${W1 + 46},${y} L${W1 + 62},${y}`; return text(svg, W1 + 74, y + 10, m ? m + ' 米' : '海面', { s: 24, a: 'start', c: '#a9cbe6', ls: '0.06em', wt: 400 }); });
+      const ruler = line(svg, rd, { c: '#a9cbe6', w: 2, go: 0.2 });
+      const probe = mk('circle', { cx: 640, cy: TOP + 20, r: 7, fill: '#fff4d8', filter: `url(#${glowId})`, opacity: 0 }, svg);
+      const trail = line(svg, `M640,${TOP + 20} L640,${BOT - 50}`, { c: '#fff1c6', w: 1.6, go: 0.3 });
+      const still = line(g, [0, 1, 2, 3].map(k => `M${W0 + 60 + k * 30},${BOT - 108 + k * 22} L${W1 - 60 - k * 40},${BOT - 108 + k * 22}`).join(' '), { c: '#9fc3e0', w: 1.6, go: 0.25 });
+      const lcalm = text(svg, 250, BOT - 128, '水是静的', { s: 36, c: '#d6ecfb', ls: '0.16em' });
+      const lup = s.note !== undefined ? text(svg, W0 + 4, 64, '上面 · 动', { s: 32, a: 'start', c: '#d6ecfb', ls: '0.12em' }) : null;
+      const t0 = AT(s.at); tl.to(sea, { opacity: 1, duration: 1.0 }, t0 - 0.3); DRAW(tl, w1, t0 - 0.2, 0.9); DRAW(tl, w2, t0, 0.9);
+      tl.fromTo(waves, { x: 0 }, { x: -L, duration: 1.7, ease: 'none', repeat: 14, immediateRender: false }, t0 - 0.2);
+      tl.to(boat, { opacity: 1, duration: 0.7 }, t0 + 0.2);
+      tl.fromTo(boat, { rotation: -7, y: 0 }, { rotation: 8, y: 6, duration: 0.85, ease: 'sine.inOut', yoyo: true, repeat: 5, immediateRender: false }, t0 + 0.2);
+      const tb = AT(s.boat); tl.fromTo(boat, { rotation: -10 }, { rotation: 22, duration: 0.6, ease: 'sine.inOut', yoyo: true, repeat: 5, immediateRender: false }, tb);
+      const tdn = AT(s.down); DRAW(tl, ruler, tdn - 0.3, 0.8); marks.forEach((m, i) => SHOW(tl, m, tdn - 0.1 + i * 0.25));
+      tl.to(probe, { opacity: 1, duration: 0.4 }, tdn); tl.to(probe, { attr: { cy: BOT - 50 }, duration: 2.0, ease: 'power1.inOut' }, tdn + 0.2); DRAW(tl, trail, tdn + 0.2, 2.0);
+      const tc = AT(s.calm); DRAW(tl, still, tc - 0.2, 1.4); SHOW(tl, lcalm, tc);
+      if (s.note !== undefined) SHOW(tl, lup, AT(s.note));
+    },
+    // 从有到好：创造（一点光、一粒种子）→ 负荷（手托着小苗）→ 维护（罩着、挡风）→ 养育（浇水、长高）→ 充裕（开花）→ 改进（结果、发光）
+    //   { anim: 'grow', at, items: [['创造', '从无到有', 时刻, 小字时刻], ...], pre: 前面几个一开场就画好 }
+    grow({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 520);
+      const X = [92, 255, 418, 582, 745, 908], Y = 236, pre = s.pre || 0;
+      const stem = h => `M0,70 C-2,${70 - h * 0.4} 3,${70 - h * 0.75} 0,${70 - h}`;
+      const leaf = (y, k, z) => `M0,${y} C${k * z * 0.35},${y - z * 0.55} ${k * z * 0.95},${y - z * 0.5} ${k * z * 1.1},${y - z * 0.18} C${k * z * 0.72},${y + z * 0.06} ${k * z * 0.3},${y + z * 0.04} 0,${y}`;
+      const drop = (x, y) => `M${x},${y} C${x - 6},${y + 9} ${x - 6},${y + 15} ${x},${y + 15} C${x + 6},${y + 15} ${x + 6},${y + 9} ${x},${y} Z`;
+      const petals = (x, y) => [0, 72, 144, 216, 288].map(a => { const c = Math.cos(a * Math.PI / 180), si = Math.sin(a * Math.PI / 180), P = (px, py) => `${(x + px * c - py * si).toFixed(1)},${(y + px * si + py * c).toFixed(1)}`; return `M${P(0, 0)} C${P(-8, -8)} ${P(-7, -20)} ${P(0, -24)} C${P(7, -20)} ${P(8, -8)} ${P(0, 0)} Z`; }).join(' ');
+      const PIC = [
+        ['M0,-30 C3,-7 7,-3 30,0 C7,3 3,7 0,30 C-3,7 -7,3 -30,0 C-7,-3 -3,-7 0,-30 Z', 'M-10,60 C-10,49 10,49 10,60 C10,69 -10,69 -10,60 Z', [0, 0]],
+        [stem(34) + ' ' + leaf(44, -1, 20) + ' ' + leaf(40, 1, 18), 'M-58,50 C-44,84 44,84 58,50 M-58,50 C-63,41 -54,37 -47,44 M58,50 C63,41 54,37 47,44'],
+        [stem(58) + ' ' + leaf(40, -1, 24) + ' ' + leaf(28, 1, 22), 'M-46,70 L-46,6 C-46,-52 46,-52 46,6 L46,70 M-86,-18 C-72,-22 -64,-28 -58,-38 M-92,8 C-78,4 -66,-2 -60,-10'],
+        [stem(88) + ' ' + leaf(36, -1, 28) + ' ' + leaf(18, 1, 28) + ' ' + leaf(0, -1, 22), drop(-30, -80) + ' ' + drop(6, -98) + ' ' + drop(32, -72)],
+        [stem(104) + ' ' + leaf(44, -1, 32) + ' ' + leaf(28, 1, 32) + ' ' + leaf(8, -1, 30) + ' ' + leaf(-10, 1, 28), petals(0, -36)],
+        [stem(104) + ' ' + leaf(44, -1, 32) + ' ' + leaf(28, 1, 32) + ' ' + leaf(8, -1, 30) + ' ' + leaf(-10, 1, 28), 'M0,-34 C-24,-34 -28,-66 -13,-76 C-6,-81 6,-81 13,-76 C28,-66 24,-34 0,-34 Z M0,-76 C2,-88 9,-94 16,-96', [0, -56]],
+      ];
+      const ground = line(svg, `M${X[0] - 64},${Y + 70} L${X[5] + 64},${Y + 70}`, { c: PAPER, w: 1.8, go: 0.12 });
+      const spot = mk('ellipse', { cx: X[0], cy: Y - 10, rx: 92, ry: 120, fill: grad(defs, 'gs' + uid, 'radialGradient', { cx: 0.5, cy: 0.5, r: 0.5, gradientUnits: 'objectBoundingBox' }, [[0, '#ffe6a6', 0.3], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const t0 = AT(s.at); gsap.set(ground._p, { strokeDashoffset: 1.01 });
+      (s.items || []).forEach(([b, sub, at, sat], i) => {
+        const t = i < pre ? t0 - 0.3 : AT(at), [pd, ex, gl] = PIC[i];
+        const g = mk('g', { transform: `translate(${X[i]},${Y})` }, svg);
+        if (gl) { const h = mk('circle', { cx: gl[0], cy: gl[1], r: 46, fill: grad(defs, 'gh' + uid + i, 'radialGradient', { cx: 0.5, cy: 0.5, r: 0.5, gradientUnits: 'objectBoundingBox' }, [[0, '#fff1c6', 0.75], [1, GOLD, 0]]), opacity: 0 }, g); tl.to(h, { opacity: 1, duration: 0.9 }, t + 0.5); }
+        const p1 = line(g, pd, { c: GOLD, w: 2.8 }), p2 = line(g, ex, { c: i === 1 || i === 2 ? PAPER : i === 3 ? '#bcdcf4' : GOLD, w: 2.4 });
+        const lb = text(svg, X[i], Y + 128, b, { s: 40, c: GOLD, ls: '0.12em', wt: 700 }), ls = text(svg, X[i], Y + 176, sub, { s: 26, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400, ls: '0.04em' });
+        DRAW(tl, p1, t, i < pre ? 0.2 : 1.0); DRAW(tl, p2, t + (i < pre ? 0 : 0.5), i < pre ? 0.2 : 0.9); SHOW(tl, lb, t + (i < pre ? 0 : 0.1), i < pre ? 0.3 : 0.8);
+        SHOW(tl, ls, i < pre ? t : sat !== undefined ? AT(sat) : t + 0.6);
+        tl.to(ground._p, { strokeDashoffset: 1 - (i + 1) / 6, duration: i < pre ? 0.2 : 0.8, ease: 'power2.inOut' }, t);
+        if (i >= pre) { tl.to(spot, { attr: { cx: X[i] }, opacity: 1, duration: 0.8, ease: 'power2.inOut' }, t - 0.2); }
+      });
+    },
+    // 钟表匠的说法：一块怀表；造好、上紧发条（钥匙来回拧），钥匙一拔就走了，表自己走——这个说法被一条条划掉；神一刻也没有离开
+    watch({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 560);
+      const cx = 300, cy = 300, R = 176, O = `${cx} ${cy}`;
+      const halo = mk('circle', { cx, cy, r: R + 70, fill: grad(defs, 'wg' + uid, 'radialGradient', { cx, cy, r: R + 70 }, [[0, '#ffe6a6', 0], [0.7, '#ffe6a6', 0.22], [0.86, GOLD, 0.16], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const kase = line(svg, circ(cx, cy, R) + ' ' + circ(cx, cy, R - 15), { c: GOLD, w: 3.4 });
+      const crown = line(svg, `M${cx - 16},${cy - R - 1} L${cx - 16},${cy - R - 28} L${cx + 16},${cy - R - 28} L${cx + 16},${cy - R - 1} ` + circ(cx, cy - R - 58, 28), { c: GOLD, w: 3 });
+      let tk = ''; for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6, r1 = R - 30, r2 = k % 3 ? R - 42 : R - 56; tk += `M${(cx + Math.sin(a) * r1).toFixed(1)},${(cy - Math.cos(a) * r1).toFixed(1)} L${(cx + Math.sin(a) * r2).toFixed(1)},${(cy - Math.cos(a) * r2).toFixed(1)} `; }
+      const ticks = line(svg, tk, { c: PAPER, w: 2.6 });
+      const hh = line(svg, `M${cx},${cy} L${cx + 52},${cy - 50}`, { c: PAPER, w: 5 }), mh = line(svg, `M${cx},${cy} L${cx},${cy - 124}`, { c: PAPER, w: 3.2 });
+      gsap.set(mh, { svgOrigin: O });
+      const pin = mk('circle', { cx, cy, r: 7, fill: '#fff4d8', opacity: 0 }, svg);
+      const key = mk('g', { opacity: 0 }, svg), ky = cy - R - 118;
+      line(key, `M${cx},${ky + 32} L${cx},${ky + 4} M${cx - 24},${ky - 14} C${cx - 24},${ky - 30} ${cx - 4},${ky - 30} ${cx},${ky - 14} C${cx + 4},${ky - 30} ${cx + 24},${ky - 30} ${cx + 24},${ky - 14} C${cx + 24},${ky} ${cx + 4},${ky} ${cx},${ky - 14} C${cx - 4},${ky} ${cx - 24},${ky} ${cx - 24},${ky - 14} Z`, { c: '#fff1c6', w: 3 });
+      gsap.set(key, { svgOrigin: `${cx} ${ky}` }); gsap.set(key.querySelectorAll('path'), { strokeDashoffset: 0 });
+      const RX = 590, rows = [['钟表匠', s.at, 46, GOLD], ['把表造好', s.make, 36, PAPER], ['上紧发条', s.wind, 36, PAPER], ['自己走开', s.away, 36, PAPER]];
+      const lbs = rows.map(([w, at, sz, c], i) => text(svg, RX, 150 + i * 80 + (i ? 20 : 0), w, { s: sz, a: 'start', c, ls: '0.16em', wt: i ? 500 : 700 }));
+      const strike = line(svg, rows.slice(1).map((_, i) => `M${RX - 10},${170 + (i + 1) * 80 - 12} L${RX + 175},${170 + (i + 1) * 80 - 12}`).join(' '), { c: CORAL, w: 4, go: 0.4 });
+      const never = text(svg, RX, 500, '一刻也没有离开', { s: 40, a: 'start', c: GOLD, ls: '0.14em', wt: 700 });
+      const t0 = AT(s.at); DRAW(tl, kase, t0, 1.2); DRAW(tl, ticks, t0 + 0.4, 1.0); DRAW(tl, crown, t0 + 0.6, 0.8); DRAW(tl, hh, t0 + 0.9, 0.6); DRAW(tl, mh, t0 + 1.0, 0.6); tl.to(pin, { opacity: 1, duration: 0.5 }, t0 + 1.1);
+      SHOW(tl, lbs[0], s.lab !== undefined ? AT(s.lab) : t0 + 0.2);
+      const tm = AT(s.make); SHOW(tl, lbs[1], tm);
+      const tw = AT(s.wind); SHOW(tl, lbs[2], tw); tl.to(key, { opacity: 1, duration: 0.4 }, tw - 0.2);
+      tl.fromTo(key, { scaleX: 1 }, { scaleX: -1, duration: 0.3, ease: 'sine.inOut', yoyo: true, repeat: 5, immediateRender: false }, tw + 0.1);
+      const ta = AT(s.away); SHOW(tl, lbs[3], ta); tl.to(key, { y: -60, x: 90, opacity: 0, duration: 1.0, ease: 'power2.in' }, ta + 0.1);
+      const tal = AT(s.alone); tl.fromTo(mh, { rotation: 0 }, { rotation: 360 * 3, duration: 26, ease: 'none', immediateRender: false }, tal);
+      const tn = AT(s.no); DRAW(tl, strike, tn, 0.9); tl.to(lbs.slice(1), { opacity: 0.4, duration: 0.6 }, tn + 0.5);
+      const tv = AT(s.never); tl.to(halo, { opacity: 1, duration: 1.2 }, tv); SHOW(tl, never, tv + 0.2);
+    },
+    // 靠墙：一个人整个靠在一堵墙上（靠着）；可是墙揣不进兜里——小墙往兜里塞，塞不进，弹回来（拿着 ✗）
+    lean({ tl, el, AT, s }) {
+      const { svg, glowId } = base(el, 540);
+      const wx0 = 560, wx1 = 790, wy0 = 76, wy1 = 486;
+      let bd = `M${wx0},${wy0} L${wx1},${wy0} L${wx1},${wy1} L${wx0},${wy1} Z`;
+      for (let y = wy0 + 41, row = 1; y < wy1 - 5; y += 41, row++) bd += ` M${wx0},${y} L${wx1},${y}`;
+      for (let y = wy0, row = 0; y < wy1 - 5; y += 41, row++) for (let x = wx0 + (row % 2 ? 38 : 76); x < wx1 - 10; x += 76) bd += ` M${x},${y} L${x},${Math.min(wy1, y + 41)}`;
+      const wallBg = mk('rect', { x: wx0, y: wy0, width: wx1 - wx0, height: wy1 - wy0, fill: 'rgba(226,189,118,.08)', opacity: 0 }, svg);
+      const wall = line(svg, bd, { c: PAPER, w: 2.2, go: 0.14 });
+      const ground = line(svg, 'M110,486 L880,486', { c: PAPER, w: 2, go: 0.12 });
+      const person = line(svg, circ(512, 150, 25) + ' M520,176 C528,220 540,270 552,330 M552,330 C540,380 520,430 498,484 M552,330 C549,384 542,432 538,484 M526,212 C500,228 500,248 522,258 C536,264 548,252 546,238', { c: '#efe6d2', w: 4.2 });
+      const glow = mk('rect', { x: wx0 - 30, y: wy0, width: 40, height: wy1 - wy0, fill: '#ffe6a6', opacity: 0, filter: `url(#${glowId})` }, svg);
+      const pocket = line(svg, 'M150,262 L330,262 L330,380 C330,432 150,432 150,380 Z M150,282 L330,282', { c: PAPER, w: 3 });
+      const mini = mk('g', { opacity: 0 }, svg);
+      line(mini, 'M200,96 L280,96 L280,206 L200,206 Z M200,123 L280,123 M200,150 L280,150 M200,178 L280,178 M240,96 L240,123 M220,123 L220,150 M260,123 L260,150 M240,150 L240,178 M220,178 L220,206 M260,178 L260,206', { c: PAPER, w: 2.2 });
+      gsap.set(mini, { svgOrigin: '240 206' }); gsap.set(mini.querySelectorAll('path'), { strokeDashoffset: 0 });
+      const x = line(svg, 'M196,300 L284,388 M284,300 L196,388', { c: CORAL, w: 6, go: 0.5 });
+      const l1 = text(svg, 675, 534, '靠着祂', { s: 44, c: GOLD, ls: '0.24em', wt: 700 }), l2 = text(svg, 240, 534, '拿着祂', { s: 44, c: CORAL, ls: '0.24em', wt: 700 });
+      const t0 = AT(s.at); DRAW(tl, ground, t0 - 0.2, 0.8); DRAW(tl, wall, t0, 1.4); tl.to(wallBg, { opacity: 1, duration: 1.0 }, t0 + 0.5); DRAW(tl, person, t0 + 0.7, 1.2);
+      tl.to(glow, { opacity: 0.35, duration: 1.0 }, t0 + 1.6);
+      const tp = AT(s.pocket); DRAW(tl, pocket, tp, 0.9); tl.to(mini, { opacity: 1, duration: 0.5 }, tp + 0.4);
+      tl.to(mini, { y: 70, scale: 0.92, duration: 0.7, ease: 'power2.in' }, tp + 1.0); tl.to(mini, { y: -10, scale: 1, duration: 0.6, ease: 'back.out(2)' }, tp + 1.7); DRAW(tl, x, tp + 2.0, 0.5);
+      SHOW(tl, l1, AT(s.lean2)); SHOW(tl, l2, AT(s.grab)); tl.to([pocket, mini, x], { opacity: 0.45, duration: 0.8 }, AT(s.grab) + 0.6);
+    },
   };
 })();

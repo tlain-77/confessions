@@ -27,6 +27,8 @@ window.lecture = async function (o = {}) {
   const host = document.querySelector('#scenes');
   if (LEC.some(sc => (sc.items || []).some(it => it.ill || it.anim))) await window.ILL_LOAD();   // 图解、动画要用的图标
   const H = s => String(s);
+  const artHost = document.createElement('div'); artHost.id = 'artbg'; host.parentNode.insertBefore(artHost, host);   // 名画垫在所有场景后面的一层（art.js）
+  let lastArt = null;
   // 1) 搭 DOM（先搭好，K.prepare 才会把 .split 拆成逐字、把各项先藏起来）
   const built = LEC.map((sc, i) => {
     const sec = document.createElement('section'); sec.className = 'scene ' + (sc.html ? '' : 'lec ') + (sc.cls || ''); sec.id = 'L' + i;
@@ -42,8 +44,8 @@ window.lecture = async function (o = {}) {
       else if (it.n) { d.className = 'ln'; d.innerHTML = H(it.n); }
       else if (it.anim) { it._replay = window.ANIM_BUILD(it.anim, d, it, AT); if (it.w) d.style.setProperty('--aw', it.w + 'px'); }   // 动画插图（anim.js）：先画好，动画等时间轴建好再挂
       else if (it.ill) { it._replay = window.ILL_BUILD(it, d, AT); }   // 图解（ill.js）
-      else if (it.art) { it._art = window.ART_ADD(it, d); }             // 名画铺满、2.5D 视差（art.js）
-      else if (it.pdx) { d.className = 'pdx'; d.innerHTML = `<div class="pdx-l"><b>${H(it.pdx[0][0])}</b>${it.pdx[0][1] ? `<span>${H(it.pdx[0][1])}</span>` : ''}</div><div class="pdx-m"><i></i>${it.mid ? `<em>${H(it.mid)}</em>` : ''}</div><div class="pdx-r"><b>${H(it.pdx[1][0])}</b>${it.pdx[1][1] ? `<span>${H(it.pdx[1][1])}</span>` : ''}</div>`; }   // 一对“打架”的词：左暗右亮
+      else if (it.art) { d.className = 'art-ph'; it._art = it.cont && lastArt && lastArt.it.art === it.art ? lastArt : window.ART_ADD(it, artHost); lastArt = it._art; }   // 名画铺满、2.5D 视差（art.js）；cont：接着上一场的同一幅
+      else if (it.pdx) { d.className = 'pdx' + (it.cls ? ' ' + it.cls : ''); d.innerHTML = `<div class="pdx-l"><b>${H(it.pdx[0][0])}</b>${it.pdx[0][1] ? `<span>${H(it.pdx[0][1])}</span>` : ''}</div><div class="pdx-m"><i></i>${it.mid ? `<em>${H(it.mid)}</em>` : ''}</div><div class="pdx-r"><b>${H(it.pdx[1][0])}</b>${it.pdx[1][1] ? `<span>${H(it.pdx[1][1])}</span>` : ''}</div>`; }   // 一对“打架”的词：左暗右亮
       else if (it.stars) { it._replay = window.STARS_BUILD(it, d, AT); }  // 一串称呼连成星座
       else if (it.pic) { d.className = 'lp'; d.style.setProperty('--pw', (it.w || 980) + 'px'); d.style.setProperty('--ph', (it.h || 520) + 'px'); d.innerHTML = `<div class="lp-f"><img src="img/${it.pic}.jpg" style="object-position:${(it.fx ?? 0.5) * 100}% ${(it.fy ?? 0.5) * 100}%"></div>` + (it.cap ? `<div class="lp-c">${H(it.cap)}</div>` : ''); }
       else if (it.pics) { d.className = 'lps'; d.style.setProperty('--ph', (it.h || 420) + 'px'); if (it.w) d.style.setProperty('--pw', it.w + 'px'); d.innerHTML = it.pics.map(p => `<div class="lp"><div class="lp-f"><img src="img/${p[0]}.jpg" style="object-position:${((p[3] || {}).fx ?? 0.5) * 100}% ${((p[3] || {}).fy ?? 0.5) * 100}%"></div>${p[1] ? `<div class="lp-c">${H(p[1])}</div>` : ''}</div>`).join(''); }
@@ -129,7 +131,7 @@ window.lecture = async function (o = {}) {
           else IN(p, t0, { y: 12, d: 1.0 });
         });
       } else if (it.art) {                                              // 名画：这一场一开始就在（垫在文字下面），镜头走满整场
-        it._art.t0 = a - 0.3; it._art.t1 = e; IN(el, Math.max(0, a - 0.25), { y: 0, blur: 0, d: 1.3, ease: 'sine.inOut' });
+        window.ART_SEG(it._art, it, i, a - 0.3, e);                     // 淡入淡出在下面统一排（画在后面那一层，可以跨场）
       } else if (it.pdx) {                                              // 左边那个词从暗里慢慢浮出来，右边那一半亮起来、词在光里出来
         const [L, R] = it.pdx, tl0 = AT(L[2]), tr0 = AT(R[2]), l = el.querySelector('.pdx-l'), r = el.querySelector('.pdx-r'), m = el.querySelector('.pdx-m');
         IN(el, Math.max(a + 0.05, tl0 - 0.45), { y: 10, d: 1.0, blur: 2 });
@@ -168,6 +170,16 @@ window.lecture = async function (o = {}) {
       if (it.dim !== undefined) tl.to(el, { opacity: 0.32, duration: 0.6 }, AT(it.dim));
       if (it.strike !== undefined) tl.fromTo(el, { '--sx': 0 }, { '--sx': 1, duration: 0.45, ease: 'power2.inOut', immediateRender: false }, AT(it.strike));
     });
+  });
+  // 名画那一层：第一场开始时淡入；紧接着换另一幅画的，新画盖在上面淡入、淡完再撤掉旧画（不经过黑）；后面没有画的，最后一场结束时淡出
+  const AR = window.ART_LIST ? window.ART_LIST().filter(r => r.segs.length) : [];
+  const SA = i => starts[i] - 0.1, SE = i => i + 1 < built.length ? starts[i + 1] - 0.1 : END;
+  AR.forEach((r, k) => {
+    const i0 = r.segs[0].i, i1 = r.segs[r.segs.length - 1].i, prev = AR[k - 1], next = AR[k + 1];
+    if (prev && prev.segs[prev.segs.length - 1].i === i0 - 1) tl.fromTo(r.el, { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'sine.inOut', immediateRender: false }, SA(i0) - 0.5);
+    else tl.fromTo(r.el, { opacity: 0 }, { opacity: 1, duration: 1.3, ease: 'sine.inOut', immediateRender: false }, Math.max(0, SA(i0) - 0.25));
+    if (next && next.segs[0].i === i1 + 1) tl.to(r.el, { opacity: 0, duration: 0.6, ease: 'sine.inOut' }, SA(i1 + 1) + 0.5);   // 新画差不多全亮了再淡掉旧的（新画只占半屏时，另一半也是慢慢暗下去）
+    else tl.to(r.el, { opacity: 0, duration: 0.7, ease: 'sine.inOut' }, SE(i1) - 0.6);
   });
   return { K, P, AT, END };
 };

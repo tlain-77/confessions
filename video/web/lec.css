@@ -84,10 +84,10 @@
 .art-scrim.left{background:linear-gradient(90deg,rgba(7,6,4,.9) 0%,rgba(7,6,4,.74) 30%,rgba(7,6,4,0) 62%)}
 .art-scrim.right{background:linear-gradient(270deg,rgba(7,6,4,.9) 0%,rgba(7,6,4,.74) 30%,rgba(7,6,4,0) 62%)}
 .art-scrim.bottom{background:linear-gradient(0deg,rgba(7,6,4,.92) 0%,rgba(7,6,4,.66) 30%,rgba(7,6,4,0) 60%)}
-.scene.lec.art-l{align-items:flex-start;text-align:left;padding-left:150px;padding-right:1000px}
-.scene.lec.art-l .ll{white-space:normal}
-.scene.lec.art-r{align-items:flex-end;text-align:right;padding-left:1000px;padding-right:150px}
-.scene.lec.art-r .ll{white-space:normal}
+.scene.lec.art-l{align-items:flex-start;text-align:left;padding-left:140px;padding-right:880px}
+.scene.lec.art-l .ll{white-space:normal;text-wrap:balance}
+.scene.lec.art-r{align-items:flex-end;text-align:right;padding-left:880px;padding-right:140px}
+.scene.lec.art-r .ll{white-space:normal;text-wrap:balance}
 .scene.lec.art-b{justify-content:flex-end;padding-bottom:190px}
 /* 一对“打架”的词（pdx）：整屏一分为二——左边暗、词从暗里慢慢浮出来；右边一层暖光亮起来（--lit），词在光里出来；中间一道细光 */
 .pdx{position:absolute;inset:0;z-index:-1;display:flex;pointer-events:none}
@@ -119,3 +119,10 @@
 .art-cap{position:absolute;right:72px;top:104px;font-family:var(--sans);font-weight:300;font-size:22px;letter-spacing:.24em;color:rgba(241,232,214,.62);text-shadow:0 1px 10px rgba(0,0,0,.9);z-index:2}
 .scene.lec.art-l .ll.kai,.scene.lec.art-r .ll.kai{font-size:58px}
 .scene.lec.art-l .lv,.scene.lec.art-r .lv{max-width:800px}
+/* 名画那一层（art.js）：在所有场景后面、背景前面 */
+#artbg{position:absolute;inset:0;pointer-events:none}
+#artbg .art-host{z-index:auto}
+.art-ph{display:none}
+.art-scrim.all{background:radial-gradient(ellipse 80% 70% at 50% 48%,rgba(7,6,4,.62),rgba(7,6,4,.8))}
+.pdx.even .pdx-l{background:radial-gradient(ellipse 90% 70% at 58% 46%,rgba(40,34,24,.5),rgba(6,6,8,.9) 80%)}
+.pdx.even .pdx-l b{color:var(--paper);text-shadow:0 0 40px rgba(0,0,0,.8)}

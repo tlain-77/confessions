@@ -51,7 +51,7 @@ F = {
 LIST = [range(57, 84), range(240, 246), range(248, 251), [306, 308, 309], range(341, 343), range(420, 424), range(496, 501), range(504, 509), [570]]
 for r in LIST:                          # 一口气列下去的词：段尾的句号换成顿号（合成一行时读起来是一串）
     for i in r:
-        if i not in F: F[i] = re.sub(r'。$', '、', auto[i])
+        if i not in F: F[i] = re.sub(r'。$', '、', g(auto[i]))
 FILLER = [621]                         # 识别成“嗯”的其实是一下咂嘴声和气声：录音里压成静音（audio/edit8.py）
 for i in FILLER: F[i] = ''
 segs = [F.get(i, g(auto[i])) for i in range(len(auto))]
