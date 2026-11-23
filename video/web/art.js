@@ -16,7 +16,7 @@
       gl_FragColor = texture2D(uImg, clamp(s, vec2(.0005), vec2(.9995)));
     }`;
   function initGL() {
-    if (GL) return GL;
+    if (GL && (GL.none || !GL.gl.isContextLost())) return GL;
     const c = document.createElement('canvas'); c.width = 1920; c.height = 1080;
     const gl = c.getContext('webgl', { preserveDrawingBuffer: true, antialias: false, premultipliedAlpha: false });
     if (!gl) return (GL = { none: true });
@@ -63,7 +63,7 @@
   };
   const ease = p => p < 0 ? 0 : p > 1 ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * p);
   const depthAt = (r, u, v) => { const w = r.dp.width, h = r.dp.height, x = Math.min(w - 1, Math.max(0, Math.round(u * (w - 1)))), y = Math.min(h - 1, Math.max(0, Math.round(v * (h - 1)))); return r.dd[(y * w + x) * 4] / 255; };
-  function draw(r, t) {
+  function draw(r, t, retry) {
     const G = GL, it = r.it, S = r.segs, T0 = S[0].t0, T1 = S[S.length - 1].t1;
     let k = 0; while (k + 1 < S.length && t >= S[k + 1].t0) k++;
     const sg = S[k], p = ease((t - sg.t0) / Math.max(0.1, sg.t1 - sg.t0)), pc = ease((t - T0) / Math.max(0.1, T1 - T0));
@@ -85,6 +85,13 @@
     gl.uniform2f(G.uC, cx, cy); gl.uniform2f(G.uV, vx, vy); gl.uniform2f(G.uS, dx * px * vx * 2, dy * px * vy * 2);
     gl.uniform1f(G.uDz, (it.dz ?? 0.05) * pc); gl.uniform1f(G.uD0, it.d0 ?? depthAt(r, cx, cy));
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    // 渲染机器忙的时候，WebGL 偶尔会丢上下文：画出来是全黑的。查一下画面中间那一点，没画上就重建上下文、重传纹理，再画一次
+    const pix = new Uint8Array(4); gl.readPixels(r.W >> 1, r.H >> 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pix);
+    if (pix[3] === 0 || gl.isContextLost()) {
+      if (retry) { r.ctx.drawImage(r.im, (cx - vx) * r.im.width, (cy - vy) * r.im.height, r.im.width * vx * 2, r.im.height * vy * 2, 0, 0, r.W, r.H); return; }   // 还是不行：至少画上画（没有视差）
+      GL = null; const G2 = initGL(); if (!G2.none) for (const a of ARTS) if (a.im) { a.tImg = tex(G2.gl, a.im); a.tDep = tex(G2.gl, a.dp); }
+      return draw(r, t, true);
+    }
     r.ctx.drawImage(G.c, 0, 0, r.W, r.H, 0, 0, r.W, r.H);
   }
   window.ART_TICK = t => { for (const r of ARTS) if (r.im && r.segs.length && t >= r.segs[0].t0 - 1.0 && t <= r.segs[r.segs.length - 1].t1 + 1.4) draw(r, t); };
