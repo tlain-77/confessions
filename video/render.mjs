@@ -25,9 +25,11 @@ await Promise.all(Array.from({ length: workers }, async (_, w) => {
         await page.evaluate(x => window.seek(x), f / fps);
         let buf = await page.screenshot({ type: 'jpeg', quality: 97 });
         // 机器忙的时候偶尔截到一帧全黑（合成器没画好）：比这个 worker 上一帧小得多（黑帧压出来只有几 KB），等一下、重新定位再截，最多两次
-        for (let k2 = 0; k2 < 2 && last && buf.length < last * 0.3; k2++) {
+        for (let k2 = 0; k2 < 3 && last && buf.length < last * 0.3; k2++) {
           console.log(`  worker ${w}: frame ${f} looks blank (${buf.length} vs ${last} bytes), retake`);
-          await new Promise(r => setTimeout(r, 800)); await page.evaluate(x => window.seek(x), f / fps);
+          if (k2 === 2) { try { await b.close(); } catch {} ({ b, page } = await open(f / fps - 0.25)); }   // 两次都一样：这个浏览器多半坏了，重开一个再截一次（还是暗，就当它本来就暗）
+          else await new Promise(r => setTimeout(r, 800));
+          await page.evaluate(x => window.seek(x), f / fps);
           const b2 = await page.screenshot({ type: 'jpeg', quality: 97 }); if (b2.length > buf.length) buf = b2;
         }
         fs.writeFileSync(`${dir}/f_${String(f - f0).padStart(6, '0')}.jpg`, buf); last = buf.length;
