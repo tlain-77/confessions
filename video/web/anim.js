@@ -868,5 +868,111 @@
       tl.to(mini, { y: 70, scale: 0.92, duration: 0.7, ease: 'power2.in' }, tp + 1.0); tl.to(mini, { y: -10, scale: 1, duration: 0.6, ease: 'back.out(2)' }, tp + 1.7); DRAW(tl, x, tp + 2.0, 0.5);
       SHOW(tl, l1, AT(s.lean2)); SHOW(tl, l2, AT(s.grab)); tl.to([pocket, mini, x], { opacity: 0.45, duration: 0.8 }, AT(s.grab) + 0.6);
     },
+    // 工地和图纸：左边工地天天在变（搭脚手架 → 拆脚手架 → 挖地基 → 浇楼板），右边那张蓝图从头到尾一直是那一张
+    blueprint({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 560);
+      const G = 470, bx0 = 140, bx1 = 400, fl = [G, G - 92, G - 184, G - 276, G - 368];      // 地面、各层楼面
+      const ground = line(svg, `M60,${G} L520,${G}`, { c: PAPER, w: 2.2, go: 0.15 });
+      const frame = line(svg, `M${bx0},${G} L${bx0},${fl[4]} L${bx1},${fl[4]} L${bx1},${G} ` + fl.slice(1, 4).map(y => `M${bx0},${y} L${bx1},${y}`).join(' ') + ` M${(bx0 + bx1) / 2},${G} L${(bx0 + bx1) / 2},${fl[4]}`, { c: GOLD, w: 3 });
+      let sc = ''; for (const x of [bx0 - 34, bx1 + 34]) sc += `M${x},${G} L${x},${fl[4] - 30} `; for (const y of [G - 46, ...fl.slice(1).map(y => y - 46), fl[4] - 30]) sc += `M${bx0 - 34},${y} L${bx0},${y} M${bx1},${y} L${bx1 + 34},${y} `;
+      for (let k = 0; k < 4; k++) { const y0 = fl[k], y1 = fl[k + 1]; sc += `M${bx0 - 34},${y0} L${bx0},${y1} M${bx1 + 34},${y0} L${bx1},${y1} `; }
+      const scaf = line(svg, sc, { c: PAPER, w: 2, go: 0.15 });
+      const pit = line(svg, `M${bx0 - 10},${G} L${bx0 + 10},${G + 54} L${bx1 - 10},${G + 54} L${bx1 + 10},${G}`, { c: CORAL, w: 3, go: 0.35 });
+      const slab = mk('rect', { x: bx0, y: fl[2] - 10, width: bx1 - bx0, height: 14, fill: GOLD, opacity: 0 }, svg);
+      const lw = text(svg, 270, 540, '工地：天天在变', { s: 30, ls: '0.12em' });
+      const steps = [['搭脚手架', s.up], ['拆脚手架', s.down], ['挖地基', s.dig], ['浇楼板', s.slab]].map(([w, at], i) => [text(svg, 60, 70 + i * 0, w, { s: 34, a: 'start', c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 }), at]);
+      // 蓝图：一张蓝纸，白线网格，画的就是这栋楼
+      const px0 = 590, py0 = 96, pw = 340, ph = 380, sk = 0.62, ox = px0 + 40 - bx0 * sk, oy = py0 + 60 - fl[4] * sk;
+      const paper = mk('rect', { x: px0, y: py0, width: pw, height: ph, rx: 4, fill: grad(defs, 'bp' + uid, 'linearGradient', { x1: px0, y1: py0, x2: px0 + pw, y2: py0 + ph }, [[0, '#2a5a92'], [1, '#163a66']]), opacity: 0 }, svg);
+      let gr = ''; for (let x = px0 + 20; x < px0 + pw; x += 20) gr += `M${x},${py0 + 6} L${x},${py0 + ph - 6} `; for (let y = py0 + 20; y < py0 + ph; y += 20) gr += `M${px0 + 6},${y} L${px0 + pw - 6},${y} `;
+      const grid = mk('path', { d: gr, stroke: '#cfe3fb', 'stroke-width': 0.8, opacity: 0, fill: 'none' }, svg);
+      const T = (x, y) => `${(ox + x * sk).toFixed(1)},${(oy + y * sk).toFixed(1)}`;
+      const plan = line(svg, `M${T(bx0, G)} L${T(bx0, fl[4])} L${T(bx1, fl[4])} L${T(bx1, G)} Z ` + fl.slice(1, 4).map(y => `M${T(bx0, y)} L${T(bx1, y)}`).join(' ') + ` M${T((bx0 + bx1) / 2, G)} L${T((bx0 + bx1) / 2, fl[4])}`, { c: '#f2f8ff', w: 2.2, gc: '#9cc7e8', go: 0.5 });
+      const ptitle = text(svg, px0 + pw - 18, py0 + ph - 18, '图纸 · 一张', { s: 22, a: 'end', c: '#dcecfb', ls: '0.2em', wt: 400 });
+      const lp = text(svg, px0 + pw / 2, 540, '图纸：从头到尾就是那一张', { s: 30, c: GOLD, ls: '0.08em' });
+      const t0 = AT(s.at); DRAW(tl, ground, t0, 0.8); DRAW(tl, frame, t0 + 0.2, 1.4); SHOW(tl, lw, t0 + 0.6);
+      steps.forEach(([lab, at], i) => { const t = AT(at); SHOW(tl, lab, t); if (i < 3) tl.to(lab, { opacity: 0, duration: 0.4 }, AT(steps[i + 1][1]) - 0.1); });
+      const tu = AT(s.up); DRAW(tl, scaf, tu, 1.0);
+      const td = AT(s.down); tl.to(scaf, { opacity: 0, duration: 0.8 }, td);
+      const tg = AT(s.dig); DRAW(tl, pit, tg, 0.8);
+      const tsl = AT(s.slab); tl.fromTo(slab, { opacity: 0, scaleX: 0 }, { opacity: 0.85, scaleX: 1, svgOrigin: `${bx0} ${fl[2]}`, duration: 0.8, ease: 'power2.out', immediateRender: false }, tsl);
+      const tp = AT(s.plan); tl.to(paper, { opacity: 1, duration: 0.8 }, tp - 0.3); tl.to(grid, { opacity: 0.18, duration: 0.8 }, tp - 0.1); DRAW(tl, plan, tp, 1.4); SHOW(tl, ptitle, tp + 0.8); SHOW(tl, lp, tp + 0.6);
+      tl.fromTo(plan._p[0], { opacity: 0.36 }, { opacity: 0.9, duration: 0.9, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }, tp + 1.6);
+    },
+    // 欠债的账本：一千万银子，一辈子还不清 → 主人“免了他的债”（一道红线、一个“免”字印）→ 可这笔债是有人还的：十字架，“付清”
+    ledger({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 540);
+      const book = line(svg, 'M150,90 C300,70 430,80 500,110 C570,80 700,70 850,90 L850,470 C700,450 570,460 500,490 C430,460 300,450 150,470 Z M500,110 L500,490', { c: PAPER, w: 3 });
+      const rows = line(svg, [0, 1, 2, 3, 4, 5].map(k => `M190,${160 + k * 50} L460,${155 + k * 50}`).join(' ') + ' ' + [0, 1, 2, 3, 4, 5].map(k => `M540,${155 + k * 50} L810,${160 + k * 50}`).join(' '), { c: '#b9ab90', w: 1.3, go: 0, glow: false });
+      gsap.set(rows._p, { strokeDashoffset: 0 }); gsap.set(rows, { opacity: 0 });
+      const who = text(svg, 325, 150, '欠 主人', { s: 34, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 });
+      const amt = text(svg, 675, 300, '一千万银子', { s: 54, c: CORAL, wt: 900, ls: '0.06em' });
+      const never = text(svg, 675, 360, '一辈子还不清', { s: 28, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 });
+      const cut = line(svg, 'M548,288 L802,282', { c: '#d9452b', w: 6, go: 0.4 });
+      const st = (x, y, w, c, t) => { const g = mk('g', { opacity: 0 }, svg); mk('rect', { x: x - w / 2, y: y - 44, width: w, height: 88, rx: 6, fill: 'none', stroke: c, 'stroke-width': 5 }, g); const tx = text(g, x, y + 16, t, { s: 46, c, wt: 900, ls: '0.1em' }); gsap.set(g, { rotation: -10, svgOrigin: `${x} ${y}` }); return g; };
+      const free = st(700, 420, 120, '#d9452b', '免'), paid = st(320, 400, 210, GOLD, '付清');
+      const cross = line(svg, 'M320,190 L320,330 M276,226 L364,226', { c: GOLD, w: 5, go: 0.7 });
+      const cg = mk('ellipse', { cx: 320, cy: 250, rx: 80, ry: 100, fill: grad(defs, 'lc' + uid, 'radialGradient', { cx: 320, cy: 250, r: 100 }, [[0, '#ffe6a6', 0.45], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const t0 = AT(s.at); DRAW(tl, book, t0, 1.2); tl.to(rows, { opacity: 0.5, duration: 0.8 }, t0 + 0.6); SHOW(tl, who, t0 + 0.8);
+      const td = AT(s.debt); SHOW(tl, amt, td); SHOW(tl, never, AT(s.never ?? s.debt) + 0.4);
+      const tf = AT(s.forgive); DRAW(tl, cut, tf, 0.6); tl.fromTo(free, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, svgOrigin: '700 420', duration: 0.5, ease: 'back.out(2)', immediateRender: false }, tf + 0.5); tl.to([amt, never], { opacity: 0.4, duration: 0.6 }, tf + 0.5);
+      if (s.cross !== undefined) { const tc = AT(s.cross); tl.to(cg, { opacity: 1, duration: 1.0 }, tc); DRAW(tl, cross, tc, 1.0); tl.to(who, { opacity: 0.3, duration: 0.6 }, tc); }
+      if (s.paid !== undefined) { const tpd = AT(s.paid); tl.fromTo(paid, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, svgOrigin: '320 400', duration: 0.5, ease: 'back.out(2)', immediateRender: false }, tpd); }
+    },
+    // 孩子的画：一张歪歪扭扭的画（房子、太阳、两个小人），“爸爸，送给你”，然后贴在冰箱上（两条胶带），一贴好多年
+    fridge({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 540);
+      const fx = 560, fy = 40, fw = 300, fh = 470;
+      const fr = line(svg, `M${fx + 16},${fy} L${fx + fw - 16},${fy} Q${fx + fw},${fy} ${fx + fw},${fy + 16} L${fx + fw},${fy + fh} L${fx},${fy + fh} L${fx},${fy + 16} Q${fx},${fy} ${fx + 16},${fy} Z M${fx},${fy + 150} L${fx + fw},${fy + 150} M${fx + 30},${fy + 60} L${fx + 30},${fy + 120} M${fx + 30},${fy + 190} L${fx + 30},${fy + 300}`, { c: PAPER, w: 3 });
+      const pic = mk('g', { opacity: 0 }, svg), cx = 710, cy = 330;
+      mk('rect', { x: cx - 110, y: cy - 80, width: 220, height: 160, fill: '#f6f0e2', stroke: '#d8cbb0', 'stroke-width': 2 }, pic);
+      const crayon = (d, c) => { const p = mk('path', { d, fill: 'none', stroke: c, 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, pic); return p; };
+      crayon(`M${cx - 70},${cy + 50} L${cx - 70},${cy} L${cx - 30},${cy - 36} L${cx + 8},${cy + 2} L${cx + 6},${cy + 52} Z M${cx - 44},${cy + 50} L${cx - 44},${cy + 22} L${cx - 22},${cy + 22} L${cx - 22},${cy + 50}`, '#d9603c');
+      crayon(`M${cx + 70},${cy - 46} m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 M${cx + 70},${cy - 72} L${cx + 70},${cy - 66} M${cx + 96},${cy - 46} L${cx + 90},${cy - 46} M${cx + 44},${cy - 46} L${cx + 50},${cy - 46}`, '#e8b23c');
+      crayon(`M${cx + 34},${cy + 50} L${cx + 42},${cy + 26} L${cx + 50},${cy + 50} M${cx + 42},${cy + 26} L${cx + 42},${cy + 8} M${cx + 32},${cy + 16} L${cx + 52},${cy + 16} M${cx + 42},${cy + 2} m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 M${cx + 64},${cy + 50} L${cx + 70},${cy + 34} L${cx + 76},${cy + 50} M${cx + 70},${cy + 34} L${cx + 70},${cy + 22} M${cx + 70},${cy + 16} m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0`, '#4f86c6');
+      crayon(`M${cx - 100},${cy + 62} C${cx - 40},${cy + 56} ${cx + 40},${cy + 66} ${cx + 100},${cy + 60}`, '#5aa05a');
+      gsap.set(pic, { svgOrigin: `${cx} ${cy}` });
+      const tape = mk('g', { opacity: 0 }, svg); [[cx - 96, cy - 84, -24], [cx + 96, cy - 84, 24]].forEach(([x, y, r]) => mk('rect', { x: x - 28, y: y - 9, width: 56, height: 18, fill: 'rgba(250,240,200,.55)', stroke: 'rgba(250,240,200,.8)', 'stroke-width': 1, transform: `rotate(${r} ${x} ${y})` }, tape));
+      const say = text(svg, 250, 210, '“爸爸，送给你！”', { s: 40, c: PAPER, font: 'LXGW WenKai', wt: 400 });
+      const yrs = text(svg, 250, 300, '贴在冰箱上，贴好多年', { s: 34, c: GOLD, font: 'LXGW WenKai', wt: 400 });
+      const t0 = AT(s.at); DRAW(tl, fr, t0, 1.2);
+      tl.fromTo(pic, { opacity: 0, x: -440, y: 90, rotation: -14, scale: 0.8 }, { opacity: 1, x: -440, y: 60, rotation: -8, scale: 0.9, duration: 0.8, ease: 'power2.out', immediateRender: false }, t0 + 0.4);
+      const tg = AT(s.give); SHOW(tl, say, tg);
+      const ts = AT(s.stick); tl.to(pic, { x: 0, y: 0, rotation: -3, scale: 1, duration: 1.2, ease: 'power2.inOut' }, ts); tl.to(tape, { opacity: 1, duration: 0.4 }, ts + 1.1); tl.to(say, { opacity: 0.35, duration: 0.6 }, ts); SHOW(tl, yrs, ts + 1.2);
+    },
+    // 领带：零花钱从爸爸那里来 → 孩子拿它买了一条领带 → 爸爸照样系上，逢人就说“这是我儿子送的”
+    tie({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 520);
+      const dad = text(svg, 200, 120, '爸爸', { s: 40, c: PAPER, ls: '0.2em' }), kid = text(svg, 800, 120, '孩子', { s: 40, c: PAPER, ls: '0.2em' });
+      const collar = line(svg, 'M140,200 L200,240 L260,200 M168,196 L200,226 L232,196', { c: PAPER, w: 3 });
+      const TIE = (x, y) => `M${x - 12},${y} L${x + 12},${y} L${x + 18},${y + 22} L${x + 8},${y + 30} L${x + 26},${y + 150} L${x},${y + 176} L${x - 26},${y + 150} L${x - 8},${y + 30} L${x - 18},${y + 22} Z`;
+      const tie = mk('g', { opacity: 0 }, svg); mk('path', { d: TIE(800, 220), fill: grad(defs, 'ti' + uid, 'linearGradient', { x1: 780, y1: 220, x2: 820, y2: 400 }, [[0, '#d9603c'], [1, '#9c3a22']]), stroke: '#f0b48e', 'stroke-width': 2 }, tie);
+      for (let k = 0; k < 4; k++) mk('path', { d: `M${786},${262 + k * 30} L${814},${248 + k * 30}`, stroke: '#f6c9a8', 'stroke-width': 3, opacity: 0.7 }, tie);
+      gsap.set(tie, { svgOrigin: '800 220' });
+      const coins = [0, 1, 2].map(k => { const c = mk('g', { opacity: 0 }, svg); mk('ellipse', { cx: 200, cy: 330, rx: 26, ry: 26, fill: grad(defs, 'co' + uid + k, 'radialGradient', { cx: 194, cy: 322, r: 30 }, [[0, '#fff3cf'], [0.6, '#e2bd76'], [1, '#a77b35']]), stroke: '#fff1c6', 'stroke-width': 2 }, c); text(c, 200, 341, '¥', { s: 28, c: '#6b4b1c', wt: 700, ls: '0' }); return c; });
+      const arc = line(svg, 'M240,300 C400,220 600,220 760,300', { c: GOLD, w: 2.4, go: 0.3 }), lm = text(svg, 500, 220, '零花钱', { s: 30, c: GOLD, font: 'LXGW WenKai', wt: 400 });
+      const back = line(svg, 'M760,420 C600,480 400,480 240,420', { c: CORAL, w: 2.4, go: 0.3 }), lt = text(svg, 500, 500, '领带', { s: 30, c: CORAL, font: 'LXGW WenKai', wt: 400 });
+      const say = text(svg, 500, 60, '“这是我儿子送的！”', { s: 40, c: GOLD, font: 'LXGW WenKai', wt: 400 });
+      const t0 = AT(s.at); SHOW(tl, kid, t0); tl.fromTo(tie, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out', immediateRender: false }, t0 + 0.3);
+      const tm = AT(s.money); SHOW(tl, dad, tm - 0.4); DRAW(tl, collar, tm - 0.3, 0.8); DRAW(tl, arc, tm, 1.0); SHOW(tl, lm, tm + 0.3);
+      coins.forEach((c, k) => { tl.to(c, { opacity: 1, duration: 0.3 }, tm + 0.2 + k * 0.25); tl.to(c, { x: 600, y: -60 * Math.sin(Math.PI * 0.5), duration: 1.2, ease: 'power1.inOut' }, tm + 0.4 + k * 0.25); tl.to(c, { opacity: 0, duration: 0.4 }, tm + 1.5 + k * 0.25); });
+      DRAW(tl, back, tm + 1.8, 1.0); SHOW(tl, lt, tm + 2.1);
+      const tw = AT(s.wear); tl.to(tie, { x: -600, y: -0, scale: 0.6, duration: 1.4, ease: 'power2.inOut' }, tw); SHOW(tl, say, tw + 1.2);
+    },
+    // 滔滔不绝：一个人周围冒出一个又一个话泡（工作、房子、新闻、八卦……），可一句都不是对神说的；最后只亮起一个：“我的天主”
+    chatter({ tl, el, AT, s }) {
+      const { svg, defs, uid, glowId } = base(el, 540);
+      const person = line(svg, 'M500,330 m-34,0 a34,34 0 1,0 68,0 a34,34 0 1,0 -68,0 M430,470 C440,400 560,400 570,470', { c: PAPER, w: 3.4 });
+      const words = s.words || ['工作', '房子', '新闻', '八卦', '上班', '吃饭', '朋友圈', '天气'];
+      const P = [[260, 230], [740, 240], [330, 120], [670, 110], [180, 360], [820, 370], [500, 60], [880, 160]];
+      const bub = (x, y, t, c, sz) => { const g = mk('g', { opacity: 0 }, svg); const w = t.length * sz + 40; mk('path', { d: `M${x - w / 2 + 14},${y - 30} L${x + w / 2 - 14},${y - 30} Q${x + w / 2},${y - 30} ${x + w / 2},${y - 16} L${x + w / 2},${y + 16} Q${x + w / 2},${y + 30} ${x + w / 2 - 14},${y + 30} L${x + 12},${y + 30} L${x},${y + 46} L${x - 6},${y + 30} L${x - w / 2 + 14},${y + 30} Q${x - w / 2},${y + 30} ${x - w / 2},${y + 16} L${x - w / 2},${y - 16} Q${x - w / 2},${y - 30} ${x - w / 2 + 14},${y - 30} Z`, fill: 'rgba(241,232,214,.06)', stroke: c, 'stroke-width': 2 }, g); text(g, x, y + sz * 0.36, t, { s: sz, c, font: 'LXGW WenKai', wt: 400, ls: '0.04em' }); gsap.set(g, { svgOrigin: `${x} ${y + 40}` }); return g; };
+      const bs = words.map((w, i) => bub(P[i % P.length][0], P[i % P.length][1], w, '#cdbfa3', 28));
+      const one = bub(500, 200, '我的天主', GOLD, 40);
+      const halo = mk('ellipse', { cx: 500, cy: 200, rx: 170, ry: 80, fill: grad(defs, 'ch' + uid, 'radialGradient', { cx: 500, cy: 200, r: 170 }, [[0, '#ffe6a6', 0.4], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const t0 = AT(s.at); DRAW(tl, person, t0, 1.0);
+      const tb = AT(s.talk); bs.forEach((b, i) => tl.fromTo(b, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false }, tb + i * 0.32));
+      const tn = AT(s.none); tl.to(bs, { opacity: 0.18, duration: 0.8 }, tn);
+      if (s.one !== undefined) { const to = AT(s.one); tl.to(bs, { opacity: 0, duration: 0.6 }, to - 0.2); tl.to(halo, { opacity: 1, duration: 1.0 }, to); tl.fromTo(one, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', immediateRender: false }, to); }
+    },
   };
 })();
