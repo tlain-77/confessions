@@ -89,3 +89,33 @@
 .scene.lec.art-r{align-items:flex-end;text-align:right;padding-left:1000px;padding-right:150px}
 .scene.lec.art-r .ll{white-space:normal}
 .scene.lec.art-b{justify-content:flex-end;padding-bottom:190px}
+/* 一对“打架”的词（pdx）：整屏一分为二——左边暗、词从暗里慢慢浮出来；右边一层暖光亮起来（--lit），词在光里出来；中间一道细光 */
+.pdx{position:absolute;inset:0;z-index:-1;display:flex;pointer-events:none}
+.pdx-l,.pdx-r{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 90px 120px}
+.pdx-l{background:radial-gradient(ellipse 90% 70% at 60% 46%,rgba(22,26,38,.62),rgba(3,4,8,.94) 78%)}
+.pdx-r{background:rgba(5,5,7,.55)}
+.pdx-r::before{content:'';position:absolute;inset:0;opacity:var(--lit,0);background:radial-gradient(ellipse 80% 66% at 42% 46%,rgba(255,238,200,.36),rgba(240,198,122,.14) 48%,rgba(0,0,0,0) 78%)}
+.pdx b{position:relative;display:block;font-weight:900;font-size:124px;letter-spacing:.1em;padding-left:.1em;line-height:1.2;white-space:nowrap}
+.pdx-l b{color:#9aa3b8;text-shadow:0 0 50px rgba(0,0,0,.95)}
+.pdx-r b{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 26px rgba(255,214,150,.3))}
+.pdx span{position:relative;display:block;margin-top:26px;font-family:var(--kai);font-size:46px;line-height:1.5;color:var(--paper2);text-shadow:0 2px 18px rgba(0,0,0,.8);text-wrap:balance}
+.pdx-r span{color:var(--paper)}
+.pdx-m{position:absolute;left:50%;top:0;bottom:0;width:0}
+.pdx-m i{position:absolute;top:9%;bottom:9%;left:-1px;width:2px;background:linear-gradient(180deg,transparent,rgba(242,210,150,.8) 30%,rgba(242,210,150,.8) 70%,transparent)}
+.pdx-m em{position:absolute;left:0;top:44%;transform:translate(-50%,-50%);font-style:normal;font-family:var(--kai);font-size:48px;line-height:1.3;color:var(--gold);writing-mode:vertical-rl;letter-spacing:.2em;padding:26px 14px;background:linear-gradient(180deg,transparent,#080807 26%,#080807 74%,transparent)}
+.scene.lec.pdx-b{justify-content:flex-end;padding-bottom:170px}
+/* 抄本式原文卡（ms）：羊皮纸、双线框、红字标题、第一个字做彩饰首字 */
+.lq.ms{border-radius:3px;border:none;padding:66px 100px 74px;color:#2b2015;
+  background:radial-gradient(ellipse 70% 60% at 28% 18%,rgba(255,251,238,.6),transparent 70%),radial-gradient(ellipse 60% 70% at 86% 92%,rgba(140,98,48,.2),transparent 70%),linear-gradient(180deg,#f0e4c6,#e3cfa3);
+  box-shadow:0 44px 100px rgba(0,0,0,.75),inset 0 0 70px rgba(118,78,30,.26),0 0 60px rgba(226,189,118,.14)}
+.lq.ms::before{content:'';position:absolute;inset:20px;border:1.5px solid rgba(146,40,26,.5);outline:1px solid rgba(146,40,26,.3);outline-offset:6px;pointer-events:none}
+.lq.ms .lq-k{color:#9b2c1d;font-weight:400;letter-spacing:.34em}
+.lq.ms .lq-t{margin-top:26px}
+.lq.ms .ch.cap{float:left;font-size:2.3em;line-height:1.08;margin:.06em .2em 0 0;padding:.06em .16em .1em;font-weight:900;color:#fbecc8;
+  background:linear-gradient(155deg,#b23a24,#6f1b11);box-shadow:inset 0 0 0 3px rgba(238,200,124,.9),inset 0 0 0 7px #741e13,inset 0 0 0 8px rgba(238,200,124,.55),0 6px 16px rgba(60,20,8,.35);text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.lq.ms.mini{padding:44px 72px 50px}
+.lq.ms.mini::before{inset:14px}
+/* 名画铺满的那一场：右上角小字写画名；画上的说明字压在暗角里 */
+.art-cap{position:absolute;right:72px;top:104px;font-family:var(--sans);font-weight:300;font-size:22px;letter-spacing:.24em;color:rgba(241,232,214,.62);text-shadow:0 1px 10px rgba(0,0,0,.9);z-index:2}
+.scene.lec.art-l .ll.kai,.scene.lec.art-r .ll.kai{font-size:58px}
+.scene.lec.art-l .lv,.scene.lec.art-r .lv{max-width:800px}
