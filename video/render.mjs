@@ -14,7 +14,7 @@ const t0 = Date.now(); let done = 0;
 await Promise.all(Array.from({ length: workers }, async (_, w) => {
   // 浏览器偶尔截图失败或崩掉（页面重、四个一起跑时）：截图失败就等一下重试；崩了就重开一个，从头走到当前时刻再接着截
   const open1 = async upto => { const b = await chromium.launch({ args: (process.env.CHROME_ARGS || '').split(' ').filter(Boolean) }); const page = await openPage(b, port, false, query);
-    try { for (let s = 0; s < upto; s += 0.25) await page.evaluate(x => { window.__WALK = 1; window.seek(x); }, s); await page.evaluate(() => { window.__WALK = 0; }); }   // walk up to the start, like real playback（走的时候名画不画）
+    try { for (let s = 0; s < upto; s += +(process.env.WALK_STEP || 0.5)) await page.evaluate(x => { window.__WALK = 1; window.seek(x); }, s); await page.evaluate(() => { window.__WALK = 0; }); }   // walk up to the start, like real playback（走的时候名画不画）
     catch (e) { try { await b.close(); } catch {} throw e; }
     return { b, page }; };
   const open = async upto => { for (let k = 0; ; k++) { try { return await open1(upto); } catch (e) { if (k >= 4) throw e; console.log(`  worker ${w}: reopen failed (${String(e.message).split('\n')[0].slice(0, 60)}), retry ${k + 1}`); await new Promise(r => setTimeout(r, 3000)); } } };

@@ -13,7 +13,7 @@ STEP=${STEP:-180}
 for s in $(python3 -c "import math; print(' '.join(str(i * $STEP) for i in range(math.ceil($TOT / $STEP))))"); do
   f=$CK/self7_$s.mp4; to=$(python3 -c "print(round(min($s + $STEP, $TOT), 3))")
   if [ ! -f $f ]; then
-    FRAMES_DIR=out/frames_s7 PAGE=self7.html node render.mjs --fps 30 --workers 4 --crf ${CRF:-16} --preset ${PRESET:-fast} --from $s --to $to --audio none --out $f.tmp.mp4 2>&1 | grep --line-buffered -v "warning"
+    FRAMES_DIR=out/frames_s7 PAGE=self7.html node render.mjs --fps 30 --workers ${WORKERS:-4} --crf ${CRF:-16} --preset ${PRESET:-fast} --from $s --to $to --audio none --out $f.tmp.mp4 2>&1 | grep --line-buffered -v "warning"
     n=$(ffprobe -v error -count_packets -select_streams v:0 -show_entries stream=nb_read_packets -of csv=p=0 $f.tmp.mp4)
     want=$(python3 -c "print(round($to * 30) - round($s * 30))")
     echo "CHUNK self7 $s frames $n (want $want)"; [ "$n" = "$want" ]
