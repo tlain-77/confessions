@@ -42,7 +42,7 @@
     el.innerHTML = `<canvas width="0" height="0"></canvas><div class="art-vig"></div>` + (it.scrim && it.scrim !== 'none' ? `<div class="art-scrim ${it.scrim}"></div>` : '') + (cap ? `<div class="art-cap">${cap}</div>` : '');
     gsap.set(el, { opacity: 0 });
     const r = { it, el, W, H: 1080, cv: el.querySelector('canvas'), segs: [], ready: null };
-    r.ctx = r.cv.getContext('2d');
+    r.ctx = r.cv.getContext('2d', { willReadFrequently: true });          // 放在内存里的画布（不放显卡）：渲染机器忙、显卡进程重启时，画布内容不会丢
     r.ready = Promise.all([load(`img/${it.art}.jpg`), load(`img/depth/${it.art}.png`)]).then(([im, dp]) => {
       r.im = im; r.dp = dp;
       const c = document.createElement('canvas'); c.width = dp.width; c.height = dp.height; const x = c.getContext('2d'); x.drawImage(dp, 0, 0);
@@ -100,6 +100,8 @@
       return draw(r, t, true);
     }
     r.ctx.drawImage(G.c, 0, 0, r.W, r.H, 0, 0, r.W, r.H);
+    if (r.ctx.getImageData(r.W >> 1, r.H >> 1, 1, 1).data[3] === 0)          // 拷过来是空的（显卡那边刚好出了问题）：直接画原图，这一帧没有视差，总比黑一帧好
+      r.ctx.drawImage(r.im, (cx - vx) * r.im.width, (cy - vy) * r.im.height, r.im.width * vx * 2, r.im.height * vy * 2, 0, 0, r.W, r.H);
   }
   window.ART_TICK = t => {
     if (window.__WALK) return;                                               // 渲染器从头走到这一块的起点：只为了让时间轴走对，画不用画
