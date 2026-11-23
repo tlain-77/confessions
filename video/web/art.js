@@ -39,7 +39,7 @@
     const side = it.side || 'full', W = side === 'full' ? 1920 : 960;
     const el = document.createElement('div'); el.className = 'art-host art-' + side; host.appendChild(el);
     const cap = it.cap !== undefined ? it.cap : (window.SHOT_CAPS || {})[it.art];
-    el.innerHTML = `<canvas width="${W}" height="1080"></canvas><div class="art-vig"></div>` + (it.scrim && it.scrim !== 'none' ? `<div class="art-scrim ${it.scrim}"></div>` : '') + (cap ? `<div class="art-cap">${cap}</div>` : '');
+    el.innerHTML = `<canvas width="0" height="0"></canvas><div class="art-vig"></div>` + (it.scrim && it.scrim !== 'none' ? `<div class="art-scrim ${it.scrim}"></div>` : '') + (cap ? `<div class="art-cap">${cap}</div>` : '');
     gsap.set(el, { opacity: 0 });
     const r = { it, el, W, H: 1080, cv: el.querySelector('canvas'), segs: [], ready: null };
     r.ctx = r.cv.getContext('2d');
@@ -58,8 +58,15 @@
   window.ART_LIST = () => ARTS;
   window.ART_LOAD = async () => {
     await Promise.all(ARTS.map(r => r.ready));
-    const G = initGL(); if (G.none) return;
-    for (const r of ARTS) { r.tImg = tex(G.gl, r.im); r.tDep = tex(G.gl, r.dp); }
+    initGL();                                                              // 纹理和画布都等要画的时候再建（四个渲染页面同时开着，几十幅画全建好太占内存）
+  };
+  const wake = r => {
+    if (r.cv.width !== r.W) { r.cv.width = r.W; r.cv.height = r.H; }
+    const G = initGL(); if (!G.none && !r.tImg) { r.tImg = tex(G.gl, r.im); r.tDep = tex(G.gl, r.dp); }
+  };
+  const sleep = r => {
+    if (r.tImg && GL && !GL.none) { GL.gl.deleteTexture(r.tImg); GL.gl.deleteTexture(r.tDep); }
+    r.tImg = r.tDep = null; if (r.cv.width) { r.cv.width = 0; r.cv.height = 0; }
   };
   const ease = p => p < 0 ? 0 : p > 1 ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * p);
   const depthAt = (r, u, v) => { const w = r.dp.width, h = r.dp.height, x = Math.min(w - 1, Math.max(0, Math.round(u * (w - 1)))), y = Math.min(h - 1, Math.max(0, Math.round(v * (h - 1)))); return r.dd[(y * w + x) * 4] / 255; };
@@ -89,10 +96,17 @@
     const pix = new Uint8Array(4); gl.readPixels(r.W >> 1, r.H >> 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pix);
     if (pix[3] === 0 || gl.isContextLost()) {
       if (retry) { r.ctx.drawImage(r.im, (cx - vx) * r.im.width, (cy - vy) * r.im.height, r.im.width * vx * 2, r.im.height * vy * 2, 0, 0, r.W, r.H); return; }   // 还是不行：至少画上画（没有视差）
-      GL = null; const G2 = initGL(); if (!G2.none) for (const a of ARTS) if (a.im) { a.tImg = tex(G2.gl, a.im); a.tDep = tex(G2.gl, a.dp); }
+      GL = null; for (const a of ARTS) a.tImg = a.tDep = null; wake(r);
       return draw(r, t, true);
     }
     r.ctx.drawImage(G.c, 0, 0, r.W, r.H, 0, 0, r.W, r.H);
   }
-  window.ART_TICK = t => { for (const r of ARTS) if (r.im && r.segs.length && t >= r.segs[0].t0 - 1.0 && t <= r.segs[r.segs.length - 1].t1 + 1.4) draw(r, t); };
+  window.ART_TICK = t => {
+    if (window.__WALK) return;                                               // 渲染器从头走到这一块的起点：只为了让时间轴走对，画不用画
+    for (const r of ARTS) {
+      if (!r.im || !r.segs.length) continue;
+      const a = r.segs[0].t0 - 1.0, b = r.segs[r.segs.length - 1].t1 + 1.4;
+      if (t >= a && t <= b) { wake(r); draw(r, t); } else if (r.tImg || r.cv.width) sleep(r);
+    }
+  };
 })();
