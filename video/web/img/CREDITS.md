@@ -125,7 +125,7 @@
 | atlas.jpg | 圭尔奇诺《擎天的阿特拉斯》 1646 | Wikimedia Commons: Guercino, atlante, 1646.jpg —— 照片作者 Sailko，许可 CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），画面经裁切、调色 |
 | primavera.jpg | 波提切利《春》 约1480 | Wikimedia Commons: Sandro Botticelli - La Primavera - Google Art Project.jpg |
 | oak.jpg | 弗里德里希《雪中的橡树》 1827 | Wikimedia Commons: Caspar David Friedrich - Eiche im Schnee II.jpg |
-| birds.jpg | 乔托（传）《向鸟儿讲道》 约1297—1299 | Wikimedia Commons: Giotto - Legend of St Francis - -15- - Sermon to the Birds.jpg |
+| birds.jpg | 乔托（传）《向鸟儿讲道》 约1297—1299 | Wikimedia Commons: Giotto - Legend of St Francis - -15- - Sermon to the Birds.jpg（500 像素宽的缩略图，放大到 960 宽） |
 | prodigal2.jpg | 牟利罗《浪子回家》 1667—1670 | Wikimedia Commons（CC0，美国国家美术馆）: Bartolomé Esteban Murillo, The Return of the Prodigal Son, 1667-1670, NGA 34956.jpg |
 | moonsea.jpg | 弗里德里希《海上月出》 1822 | Wikimedia Commons: Caspar David Friedrich - Mondaufgang am Meer - Google Art Project.jpg |
 | butterfly.jpg | 梅里安《苏里南昆虫变态图谱》插图 1705 | Wikimedia Commons: Maria Merian Metamorphosis Insectorum Surinamensium MIA P18717.jpg |
