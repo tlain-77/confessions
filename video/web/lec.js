@@ -33,7 +33,7 @@ window.lecture = async function (o = {}) {
     if (sc.html) { sec.innerHTML = sc.html; host.appendChild(sec); return { sc, sec, els: [] }; }
     const els = (sc.items || []).map(it => {
       const d = document.createElement('div');
-      if (it.q) { d.className = 'lq' + (it.mini ? ' mini' : ''); d.innerHTML = `<div class="lq-k">${H(it.k || '')}</div><div class="lq-t split${it.sm ? ' sm' : ''}${it.xs ? ' xs' : ''}">${H(it.q)}</div>`; }
+      if (it.q) { d.className = 'lq' + (it.mini ? ' mini' : '') + (it.ms ? ' ms' : ''); d.innerHTML = `<div class="lq-k">${H(it.k || '')}</div><div class="lq-t split${it.sm ? ' sm' : ''}${it.xs ? ' xs' : ''}">${H(it.q)}</div>`; }
       else if (it.v) { d.className = 'lv' + (it.sm ? ' sm' : ''); d.innerHTML = `<em>${H(it.ref || '')}</em><span>${H(it.v)}</span>`; }
       else if (it.fig) { d.className = 'lf' + (it.sm ? ' sm' : ''); d.innerHTML = `<img src="fig/${it.fig}.png"${it.w ? ` style="width:${it.w}px"` : ''}>` + (it.spots ? '<i class="lf-spot"></i>' : ''); }
       else if (it.think) { d.className = 'lt'; d.innerHTML = `<b>停下来想一想</b><span>${H(it.think)}</span>`; }
@@ -42,6 +42,9 @@ window.lecture = async function (o = {}) {
       else if (it.n) { d.className = 'ln'; d.innerHTML = H(it.n); }
       else if (it.anim) { it._replay = window.ANIM_BUILD(it.anim, d, it, AT); if (it.w) d.style.setProperty('--aw', it.w + 'px'); }   // 动画插图（anim.js）：先画好，动画等时间轴建好再挂
       else if (it.ill) { it._replay = window.ILL_BUILD(it, d, AT); }   // 图解（ill.js）
+      else if (it.art) { it._art = window.ART_ADD(it, d); }             // 名画铺满、2.5D 视差（art.js）
+      else if (it.pdx) { d.className = 'pdx'; d.innerHTML = `<div class="pdx-l"><b>${H(it.pdx[0][0])}</b>${it.pdx[0][1] ? `<span>${H(it.pdx[0][1])}</span>` : ''}</div><div class="pdx-m"><i></i>${it.mid ? `<em>${H(it.mid)}</em>` : ''}</div><div class="pdx-r"><b>${H(it.pdx[1][0])}</b>${it.pdx[1][1] ? `<span>${H(it.pdx[1][1])}</span>` : ''}</div>`; }   // 一对“打架”的词：左暗右亮
+      else if (it.stars) { it._replay = window.STARS_BUILD(it, d, AT); }  // 一串称呼连成星座
       else if (it.pic) { d.className = 'lp'; d.style.setProperty('--pw', (it.w || 980) + 'px'); d.style.setProperty('--ph', (it.h || 520) + 'px'); d.innerHTML = `<div class="lp-f"><img src="img/${it.pic}.jpg" style="object-position:${(it.fx ?? 0.5) * 100}% ${(it.fy ?? 0.5) * 100}%"></div>` + (it.cap ? `<div class="lp-c">${H(it.cap)}</div>` : ''); }
       else if (it.pics) { d.className = 'lps'; d.style.setProperty('--ph', (it.h || 420) + 'px'); if (it.w) d.style.setProperty('--pw', it.w + 'px'); d.innerHTML = it.pics.map(p => `<div class="lp"><div class="lp-f"><img src="img/${p[0]}.jpg" style="object-position:${((p[3] || {}).fx ?? 0.5) * 100}% ${((p[3] || {}).fy ?? 0.5) * 100}%"></div>${p[1] ? `<div class="lp-c">${H(p[1])}</div>` : ''}</div>`).join(''); }
       else if (it.rows) { d.className = 'lr'; d.innerHTML = it.rows.map(r => `<div><i>${H(r[0])}</i><b>${H(r[1])}</b></div>`).join(''); }
@@ -50,6 +53,7 @@ window.lecture = async function (o = {}) {
     });
     host.appendChild(sec); return { sc, sec, els };
   });
+  if (LEC.some(sc => (sc.items || []).some(it => it.art))) await window.ART_LOAD();   // 名画和深浅图
   await K.prepare(o.hide || '');
   const { tl, IN, type, big, light, flash, scene, chars } = K;
   // 原文卡：念到哪个字出哪个字（引文和这段录音按字对齐，最长公共子序列；对不上的字按前后插值）
@@ -105,9 +109,12 @@ window.lecture = async function (o = {}) {
       if (it.ill) (it.items || []).forEach(x => { const o2 = Array.isArray(x) ? { lab: x[1], at: x[2], ...(x[3] || {}) } : x; inner.push([o2.lab, o2.at]); if (o2.sat !== undefined) inner.push([o2.sub, o2.sat]); });
       if (it.pics) it.pics.forEach(p => { inner.push([p[1], p[2]]); if ((p[3] || {}).capAt !== undefined) inner.push([p[1], p[3].capAt]); });
       if (it.capAt !== undefined) inner.push([it.cap, it.capAt]);
+      if (it.pdx) it.pdx.forEach(w => { inner.push([w[0], w[2]]); if (w[3] !== undefined) inner.push([w[1], w[3]]); });
+      if (it.stars) it.stars.forEach(w => inner.push([w[0], w[1]]));
       for (const [lab, x] of inner) { const tx = AT(x); if (tx < a - 0.7 - (b.late || 0) || tx > e - 0.3) throw new Error(`第 ${i} 场「${lab}」的时刻 ${tx.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）`); }
-      if (!xf && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
+      if (!xf && !it.art && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
+        if (it.ms) { const f = chars(el.querySelector('.lq-t')).find(c => /[一-鿿]/.test(c.textContent)); if (f) f.classList.add('cap'); }   // 抄本式：第一个字做彩饰首字
         IN(el, Math.max(a + 0.05, at - 0.6), { y: 18, d: 1.1, blur: 3 });
         const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at0 - 1.0, e);
         if (ts) cs.forEach((c, j) => IN(c, Math.max(at - 0.3, ts[j] - 0.05), { d: 0.6, y: 5, blur: 3 }));
@@ -121,6 +128,18 @@ window.lecture = async function (o = {}) {
           if (spec[j].sat !== undefined && sp) { IN(b, t0, { y: 12, d: 1.0 }); IN(sp, AT(spec[j].sat), { y: 8, d: 0.9 }); }
           else IN(p, t0, { y: 12, d: 1.0 });
         });
+      } else if (it.art) {                                              // 名画：这一场一开始就在（垫在文字下面），镜头走满整场
+        it._art.t0 = a - 0.3; it._art.t1 = e; IN(el, Math.max(0, a - 0.25), { y: 0, blur: 0, d: 1.3, ease: 'sine.inOut' });
+      } else if (it.pdx) {                                              // 左边那个词从暗里慢慢浮出来，右边那一半亮起来、词在光里出来
+        const [L, R] = it.pdx, tl0 = AT(L[2]), tr0 = AT(R[2]), l = el.querySelector('.pdx-l'), r = el.querySelector('.pdx-r'), m = el.querySelector('.pdx-m');
+        IN(el, Math.max(a + 0.05, tl0 - 0.45), { y: 10, d: 1.0, blur: 2 });
+        tl.fromTo(m.querySelector('i'), { scaleY: 0 }, { scaleY: 1, duration: 1.1, ease: 'power2.inOut', immediateRender: false }, Math.max(a + 0.05, tl0 - 0.3));
+        IN(l.querySelector('b'), tl0, { y: 0, d: 1.8, blur: 14, ease: 'sine.out', o: 0.92 }); if (l.querySelector('span')) IN(l.querySelector('span'), L[3] !== undefined ? AT(L[3]) : tl0 + 0.8, { y: 8, d: 1.0, blur: 4 });
+        tl.fromTo(r, { '--lit': 0 }, { '--lit': 1, duration: 1.4, ease: 'sine.inOut', immediateRender: false }, tr0 - 0.2);
+        IN(r.querySelector('b'), tr0, { y: 6, d: 1.0, blur: 6 }); if (r.querySelector('span')) IN(r.querySelector('span'), R[3] !== undefined ? AT(R[3]) : tr0 + 0.8, { y: 8, d: 1.0, blur: 4 });
+        if (m.querySelector('em')) IN(m.querySelector('em'), it.midAt !== undefined ? AT(it.midAt) : tr0 - 0.3, { y: 0, d: 0.9, blur: 4 });
+      } else if (it.stars) {
+        IN(el, Math.max(a + 0.05, AT(it.stars[0][1]) - 0.4), { y: 0, d: 1.0, blur: 0 }); it._replay(tl);
       } else if (it.anim || it.ill) {
         // 图解：容器在里面最早的那一样出来之前一点点出现（不要等到整个图解的“重点”才一起冒出来）
         let t1 = at; if (it.ill) (it.items || []).forEach(x => { t1 = Math.min(t1, AT(Array.isArray(x) ? x[2] : x.at)); });

@@ -72,3 +72,20 @@
 .lps{display:flex;gap:56px;justify-content:center;margin:8px 0}
 .lps .lp-f{width:var(--pw,620px);height:var(--ph,420px)}
 .lps .lp-c{font-size:40px}
+/* 名画铺满（art.js）：整幅、右半或左半；文字压在一侧的暗角上。每一场自成一层，画垫在这一场的文字下面 */
+.scene.lec{isolation:isolate}
+.art-host{position:absolute;top:0;bottom:0;z-index:-1;overflow:hidden;pointer-events:none}
+.art-host.art-full{left:0;right:0}
+.art-host.art-right{left:960px;right:0;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 160px);mask-image:linear-gradient(90deg,transparent 0,#000 160px)}
+.art-host.art-left{left:0;right:960px;-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 160px);mask-image:linear-gradient(270deg,transparent 0,#000 160px)}
+.art-host canvas{display:block;width:100%;height:100%}
+.art-vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 70% at 50% 46%,transparent 50%,rgba(0,0,0,.5) 100%)}
+.art-scrim{position:absolute;inset:0}
+.art-scrim.left{background:linear-gradient(90deg,rgba(7,6,4,.9) 0%,rgba(7,6,4,.74) 30%,rgba(7,6,4,0) 62%)}
+.art-scrim.right{background:linear-gradient(270deg,rgba(7,6,4,.9) 0%,rgba(7,6,4,.74) 30%,rgba(7,6,4,0) 62%)}
+.art-scrim.bottom{background:linear-gradient(0deg,rgba(7,6,4,.92) 0%,rgba(7,6,4,.66) 30%,rgba(7,6,4,0) 60%)}
+.scene.lec.art-l{align-items:flex-start;text-align:left;padding-left:150px;padding-right:1000px}
+.scene.lec.art-l .ll{white-space:normal}
+.scene.lec.art-r{align-items:flex-end;text-align:right;padding-left:1000px;padding-right:150px}
+.scene.lec.art-r .ll{white-space:normal}
+.scene.lec.art-b{justify-content:flex-end;padding-bottom:190px}

@@ -18,6 +18,35 @@
   window.ILL_HAS = name => !!(ICONS && ICONS[name]);
   window.ILL_NODES = name => ICONS && ICONS[name];                                   // anim.js 里的动画也用这些图标
 
+  // 一串称呼连成星座：说到哪个词，哪颗星亮起来，跟上一颗连一根细金线，名字在星旁边浮出来（{ stars: [['至高', 时刻], ...], h, w, pos }）
+  window.STARS_BUILD = (spec, el, AT) => {
+    const q = [], tl = new Proxy({}, { get: (_, k) => (...a) => { q.push([k, a]); return tl; } });
+    const uid = ++UID, H = spec.h || 460, n = spec.stars.length;
+    el.classList.add('la', 'il', 'st'); if (spec.w) el.style.setProperty('--aw', spec.w + 'px');
+    const svg = mk('svg', { viewBox: `0 0 1000 ${H}`, width: 1000, height: H }, el), defs = mk('defs', {}, svg);
+    const f = mk('filter', { id: 'sz' + uid, x: '-300%', y: '-300%', width: '700%', height: '700%' }, defs);
+    mk('feGaussianBlur', { stdDeviation: 3.2, result: 'b' }, f); const fm = mk('feMerge', {}, f); mk('feMergeNode', { in: 'b' }, fm); mk('feMergeNode', { in: 'b' }, fm); mk('feMergeNode', { in: 'SourceGraphic' }, fm);
+    const hg = mk('radialGradient', { id: 'sh' + uid }, defs); mk('stop', { offset: 0, 'stop-color': '#fff1c6', 'stop-opacity': 0.75 }, hg); mk('stop', { offset: 0.35, 'stop-color': '#f3d58e', 'stop-opacity': 0.25 }, hg); mk('stop', { offset: 1, 'stop-color': '#f3d58e', 'stop-opacity': 0 }, hg);
+    let sd = uid * 7919; const r = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
+    const pos = spec.pos || spec.stars.map((_, i) => [80 + i * (840 / Math.max(1, n - 1)), H * 0.46 + (i % 2 ? -1 : 1) * H * 0.17 + (r() - 0.5) * H * 0.08]);
+    const lines = mk('g', {}, svg), dots = mk('g', {}, svg);
+    // 远处还有些暗星，衬着
+    for (let k = 0; k < 40; k++) { const c = mk('circle', { cx: r() * 1000, cy: r() * H, r: 0.6 + r() * 1.2, fill: '#f6eeda', opacity: 0 }, lines); tl.to(c, { opacity: 0.15 + r() * 0.35, duration: 1.6 }, AT(spec.stars[0][1]) - 0.4 + r() * 1.5); }
+    spec.stars.forEach(([w, at], i) => {
+      const [x, y] = pos[i], t = AT(at), up = y < H * 0.46;
+      if (i) { const [x0, y0] = pos[i - 1]; const L = mk('path', { d: `M${x0},${y0} L${x},${y}`, fill: 'none', stroke: '#e2bd76', 'stroke-width': 1.4, 'stroke-opacity': 0.65, 'stroke-linecap': 'round', pathLength: 1 }, lines);
+        gsap.set(L, { strokeDashoffset: 1.01 }); tl.to(L, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut' }, t - 0.15); }
+      const halo = mk('circle', { cx: x, cy: y, r: 30, fill: `url(#sh${uid})`, opacity: 0 }, dots);
+      const core = mk('circle', { cx: x, cy: y, r: 4.6, fill: '#fff6dc', filter: `url(#sz${uid})`, opacity: 0 }, dots);
+      const lab = mk('text', { x, y: up ? y - 40 : y + 62, 'text-anchor': 'middle', fill: '#f0d79c', 'font-size': spec.fs || (w.length > 3 ? 36 : 42), 'font-family': 'Noto Serif SC', 'font-weight': 500, 'letter-spacing': '0.14em', stroke: 'rgba(8,6,4,.6)', 'stroke-width': 4, 'paint-order': 'stroke' }, dots); lab.textContent = w;
+      tl.fromTo(halo, { opacity: 0, scale: 0.4, svgOrigin: `${x} ${y}` }, { opacity: 1, scale: 1, svgOrigin: `${x} ${y}`, duration: 0.9, ease: 'power2.out', immediateRender: false }, t);
+      tl.to(core, { opacity: 1, duration: 0.3 }, t);
+      tl.fromTo(lab, { opacity: 0, y: up ? -6 : 6 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out', immediateRender: false }, t + 0.1);
+      tl.fromTo(halo, { opacity: 1 }, { opacity: 0.55, duration: 1.6 + r(), ease: 'sine.inOut', yoyo: true, repeat: 5, immediateRender: false }, t + 1.0);
+    });
+    return realTl => { for (const [k, a] of q) realTl[k](...a); };
+  };
+
   window.ILL_BUILD = (spec, el, AT) => {
     const q = [], tl = new Proxy({}, { get: (_, k) => (...a) => { q.push([k, a]); return tl; } });
     const uid = ++UID, H = spec.h || 400;

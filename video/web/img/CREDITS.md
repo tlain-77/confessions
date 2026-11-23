@@ -115,5 +115,21 @@
 | shepherd.jpg | 普洛克霍斯特《好牧人》 19世纪 | Wikimedia Commons: Bernhard Plockhorst - Good Shephard.jpg |
 | goldfinch.jpg | 法布里蒂乌斯《金翅雀》 1654 | Wikimedia Commons: Carel Fabritius - The Goldfinch - 605 - Mauritshuis.jpg |
 | zurbaran.jpg | 苏巴朗《四个器皿的静物》 约1650（第三讲“瓦器”动画里用的那只红陶罐） | Wikimedia Commons: Francisco de Zurbarán - Still Life with Four Vessels - Google Art Project.jpg |
+| bush.jpg | 费蒂《摩西在燃烧的荆棘前》 约1613 | Wikimedia Commons（华沙国家博物馆）: Domenico Fetti - Moses before the burning bush - M.Ob.769 MNW - National Museum in Warsaw.jpg |
+| sunrise.jpg | 莫奈《印象·日出》 1872 | Wikimedia Commons: Claude Monet, Impression, soleil levant.jpg |
+| wave.jpg | 葛饰北斋《神奈川冲浪里》 约1831 | Wikimedia Commons: Tsunami by hokusai 19th century.jpg |
+| mother.jpg | 惠斯勒《灰与黑的协奏曲：画家的母亲》 1871 | Wikimedia Commons: Whistlers Mother high res.jpg |
+| artofpainting.jpg | 维米尔《绘画的艺术》 约1666—1668 | Wikimedia Commons: Jan Vermeer - The Art of Painting - Google Art Project.jpg |
+| baptist.jpg | 达·芬奇《施洗约翰》 1513—1516 | Wikimedia Commons: Leonardo da Vinci - Saint John the Baptist C2RMF retouched.jpg |
+| magdalen.jpg | 乔治·德·拉图尔《油灯前的抹大拉》 约1640 | Wikimedia Commons: Georges de La Tour - The Magdalen with the Smoking Flame - Google Art Project.jpg |
+| atlas.jpg | 圭尔奇诺《擎天的阿特拉斯》 1646 | Wikimedia Commons: Guercino, atlante, 1646.jpg —— 照片作者 Sailko，许可 CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），画面经裁切、调色 |
+| primavera.jpg | 波提切利《春》 约1480 | Wikimedia Commons: Sandro Botticelli - La Primavera - Google Art Project.jpg |
+| oak.jpg | 弗里德里希《雪中的橡树》 1827 | Wikimedia Commons: Caspar David Friedrich - Eiche im Schnee II.jpg |
+| birds.jpg | 乔托（传）《向鸟儿讲道》 约1297—1299 | Wikimedia Commons: Giotto - Legend of St Francis - -15- - Sermon to the Birds.jpg |
+| prodigal2.jpg | 牟利罗《浪子回家》 1667—1670 | Wikimedia Commons（CC0，美国国家美术馆）: Bartolomé Esteban Murillo, The Return of the Prodigal Son, 1667-1670, NGA 34956.jpg |
+| moonsea.jpg | 弗里德里希《海上月出》 1822 | Wikimedia Commons: Caspar David Friedrich - Mondaufgang am Meer - Google Art Project.jpg |
+| butterfly.jpg | 梅里安《苏里南昆虫变态图谱》插图 1705 | Wikimedia Commons: Maria Merian Metamorphosis Insectorum Surinamensium MIA P18717.jpg |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。
+
+`depth/` 里是部分画的深浅图（tools/depth.py 用 Depth Anything V2 Small 算出，越亮越近），第四讲起用来做名画的 2.5D 纵深推镜。
