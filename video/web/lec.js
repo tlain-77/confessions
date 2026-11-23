@@ -117,10 +117,12 @@ window.lecture = async function (o = {}) {
       if (!xf && !it.art && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
         if (it.ms) { const f = chars(el.querySelector('.lq-t')).find(c => /[一-鿿]/.test(c.textContent)); if (f) f.classList.add('cap'); }   // 抄本式：第一个字做彩饰首字
-        IN(el, Math.max(a + 0.05, at - 0.6), { y: 18, d: 1.1, blur: 3 });
-        const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), at0 - 1.0, e);
-        if (ts) cs.forEach((c, j) => IN(c, Math.max(at - 0.3, ts[j] - 0.05), { d: 0.6, y: 5, blur: 3 }));
-        else type(el.querySelector('.lq-t'), at, Math.max(1.5, (e - at) * 0.7), { d: 0.6, y: 5, blur: 3 });
+        // xfade：紧接着上一张卡（同一个位置）——新卡在旧卡淡出的同时淡进来，纸面不会先暗一下再亮（不然像闪了一下）
+        if (xf) IN(el, a - 0.62, { y: 0, d: 0.75, blur: 0, ease: 'sine.inOut' }); else IN(el, Math.max(a + 0.05, at - 0.6), { y: 18, d: 1.1, blur: 3 });
+        const tq = xf && it.at !== undefined ? AT(it.at) : at;            // 逐字出现按这一张卡自己说到的时刻算
+        const cs = chars(el.querySelector('.lq-t')), ts = speakTimes(cs.map(c => c.textContent), (xf ? tq : at0) - 1.0, e);
+        if (ts) cs.forEach((c, j) => IN(c, Math.max(tq - 0.3, ts[j] - 0.05), { d: 0.6, y: 5, blur: 3 }));
+        else type(el.querySelector('.lq-t'), tq, Math.max(1.5, (e - tq) * 0.7), { d: 0.6, y: 5, blur: 3 });
         (it.hl || []).forEach(([sel, t2, col]) => tl.to(chars(el.querySelector('.lq-t ' + sel)), { color: col || '#b8321c', duration: 0.5, stagger: 0.02 }, AT(t2)));
       } else if (it.cols || it.tri) {
         // 每栏的标题在 at 出来；下面的小字可以另给时刻 sat（说到时再出来），不给就跟标题一起
