@@ -890,7 +890,7 @@
       const plan = line(svg, `M${T(bx0, G)} L${T(bx0, fl[4])} L${T(bx1, fl[4])} L${T(bx1, G)} Z ` + fl.slice(1, 4).map(y => `M${T(bx0, y)} L${T(bx1, y)}`).join(' ') + ` M${T((bx0 + bx1) / 2, G)} L${T((bx0 + bx1) / 2, fl[4])}`, { c: '#f2f8ff', w: 2.2, gc: '#9cc7e8', go: 0.5 });
       const ptitle = text(svg, px0 + pw - 18, py0 + ph - 18, '图纸 · 一张', { s: 22, a: 'end', c: '#dcecfb', ls: '0.2em', wt: 400 });
       const lp = text(svg, px0 + pw / 2, 540, '图纸：从头到尾就是那一张', { s: 30, c: GOLD, ls: '0.08em' });
-      const t0 = AT(s.at); DRAW(tl, ground, t0, 0.8); DRAW(tl, frame, t0 + 0.2, 1.4); SHOW(tl, lw, t0 + 0.6);
+      const t0 = AT(s.at); DRAW(tl, ground, t0, 0.8); DRAW(tl, frame, t0 + 0.2, 1.4); SHOW(tl, lw, s.site !== undefined ? AT(s.site) : t0 + 0.6);
       steps.forEach(([lab, at], i) => { const t = AT(at); SHOW(tl, lab, t); if (i < 3) tl.to(lab, { opacity: 0, duration: 0.4 }, AT(steps[i + 1][1]) - 0.1); });
       const tu = AT(s.up); DRAW(tl, scaf, tu, 1.0);
       const td = AT(s.down); tl.to(scaf, { opacity: 0, duration: 0.8 }, td);
@@ -934,7 +934,7 @@
       gsap.set(pic, { svgOrigin: `${cx} ${cy}` });
       const tape = mk('g', { opacity: 0 }, svg); [[cx - 96, cy - 84, -24], [cx + 96, cy - 84, 24]].forEach(([x, y, r]) => mk('rect', { x: x - 28, y: y - 9, width: 56, height: 18, fill: 'rgba(250,240,200,.55)', stroke: 'rgba(250,240,200,.8)', 'stroke-width': 1, transform: `rotate(${r} ${x} ${y})` }, tape));
       const say = text(svg, 250, 210, '“爸爸，送给你！”', { s: 40, c: PAPER, font: 'LXGW WenKai', wt: 400 });
-      const yrs = text(svg, 250, 300, '贴在冰箱上，贴好多年', { s: 34, c: GOLD, font: 'LXGW WenKai', wt: 400 });
+      const yrs = text(svg, 250, 300, '一贴，就贴了好多年', { s: 34, c: GOLD, font: 'LXGW WenKai', wt: 400 });
       const t0 = AT(s.at); DRAW(tl, fr, t0, 1.2);
       tl.fromTo(pic, { opacity: 0, x: -440, y: 90, rotation: -14, scale: 0.8 }, { opacity: 1, x: -440, y: 60, rotation: -8, scale: 0.9, duration: 0.8, ease: 'power2.out', immediateRender: false }, t0 + 0.4);
       const tg = AT(s.give); SHOW(tl, say, tg);
@@ -957,7 +957,7 @@
       const tm = AT(s.money); SHOW(tl, dad, tm - 0.4); DRAW(tl, collar, tm - 0.3, 0.8); DRAW(tl, arc, tm, 1.0); SHOW(tl, lm, tm + 0.3);
       coins.forEach((c, k) => { tl.to(c, { opacity: 1, duration: 0.3 }, tm + 0.2 + k * 0.25); tl.to(c, { x: 600, y: -60 * Math.sin(Math.PI * 0.5), duration: 1.2, ease: 'power1.inOut' }, tm + 0.4 + k * 0.25); tl.to(c, { opacity: 0, duration: 0.4 }, tm + 1.5 + k * 0.25); });
       DRAW(tl, back, tm + 1.8, 1.0); SHOW(tl, lt, tm + 2.1);
-      const tw = AT(s.wear); tl.to(tie, { x: -600, y: -0, scale: 0.6, duration: 1.4, ease: 'power2.inOut' }, tw); SHOW(tl, say, tw + 1.2);
+      if (s.wear !== undefined) { const tw = AT(s.wear); tl.to(tie, { x: -600, y: -0, scale: 0.6, duration: 1.4, ease: 'power2.inOut' }, tw); SHOW(tl, say, s.sayAt !== undefined ? AT(s.sayAt) : tw + 1.2); } else gsap.set(say, { opacity: 0 });
     },
     // 滔滔不绝：一个人周围冒出一个又一个话泡（工作、房子、新闻、八卦……），可一句都不是对神说的；最后只亮起一个：“我的天主”
     chatter({ tl, el, AT, s }) {
@@ -970,7 +970,8 @@
       const one = bub(500, 200, '我的天主', GOLD, 40);
       const halo = mk('ellipse', { cx: 500, cy: 200, rx: 170, ry: 80, fill: grad(defs, 'ch' + uid, 'radialGradient', { cx: 500, cy: 200, r: 170 }, [[0, '#ffe6a6', 0.4], [1, GOLD, 0]]), opacity: 0 }, svg);
       const t0 = AT(s.at); DRAW(tl, person, t0, 1.0);
-      const tb = AT(s.talk); bs.forEach((b, i) => tl.fromTo(b, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false }, tb + i * 0.32));
+      const tb = AT(s.talk), tw = (s.tws || []).map(AT), last = tw.length ? tw[tw.length - 1] : tb;   // tws：前几个话泡各自说到时出来，后面的接着冒
+      bs.forEach((b, i) => tl.fromTo(b, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(2)', immediateRender: false }, i < tw.length ? tw[i] : (tw.length ? last + 0.5 + (i - tw.length) * 0.32 : tb + i * 0.32)));
       const tn = AT(s.none); tl.to(bs, { opacity: 0.18, duration: 0.8 }, tn);
       if (s.one !== undefined) { const to = AT(s.one); tl.to(bs, { opacity: 0, duration: 0.6 }, to - 0.2); tl.to(halo, { opacity: 1, duration: 1.0 }, to); tl.fromTo(one, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', immediateRender: false }, to); }
     },

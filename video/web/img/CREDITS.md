@@ -50,7 +50,7 @@
 | ladder.jpg | 布莱克《雅各的梯子》 约1800 | Wikimedia Commons: Blake jacobsladder.jpg |
 | bones.jpg | 多雷《以西结看见枯骨的平原》 1866 | Wikimedia Commons: Ezekiel’s Vision of the Valley of Dry Bones.jpg |
 | lazarus.jpg | 伦勃朗《拉撒路复活》 约1630 | Wikimedia Commons: Rembrandt Harmensz. van Rijn - The Raising of Lazarus - Google Art Project.jpg |
-| doctor.jpg | 菲尔德斯《医生》 1891 | Wikimedia Commons: Luke Fildes (1891) The Doctor.png |
+| doctor.jpg | 菲尔德斯《医生》 1891 | Wikimedia Commons: The Doctor Luke Fildes crop.jpg（泰特美术馆藏，画面四边略有裁切） |
 | avenue.jpg | 霍贝玛《米德尔哈尼斯的林荫道》 1689 | Wikimedia Commons: Meindert Hobbema - The Alley at Middelharnis - WGA11427.jpg |
 | annunc.jpg | 弗拉·安杰利科《天使报喜》 约1434 | Wikimedia Commons: Fra Angelico - Annunciation - WGA0474.jpg |
 | dewitte.jpg | 德·维特《阿姆斯特丹老教堂里的讲道》 约1660 | Wikimedia Commons: Emanuel de Witte (c.1615-1617-1692) - The Interior of the Oude Kerk, Amsterdam, during a Sermon - NG1053 - National Gallery.jpg |
@@ -129,6 +129,12 @@
 | prodigal2.jpg | 牟利罗《浪子回家》 1667—1670 | Wikimedia Commons（CC0，美国国家美术馆）: Bartolomé Esteban Murillo, The Return of the Prodigal Son, 1667-1670, NGA 34956.jpg |
 | moonsea.jpg | 弗里德里希《海上月出》 1822 | Wikimedia Commons: Caspar David Friedrich - Mondaufgang am Meer - Google Art Project.jpg |
 | butterfly.jpg | 梅里安《苏里南昆虫变态图谱》插图 1705 | Wikimedia Commons: Maria Merian Metamorphosis Insectorum Surinamensium MIA P18717.jpg |
+| augchild.jpg | 加罗法洛《奥古斯丁的异象》 约1518 | Wikimedia Commons（英国国家美术馆）: Benvenuto Tisi da Garofalo (c.1481-1559) - Saint Augustine with the Holy Family and Saint Catherine of Alexandria ('The Vision of Saint Augustine') - NG81 - National Gallery.jpg |
+| crucified.jpg | 委拉斯开兹《十字架上的基督》 约1632 | Wikimedia Commons: Diego Velázquez - Christ on the Cross - WGA24389.jpg |
+| cassatt.jpg | 卡萨特《母与子》 约1905 | Wikimedia Commons（CC0，美国国家美术馆）: Mary Cassatt, Mother and Child, c. 1905, NGA 46573.jpg |
+| entry.jpg | 乔托《进入耶路撒冷》（斯克罗维尼礼拜堂壁画） 约1305 | Wikimedia Commons: Giotto di Bondone - No. 26 Scenes from the Life of Christ - 10. Entry into Jerusalem - WGA09206.jpg |
+| joseph.jpg | 博塔拉《约瑟被哥哥们卖掉》 约1640 | Wikimedia Commons: Raffaellino Bottalla - Joseph sold by his brothers - Google Art Project.jpg |
+| solomon.jpg | 瓦伦坦·德·布洛涅《所罗门的审判》 约1625 | Wikimedia Commons: Valentin de Boulogne - The Judgment of Solomon - WGA24248.jpg |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。
 

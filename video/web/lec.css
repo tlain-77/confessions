@@ -110,6 +110,7 @@
   box-shadow:0 44px 100px rgba(0,0,0,.75),inset 0 0 70px rgba(118,78,30,.26),0 0 60px rgba(226,189,118,.14)}
 .lq.ms::before{content:'';position:absolute;inset:20px;border:1.5px solid rgba(146,40,26,.5);outline:1px solid rgba(146,40,26,.3);outline-offset:6px;pointer-events:none}
 .lq.ms .lq-k{color:#9b2c1d;font-weight:400;letter-spacing:.34em}
+.lq.ms{white-space:normal;font-size:inherit;line-height:normal}   /* ep2.css 里另有一个 .ms（不换行、52px），撞了类名：这里改回来，长句子才会在卡片里折行 */
 .lq.ms .lq-t{margin-top:26px}
 .lq.ms .ch.cap{float:left;font-size:2.3em;line-height:1.08;margin:.06em .2em 0 0;padding:.06em .16em .1em;font-weight:900;color:#fbecc8;
   background:linear-gradient(155deg,#b23a24,#6f1b11);box-shadow:inset 0 0 0 3px rgba(238,200,124,.9),inset 0 0 0 7px #741e13,inset 0 0 0 8px rgba(238,200,124,.55),0 6px 16px rgba(60,20,8,.35);text-shadow:0 1px 0 rgba(0,0,0,.25)}
