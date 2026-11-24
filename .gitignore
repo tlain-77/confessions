@@ -58,3 +58,11 @@ video/rec/self7_voice_dry.wav
 video/rec/self7_voice_fixed.wav
 video/rec/self7_voice_x.wav
 __pycache__/
+# 第六讲（卷一第五章上）录音的中间文件
+video/rec/part10.wav
+video/rec/part10_df35.wav
+video/rec/part10_clean35.wav
+video/rec/part10_clean35m.wav
+video/rec/part10_tight.wav
+video/rec/self8_voice.wav
+video/rec/self8_voice_x.wav

@@ -975,5 +975,99 @@
       const tn = AT(s.none); tl.to(bs, { opacity: 0.18, duration: 0.8 }, tn);
       if (s.one !== undefined) { const to = AT(s.one); tl.to(bs, { opacity: 0, duration: 0.6 }, to - 0.2); tl.to(halo, { opacity: 1, duration: 1.0 }, to); tl.fromTo(one, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', immediateRender: false }, to); }
     },
+    // 神是“之一”还是中心：一张清单（工作、家庭、身体、爱好、神），神只是其中一行 → 神挪到正中，别的绕着祂转
+    orbit({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 560);
+      const items = s.items || ['工作', '家庭', '身体', '爱好', '神'], n = items.length;
+      const cx = 500, cy = 268, rx = 250, ry = 168, ang = k => -Math.PI / 2 + k * 2 * Math.PI / (n - 1);
+      const ell = `M${cx + rx},${cy} A${rx},${ry} 0 1 1 ${cx - rx},${cy} A${rx},${ry} 0 1 1 ${cx + rx},${cy}`;
+      const ring = line(svg, ell, { c: GOLD, w: 1.6, go: 0.12 });
+      const halo = mk('ellipse', { cx, cy, rx: 150, ry: 110, fill: grad(defs, 'oh' + uid, 'radialGradient', { cx, cy, r: 150 }, [[0, '#ffe6a6', 0.45], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const boxes = items.map((w, i) => {
+        const god = i === n - 1, g = mk('g', { opacity: 0 }, svg);
+        mk('rect', { x: -110, y: -30, width: 220, height: 60, rx: 10, fill: 'rgba(241,232,214,.06)', stroke: god ? GOLD : '#cdbfa3', 'stroke-width': 2 }, g);
+        mk('rect', { x: -94, y: -12, width: 24, height: 24, rx: 4, fill: 'none', stroke: '#9d927b', 'stroke-width': 2 }, g);
+        text(g, 12, 12, w, { s: 34, c: god ? GOLD : PAPER, font: 'LXGW WenKai', wt: 400 });
+        gsap.set(g, { x: 300, y: 104 + i * 82 }); return g; });
+      const lab1 = text(svg, 470, 278, '排在名单上的“之一”', { s: 36, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400, a: 'start' });
+      const lab2 = text(svg, cx, 530, '不在名单上，在中心', { s: 32, c: GOLD });
+      const t0 = AT(s.at), tli = s.list !== undefined ? AT(s.list) : t0;
+      boxes.forEach((g, i) => tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.6, immediateRender: false }, tli + i * 0.4));
+      SHOW(tl, lab1, s.one !== undefined ? AT(s.one) : tli + n * 0.4);
+      if (s.center !== undefined) {
+        const tc = AT(s.center); tl.to(lab1, { opacity: 0, duration: 0.5 }, tc);
+        boxes.forEach((g, i) => { if (i === n - 1) tl.to(g, { x: cx, y: cy, scale: 1.25, duration: 1.4, ease: 'power2.inOut' }, tc);
+          else { const a = ang(i); tl.to(g, { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a), scale: 0.8, opacity: 0.75, duration: 1.4, ease: 'power2.inOut' }, tc); } });
+        DRAW(tl, ring, tc + 0.9, 1.3); tl.to(halo, { opacity: 1, duration: 1.2 }, tc + 1.0); SHOW(tl, lab2, tc + 1.6);
+      } else { gsap.set(ring._p, { strokeDashoffset: 1.01 }); gsap.set(lab2, { opacity: 0 }); }
+    },
+    // 鱼离开水：左边是水，鱼在水里游 → 跳到右边岸上，翻腾、喘不上气 → “不是水在惩罚它” → “是它离开了唯一能活的地方”
+    fish({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 560);
+      const WL = 300;
+      const water = mk('path', { d: `M40,${WL} L520,${WL} L520,520 L40,520 Z`, fill: grad(defs, 'fw' + uid, 'linearGradient', { x1: 0, y1: WL, x2: 0, y2: 520 }, [[0, WATER, 0.26], [1, '#22415c', 0.5]]), opacity: 0 }, svg);
+      let wd = ''; for (const y of [WL, WL + 70, WL + 140]) { wd += `M60,${y}`; for (let x = 60; x < 500; x += 40) wd += ` q10,-9 20,0 q10,9 20,0`; wd += ' '; }
+      const waves = line(svg, wd, { c: WATER, w: 2.2, go: 0.3 });
+      const shore = line(svg, `M520,${WL} C580,${WL - 6} 640,${WL + 26} 960,${WL + 34}`, { c: '#cdb38a', w: 3, go: 0.2 });
+      const fishG = mk('g', { opacity: 0 }, svg);
+      mk('path', { d: 'M60,0 C30,-34 -34,-34 -60,0 C-34,34 30,34 60,0 Z M-60,0 L-92,-24 L-84,0 L-92,24 Z', fill: 'rgba(226,189,118,.16)', stroke: GOLD, 'stroke-width': 3, 'stroke-linejoin': 'round' }, fishG);
+      mk('circle', { cx: 34, cy: -7, r: 4.5, fill: PAPER }, fishG);
+      mk('path', { d: 'M8,-22 C14,-8 14,8 8,22', fill: 'none', stroke: GOLD, 'stroke-width': 2, opacity: 0.7 }, fishG);
+      gsap.set(fishG, { x: 250, y: 410, svgOrigin: '0 0' });
+      const gasp = mk('g', { opacity: 0 }, svg); [[800, 220, 7], [826, 196, 9], [858, 178, 11]].forEach(([x, y, r]) => mk('circle', { cx: x, cy: y, r, fill: 'none', stroke: PAPER, 'stroke-width': 2 }, gasp));
+      const splash = line(svg, 'M505,292 q-14,-34 -34,-40 M520,288 q0,-40 -6,-56 M535,292 q14,-30 30,-36', { c: WATER, w: 2.4, go: 0.3 });
+      const l1 = text(svg, 500, 96, '不是水在惩罚它', { s: 38, c: PAPER, font: 'LXGW WenKai', wt: 400 });
+      const l2 = text(svg, 500, 152, '是它离开了唯一能活的地方', { s: 38, c: GOLD });
+      const t0 = AT(s.at), tld = AT(s.land);
+      tl.to(water, { opacity: 1, duration: 0.8 }, t0); DRAW(tl, waves, t0, 1.2); DRAW(tl, shore, t0 + 0.3, 1.0);
+      tl.to(fishG, { opacity: 1, duration: 0.6 }, t0 + 0.6);
+      const sw = Math.max(0, tld - t0 - 0.8), k = Math.max(1, Math.floor(sw / 1.0));
+      tl.to(fishG, { x: 330, duration: sw, ease: 'none' }, t0 + 0.6);
+      tl.to(fishG, { y: 396, rotation: -4, duration: sw / (k + 1), yoyo: true, repeat: k, ease: 'sine.inOut' }, t0 + 0.6);
+      gsap.set(splash._p, { strokeDashoffset: 1.01 });
+      tl.to(fishG, { x: 520, y: 180, rotation: -32, duration: 0.6, ease: 'power2.out' }, tld);
+      tl.to(fishG, { x: 720, y: 292, rotation: 14, duration: 0.6, ease: 'power2.in' }, tld + 0.6);
+      DRAW(tl, splash, tld + 0.15, 0.5); tl.to(splash, { opacity: 0, duration: 0.8 }, tld + 1.0);
+      if (s.gasp !== undefined) { const tg = AT(s.gasp);
+        tl.to(fishG, { rotation: -22, duration: 0.32, yoyo: true, repeat: 5, ease: 'sine.inOut' }, tg);
+        tl.to(gasp, { opacity: 1, duration: 0.5 }, tg + 0.3); tl.to(gasp, { opacity: 0.25, duration: 1.2 }, tg + 2.2); }
+      if (s.not !== undefined) SHOW(tl, l1, AT(s.not)); else gsap.set(l1, { opacity: 0 });
+      if (s.left !== undefined) { const tlf = AT(s.left); SHOW(tl, l2, tlf); tl.to(water, { opacity: 0.6, duration: 0.6, yoyo: true, repeat: 1 }, tlf); } else gsap.set(l2, { opacity: 0 });
+    },
+    // 收音机：电台一直在播（塔上一圈一圈的信号）→ 收音机没调准，只有杂音 → 指针转到那个频道，杂音退去，变成清楚的声音
+    radio({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 560);
+      const tower = line(svg, 'M150,360 L190,130 L230,360 M162,290 L218,290 M171,236 L209,236 M180,184 L200,184 M190,130 L190,108', { c: PAPER, w: 3 });
+      const rings = [1, 2, 3, 4].map(k => { const r = 30 + k * 52; return line(svg, `M${(190 + r * Math.cos(-0.85)).toFixed(1)},${(108 + r * Math.sin(-0.85)).toFixed(1)} A${r},${r} 0 0 1 ${(190 + r * Math.cos(0.85)).toFixed(1)},${(108 + r * Math.sin(0.85)).toFixed(1)}`, { c: WATER, w: 2.2, go: 0.35 }); });
+      const bx = 560, by = 230, bw = 340, bh = 230;
+      const box = line(svg, `M${bx + 18},${by} L${bx + bw - 18},${by} Q${bx + bw},${by} ${bx + bw},${by + 18} L${bx + bw},${by + bh - 18} Q${bx + bw},${by + bh} ${bx + bw - 18},${by + bh} L${bx + 18},${by + bh} Q${bx},${by + bh} ${bx},${by + bh - 18} L${bx},${by + 18} Q${bx},${by} ${bx + 18},${by} Z M${bx + bw - 60},${by} L${bx + bw - 10},${by - 120}`, { c: PAPER, w: 3 });
+      let gr = ''; for (let i = 0; i < 5; i++) for (let j = 0; j < 4; j++) { const x = bx + 50 + i * 26, y = by + 90 + j * 26; gr += `M${x + 6},${y} A6,6 0 1 1 ${x - 6},${y} A6,6 0 1 1 ${x + 6},${y} `; }
+      const grille = line(svg, gr, { c: '#b9ab90', w: 1.6, go: 0, glow: false });
+      let tk = `M${bx + 190},${by + 60} L${bx + 310},${by + 60} `; for (let i = 0; i <= 12; i++) { const x = bx + 190 + i * 10; tk += `M${x},${by + 60} L${x},${by + (i % 3 ? 52 : 46)} `; }
+      const scale = line(svg, tk, { c: '#cdbfa3', w: 1.6, go: 0, glow: false });
+      const mark = mk('circle', { cx: bx + 290, cy: by + 74, r: 4, fill: GOLD, opacity: 0 }, svg);
+      const ptr = mk('path', { d: `M0,${by + 40} L0,${by + 80}`, stroke: CORAL, 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0 }, svg); gsap.set(ptr, { x: bx + 205 });
+      let sr = 7; const r = () => (sr = (sr * 9301 + 49297) % 233280) / 233280;
+      let nz = `M${bx + 190},${by + 150}`; for (let x = bx + 194; x <= bx + 316; x += 4) nz += ` L${x},${(by + 150 + (r() - 0.5) * 46).toFixed(1)}`;
+      const noise = line(svg, nz, { c: '#9d927b', w: 2, go: 0.15 });
+      let sn = `M${bx + 190},${by + 150}`; for (let x = bx + 192; x <= bx + 316; x += 2) sn += ` L${x},${(by + 150 - 22 * Math.sin((x - bx - 190) / 124 * Math.PI * 4)).toFixed(1)}`;
+      const sine = line(svg, sn, { c: GOLD, w: 2.6, go: 0.5 });
+      const glowC = mk('ellipse', { cx: bx + 102, cy: by + 128, rx: 110, ry: 90, fill: grad(defs, 'rg' + uid, 'radialGradient', { cx: bx + 102, cy: by + 128, r: 110 }, [[0, '#ffe6a6', 0.35], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const lsig = text(svg, 250, 430, '电台一直在播', { s: 32, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 });
+      const lsta = text(svg, bx + bw / 2, by + bh + 60, '没调准：只听见沙沙的杂音', { s: 30, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const ltun = text(svg, bx + bw / 2, by + bh + 60, '调准了：听见了', { s: 32, c: GOLD });
+      const t0 = AT(s.at); DRAW(tl, tower, t0, 1.0); DRAW(tl, box, t0 + 0.3, 1.2); DRAW(tl, grille, t0 + 0.8, 1.0); DRAW(tl, scale, t0 + 0.9, 0.8);
+      tl.to([ptr, mark], { opacity: 1, duration: 0.5 }, t0 + 1.4);
+      const tsg = s.signal !== undefined ? AT(s.signal) : t0 + 1.2;
+      rings.forEach((g, k) => DRAW(tl, g, tsg + k * 0.35, 0.8)); SHOW(tl, lsig, tsg + 0.6);
+      const tst = s.static !== undefined ? AT(s.static) : tsg + 2;
+      DRAW(tl, noise, tst, 1.0); SHOW(tl, lsta, tst + 0.3);
+      tl.to(ptr, { x: bx + 222, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: 1 }, tst + 0.4);
+      if (s.tune !== undefined) { const ttu = AT(s.tune);
+        tl.to(ptr, { x: bx + 290, duration: 1.2, ease: 'power2.inOut' }, ttu);
+        tl.to([noise, lsta], { opacity: 0, duration: 0.8 }, ttu + 0.9); DRAW(tl, sine, ttu + 1.0, 1.2);
+        tl.to(glowC, { opacity: 1, duration: 1.0 }, ttu + 1.1); SHOW(tl, ltun, ttu + 1.4);
+      } else { gsap.set(sine._p, { strokeDashoffset: 1.01 }); gsap.set(ltun, { opacity: 0 }); }
+    },
   };
 })();

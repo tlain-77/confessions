@@ -135,6 +135,10 @@
 | entry.jpg | 乔托《进入耶路撒冷》（斯克罗维尼礼拜堂壁画） 约1305 | Wikimedia Commons: Giotto di Bondone - No. 26 Scenes from the Life of Christ - 10. Entry into Jerusalem - WGA09206.jpg |
 | joseph.jpg | 博塔拉《约瑟被哥哥们卖掉》 约1640 | Wikimedia Commons: Raffaellino Bottalla - Joseph sold by his brothers - Google Art Project.jpg |
 | solomon.jpg | 瓦伦坦·德·布洛涅《所罗门的审判》 约1625 | Wikimedia Commons: Valentin de Boulogne - The Judgment of Solomon - WGA24248.jpg |
+| cophetua.jpg | 伯恩-琼斯《国王与乞丐少女》 1884 | Wikimedia Commons（泰特美术馆）: Edward Burne-Jones - King Cophetua and the Beggar Maid - Google Art Project.jpg |
+| samuel.jpg | 雷诺兹《幼年撒母耳》 1776 | Wikimedia Commons: Joshua Reynolds (1723-1792) - The Infant Samuel - N00162 - National Gallery.jpg |
+| arnolfini.jpg | 凡·艾克《阿尔诺芬尼夫妇像》 1434 | Wikimedia Commons（英国国家美术馆）: Van Eyck - Arnolfini Portrait.jpg |
+| pearl.jpg | 菲蒂（工作室）《重价的珠子》 17世纪 | Wikimedia Commons: Domenico Fetti La Perle de grand prix DSCF2652.JPG —— 照片作者 DamTESC，许可 CC BY-SA 3.0（https://creativecommons.org/licenses/by-sa/3.0/），画面经缩小 |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。
 
