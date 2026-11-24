@@ -117,6 +117,10 @@ window.lecture = async function (o = {}) {
       if (!xf && !it.art && (at < a - 0.01 || at > e)) throw new Error(`第 ${i} 场第 ${k} 项的时刻 ${at.toFixed(2)} 不在这一场里（${a.toFixed(2)}–${e.toFixed(2)}）：` + JSON.stringify(it).slice(0, 80));
       if (it.q) {
         if (it.ms) { const f = chars(el.querySelector('.lq-t')).find(c => /[一-鿿]/.test(c.textContent)); if (f) f.classList.add('cap'); }   // 抄本式：第一个字做彩饰首字
+        { const cs0 = chars(el.querySelector('.lq-t')); let g = [];        // 标点不落行首：句中、句末标点跟前一个字绑在一起，开引号跟后一个字绑在一起（逐字拆开以后，浏览器的避头尾规则管不到）
+          const flush = () => { if (g.length > 1 && g.every(c => c.parentNode === g[0].parentNode)) { const w = document.createElement('span'); w.className = 'nb'; g[0].before(w); g.forEach(c => w.appendChild(c)); } g = []; };
+          cs0.forEach((c, j) => { const t = c.textContent, p = j ? cs0[j - 1].textContent : '', cap = c.classList.contains('cap') || g.some(x => x.classList.contains('cap'));
+            if (g.length && !cap && (/[，。、；：？！”’》）…]/.test(t) || /[“‘《（]/.test(p))) g.push(c); else { flush(); g = [c]; } }); flush(); }
         // xfade：紧接着上一张卡（同一个位置）——新卡在旧卡淡出的同时淡进来，纸面不会先暗一下再亮（不然像闪了一下）
         if (xf) IN(el, a - 0.62, { y: 0, d: 0.75, blur: 0, ease: 'sine.inOut' }); else IN(el, Math.max(a + 0.05, at - 0.6), { y: 18, d: 1.1, blur: 3 });
         const tq = xf && it.at !== undefined ? AT(it.at) : at;            // 逐字出现按这一张卡自己说到的时刻算

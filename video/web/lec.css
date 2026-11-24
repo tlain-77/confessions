@@ -24,6 +24,7 @@
 .lq-t{margin-top:20px;font-weight:700;font-size:58px;line-height:1.62}
 .lq-t.sm{font-size:50px}.lq-t.xs{font-size:44px;line-height:1.7}
 .lq-t b{font-weight:inherit}
+.lq-t .nb{display:inline-block;white-space:nowrap}   /* 标点跟着前一个字，不落行首（lec.js 里分组） */
 .lq.mini{width:1180px;padding:34px 60px 40px;margin-bottom:28px}
 .lq.mini .lq-t{font-size:42px;margin-top:12px}
 /* 经文卡 */
