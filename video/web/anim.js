@@ -992,7 +992,8 @@
       const lab1 = text(svg, 470, 278, '排在名单上的“之一”', { s: 36, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400, a: 'start' });
       const lab2 = text(svg, cx, 530, '不在名单上，在中心', { s: 32, c: GOLD });
       const t0 = AT(s.at), tli = s.list !== undefined ? AT(s.list) : t0;
-      boxes.forEach((g, i) => tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.6, immediateRender: false }, tli + i * 0.4));
+      const tw = s.tws ? s.tws.map(AT) : null;                  // tws：每一行说到时再出来（不给就从 list 起每 0.4 秒一行）
+      boxes.forEach((g, i) => tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.6, immediateRender: false }, tw ? tw[i] : tli + i * 0.4));
       SHOW(tl, lab1, s.one !== undefined ? AT(s.one) : tli + n * 0.4);
       if (s.center !== undefined) {
         const tc = AT(s.center); tl.to(lab1, { opacity: 0, duration: 0.5 }, tc);
@@ -1054,7 +1055,7 @@
       const sine = line(svg, sn, { c: GOLD, w: 2.6, go: 0.5 });
       const glowC = mk('ellipse', { cx: bx + 102, cy: by + 128, rx: 110, ry: 90, fill: grad(defs, 'rg' + uid, 'radialGradient', { cx: bx + 102, cy: by + 128, r: 110 }, [[0, '#ffe6a6', 0.35], [1, GOLD, 0]]), opacity: 0 }, svg);
       const lsig = text(svg, 250, 430, '电台一直在播', { s: 32, c: '#e2d6bd', font: 'LXGW WenKai', wt: 400 });
-      const lsta = text(svg, bx + bw / 2, by + bh + 60, '没调准：只听见沙沙的杂音', { s: 30, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const lsta = text(svg, bx + bw / 2, by + bh + 60, '没调准：只能听到沙沙的杂音', { s: 30, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
       const ltun = text(svg, bx + bw / 2, by + bh + 60, '调准了：听见了', { s: 32, c: GOLD });
       const t0 = AT(s.at); DRAW(tl, tower, t0, 1.0); DRAW(tl, box, t0 + 0.3, 1.2); DRAW(tl, grille, t0 + 0.8, 1.0); DRAW(tl, scale, t0 + 0.9, 0.8);
       tl.to([ptr, mark], { opacity: 1, duration: 0.5 }, t0 + 1.4);

@@ -128,3 +128,4 @@
 .art-scrim.all{background:radial-gradient(ellipse 80% 70% at 50% 48%,rgba(7,6,4,.62),rgba(7,6,4,.8))}
 .pdx.even .pdx-l{background:radial-gradient(ellipse 90% 70% at 58% 46%,rgba(40,34,24,.5),rgba(6,6,8,.9) 80%)}
 .pdx.even .pdx-l b{color:var(--paper);text-shadow:0 0 40px rgba(0,0,0,.8)}
+.pdx.long b{font-size:84px;letter-spacing:.06em}                 /* 词长（六七个字）时小一号，不出半屏 */
