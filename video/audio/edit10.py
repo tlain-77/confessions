@@ -20,8 +20,10 @@ y = x.copy(); log = []
 a, b, src = S(68.517), S(68.665), S(150.517)
 n, f = b - a, S(0.008)
 piece = x[src:src + n].copy(); w = np.ones(n); w[:f] = np.linspace(0, 1, f); w[-f:] = np.linspace(1, 0, f)
+m, rp = S(68.600) - a, S(0.012)                     # 借来的“息”擦音比原来“心”的擦音响 4 dB 左右：压到一样响，到元音起头 12 ms 渐回原样
+gfr = np.sqrt(np.mean(x[a:a + m] ** 2) / np.mean(piece[:m] ** 2)); g = np.ones(n); g[:m] = gfr; g[m:m + rp] = np.linspace(gfr, 1, rp); piece *= g
 y[a:b] = x[a:b] * (1 - w) + piece * w
-log.append('换字：68.517–68.665 的“心”换成 150.517 起“安息在”的“息”')
+log.append(f'换字：68.517–68.665 的“心”换成 150.517 起“安息在”的“息”（擦音 {20 * np.log10(gfr):+.1f} dB）')
 # 2) 咂嘴声压成静音（边上 30 ms 渐变）
 MUTE = {188: (516.40, 516.98), 338: (981.95, 982.62), 424: (1223.30, len(x) / sr - 0.01)}
 for i, (t0, t1) in MUTE.items():
