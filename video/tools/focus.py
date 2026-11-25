@@ -1,14 +1,18 @@
 """给每幅画找几处“值得推近看”的地方（细节最多、彼此不重叠的几块），写成 web/img/focus.js。
 逐句换背景时，第一次用整幅，接着推近到这些局部，同一幅画也能换出好几个镜头。
-用法：python3 tools/focus.py
+用法：python3 tools/focus.py            # 所有画重算（会整个重写 focus.js 和 blur/、soft/）
+      python3 tools/focus.py 名 …       # 只算这几幅，合并进现有的 focus.js，别的画一律不动
 """
-import glob, json, os
+import glob, json, os, sys
 import numpy as np
 from PIL import Image
 
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-out = {}
-for f in sorted(glob.glob('web/img/*.jpg')):
+NAMES = sys.argv[1:]
+if NAMES:
+    src = open('web/img/focus.js', encoding='utf-8').read(); out = json.loads(src[src.index('=') + 1:].strip().rstrip(';'))
+else: out = {}
+for f in ([f'web/img/{n}.jpg' for n in NAMES] if NAMES else sorted(glob.glob('web/img/*.jpg'))):
     k = os.path.basename(f)[:-4]
     im = Image.open(f); w, h = im.size
     g = np.asarray(im.convert('L').resize((192, max(8, round(192 * h / w))), Image.BILINEAR), np.float32)
