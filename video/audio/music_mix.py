@@ -1,12 +1,17 @@
 """人声 + 配乐。配乐在说话时压低（约低于人声 20 dB），停顿超过 1.2 秒、片头片尾时抬起。
-usage: python3 audio/music_mix.py voice.wav out.wav section_starts_csv [seed]"""
-import sys, subprocess
+usage: [SCORE=score2.py] python3 audio/music_mix.py voice.wav out.wav section_starts_csv [seed]"""
+import os, sys, subprocess
 import numpy as np, soundfile as sf
 from scipy.signal import butter, sosfilt
 vpath, out, secs = sys.argv[1], sys.argv[2], sys.argv[3]; seed = sys.argv[4] if len(sys.argv) > 4 else '7'
 v, sr = sf.read(vpath, dtype='float64'); v = v.mean(1) if v.ndim > 1 else v; assert sr == 48000
 T = len(v) / sr
-subprocess.run(['python3', 'audio/score.py', out + '.mid', f'{T + 4:.2f}', secs, seed], check=True)
+SCORE = os.environ.get('SCORE', 'score.py')                     # 第八讲起用 score2.py（配器更丰富，段落之间有过门，片头片尾有引子和收束）
+if SCORE == 'score.py':
+    subprocess.run(['python3', 'audio/score.py', out + '.mid', f'{T + 4:.2f}', secs, seed], check=True)
+else:                                                            # 新的作曲要知道第一句话从哪里开始、最后一句话在哪里结束
+    h = int(0.05 * sr); ee = np.array([np.sqrt(np.mean(v[i * h:(i + 1) * h] ** 2)) for i in range(len(v) // h)]); on = np.where(ee > 0.1 * np.percentile(ee, 95))[0]
+    subprocess.run(['python3', f'audio/{SCORE}', out + '.mid', f'{T + 4:.2f}', secs, seed, f'{on[0] * 0.05:.2f}', f'{(on[-1] + 1) * 0.05:.2f}'], check=True)
 subprocess.run(['fluidsynth', '-ni', '-q', '-g', '0.6', '-r', '48000', '-F', out + '.music.wav', '/usr/share/sounds/sf2/FluidR3_GM.sf2', out + '.mid'], check=True, capture_output=True)
 m, msr = sf.read(out + '.music.wav', dtype='float64'); m = m[:len(v)]; m = np.pad(m, ((0, max(0, len(v) - len(m))), (0, 0)))
 # 说话的包络（50 ms 一格）
