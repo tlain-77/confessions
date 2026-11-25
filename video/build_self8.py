@@ -79,4 +79,5 @@ def build(name, var, sfile, lo, hi, lead, tail):
     return d
 MATCH = {}
 d = build('self8', 'EPD', 's11', 0, 1e9, 1.5, 7.0)
-
+if SRC == '_tight':                      # 开头“我是 tlain”那条字幕按实际声音补上（见 tools/namesub.py）
+    import tools.namesub; d = tools.namesub.patch_files('self8')
