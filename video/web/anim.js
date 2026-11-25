@@ -1070,5 +1070,157 @@
         tl.to(glowC, { opacity: 1, duration: 1.0 }, ttu + 1.1); SHOW(tl, ltun, ttu + 1.4);
       } else { gsap.set(sine._p, { strokeDashoffset: 1.01 }); gsap.set(ltun, { opacity: 0 }); }
     },
+
+    // 小学生在台上，眼睛往台下找爸妈的脸：台口、台上的孩子、一排座位 → 目光一排扫过去 → 中间座位亮起一张笑脸（不怕了） → 笑脸淡去，座位空了
+    seats({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 520);
+      const stage = line(svg, 'M70,170 Q500,140 930,170', { c: PAPER, w: 3, go: 0.2 });
+      const kid = line(svg, 'M518,46 A18,18 0 1 1 482,46 A18,18 0 1 1 518,46 M500,64 L500,116 M500,80 L474,102 M500,80 L526,102 M500,116 L484,152 M500,116 L516,152', { c: GOLD, w: 3.4 });
+      const xs = [180, 340, 500, 660, 820], sy = 440;
+      const seatD = x => `M${x - 50},${sy} L${x - 50},${sy - 66} Q${x - 50},${sy - 92} ${x - 24},${sy - 92} L${x + 24},${sy - 92} Q${x + 50},${sy - 92} ${x + 50},${sy - 66} L${x + 50},${sy} M${x - 64},${sy} L${x + 64},${sy} M${x - 64},${sy - 34} L${x - 64},${sy + 34} M${x + 64},${sy - 34} L${x + 64},${sy + 34}`;
+      const seatsG = xs.map(x => line(svg, seatD(x), { c: '#9d927b', w: 2.6, go: 0.12 }));
+      const beam = mk('path', { d: 'M500,52 L452,330 L548,330 Z', fill: grad(defs, 'bm' + uid, 'linearGradient', { x1: 0, y1: 52, x2: 0, y2: 330 }, [[0, '#fff1c8', 0.42], [1, '#fff1c8', 0]]), opacity: 0 }, svg);
+      gsap.set(beam, { svgOrigin: '500 52' });
+      const fx = 500, fy = sy - 140;
+      const halo = mk('circle', { cx: fx, cy: fy, r: 80, fill: grad(defs, 'fh' + uid, 'radialGradient', { cx: fx, cy: fy, r: 80 }, [[0, '#ffe6a6', 0.55], [1, GOLD, 0]]), opacity: 0 }, svg);
+      const face = line(svg, `M${fx + 34},${fy} A34,34 0 1 1 ${fx - 34},${fy} A34,34 0 1 1 ${fx + 34},${fy} M${fx - 12},${fy - 9} L${fx - 12},${fy - 4} M${fx + 12},${fy - 9} L${fx + 12},${fy - 4} M${fx - 16},${fy + 10} Q${fx},${fy + 25} ${fx + 16},${fy + 10}`, { c: GOLD, w: 3 });
+      const l1 = text(svg, 500, 512, '看见那张脸在笑，就不怕了', { s: 34, c: GOLD });
+      const l2 = text(svg, 500, 512, '座位空着，心里也是空的', { s: 34, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const t0 = AT(s.at);
+      DRAW(tl, stage, t0, 1.0); DRAW(tl, kid, t0 + 0.3, 1.0); seatsG.forEach((g, i) => DRAW(tl, g, t0 + 0.5 + i * 0.15, 0.9));
+      gsap.set(face._p, { strokeDashoffset: 1.01 }); gsap.set([l1, l2], { opacity: 0 });
+      if (s.look !== undefined) { const tk = AT(s.look);
+        tl.fromTo(beam, { opacity: 0, rotation: 38 }, { opacity: 1, rotation: 38, duration: 0.4, immediateRender: false }, tk);
+        tl.to(beam, { rotation: -38, duration: 2.2, ease: 'sine.inOut' }, tk + 0.3); tl.to(beam, { rotation: 0, duration: 1.0, ease: 'sine.inOut' }, tk + 2.5); }
+      if (s.face !== undefined) { const tf = AT(s.face);
+        DRAW(tl, face, tf, 0.9); tl.to(halo, { opacity: 1, duration: 1.0 }, tf + 0.3); SHOW(tl, l1, tf + 0.5); }
+      if (s.empty !== undefined) { const te = AT(s.empty);
+        tl.to([face, halo], { opacity: 0, duration: 0.9 }, te); tl.to(l1, { opacity: 0, duration: 0.5 }, te); tl.to(beam, { opacity: 0.4, duration: 0.9 }, te); SHOW(tl, l2, te + 0.4); }
+    },
+    // 一粒麦子：在上面是一粒 → 落进土里、暗下去（死了） → 扎根、发芽、长高 → 结出一穗许多子粒
+    seed({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 540);
+      const GY = 340, X = 600;
+      const soil = mk('path', { d: `M120,${GY} L940,${GY} L940,540 L120,540 Z`, fill: grad(defs, 'sl' + uid, 'linearGradient', { x1: 0, y1: GY, x2: 0, y2: 540 }, [[0, '#7a5a3a', 0.45], [1, '#2a1d12', 0.05]]), opacity: 0 }, svg);
+      const ground = line(svg, `M120,${GY} C380,${GY - 6} 700,${GY + 6} 940,${GY}`, { c: '#cdb38a', w: 3, go: 0.2 });
+      const grain = mk('g', { opacity: 0 }, svg);
+      const gBody = mk('ellipse', { cx: 0, cy: 0, rx: 15, ry: 25, fill: 'rgba(226,189,118,.38)', stroke: GOLD, 'stroke-width': 3 }, grain);
+      mk('path', { d: 'M0,-19 L0,19', stroke: GOLD, 'stroke-width': 2, opacity: 0.7 }, grain);
+      gsap.set(grain, { x: X, y: 110 });
+      const roots = line(svg, `M${X},${GY + 40} C${X - 10},${GY + 76} ${X - 30},${GY + 96} ${X - 46},${GY + 128} M${X},${GY + 40} C${X + 10},${GY + 80} ${X + 32},${GY + 100} ${X + 50},${GY + 130} M${X},${GY + 42} L${X},${GY + 120}`, { c: '#cdb38a', w: 2.4, go: 0.2 });
+      const stem = line(svg, `M${X},${GY + 34} C${X - 2},270 ${X + 4},200 ${X},130`, { c: '#a9d394', w: 4, go: 0.3 });
+      const leaves = line(svg, `M${X},262 C${X - 30},244 ${X - 52},250 ${X - 74},232 M${X},222 C${X + 30},204 ${X + 52},210 ${X + 74},192`, { c: '#a9d394', w: 3.2, go: 0.3 });
+      const kernels = [];
+      for (let i = 0; i < 14; i++) { const side = i % 2 ? 1 : -1, y = 122 - Math.floor(i / 2) * 14, kx = X + side * 11;
+        kernels.push(mk('ellipse', { cx: kx, cy: y, rx: 7, ry: 12, transform: `rotate(${side * 22} ${kx} ${y})`, fill: 'rgba(226,189,118,.45)', stroke: GOLD, 'stroke-width': 2.2, opacity: 0 }, svg)); }
+      const l1 = text(svg, 300, 120, '仍旧是一粒', { s: 34, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const l2 = text(svg, 300, 300, '落在地里死了', { s: 34, c: PAPER, font: 'LXGW WenKai', wt: 400 });
+      const l3 = text(svg, 300, 190, '结出许多子粒来', { s: 38, c: GOLD });
+      const t0 = AT(s.at);
+      tl.to(soil, { opacity: 1, duration: 0.8 }, t0); DRAW(tl, ground, t0, 1.0); tl.to(grain, { opacity: 1, duration: 0.6 }, t0 + 0.4);
+      gsap.set([l1, l2, l3], { opacity: 0 }); [roots, stem, leaves].forEach(g => gsap.set(g._p, { strokeDashoffset: 1.01 }));
+      if (s.one !== undefined) SHOW(tl, l1, AT(s.one));
+      if (s.die !== undefined) { const td = AT(s.die);
+        tl.to(l1, { opacity: 0.25, duration: 0.6 }, td);
+        tl.to(grain, { y: GY + 34, rotation: 70, duration: 1.0, ease: 'power2.in' }, td);
+        tl.to(gBody, { attr: { fill: 'rgba(120,96,60,.35)' }, duration: 0.8 }, td + 1.0); tl.to(grain, { opacity: 0.55, duration: 0.8 }, td + 1.0);
+        SHOW(tl, l2, td + 0.9); }
+      if (s.grow !== undefined) { const tg = AT(s.grow);
+        DRAW(tl, roots, tg, 1.0); DRAW(tl, stem, tg + 0.5, 1.4); DRAW(tl, leaves, tg + 1.4, 1.0); tl.to(l2, { opacity: 0.35, duration: 0.6 }, tg + 0.5); }
+      if (s.many !== undefined) { const tm = AT(s.many);
+        kernels.forEach((k, i) => tl.fromTo(k, { opacity: 0, scale: 0.4, svgOrigin: `${X} 100` }, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', immediateRender: false }, tm + i * 0.09));
+        SHOW(tl, l3, tm + 0.6); }
+    },
+    // 死，是门，不是墙：一堵砖墙 → 中间的砖淡去，现出一扇门 → 门打开，门那边是光
+    doorwall({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 540);
+      const X0 = 170, X1 = 830, Y0 = 70, Y1 = 470, BH = 40, BW = 110, DX0 = 430, DX1 = 570, DY0 = 190;
+      const inDoor = (x, y) => x > DX0 - 2 && x < DX1 + 2 && y > DY0 - 2;
+      let outer = `M${X0},${Y0} L${X1},${Y0} L${X1},${Y1} L${X0},${Y1} Z`, inner = '';
+      for (let y = Y0 + BH, r = 0; y < Y1; y += BH, r++) {               // 横缝：门洞里的那一截归 inner
+        if (y > DY0) { outer += ` M${X0},${y} L${DX0},${y} M${DX1},${y} L${X1},${y}`; inner += ` M${DX0},${y} L${DX1},${y}`; } else outer += ` M${X0},${y} L${X1},${y}`;
+      }
+      for (let y = Y0, r = 0; y < Y1; y += BH, r++) for (let x = X0 + (r % 2 ? BW / 2 : BW); x < X1; x += BW) {
+        const seg = ` M${x},${y} L${x},${Math.min(Y1, y + BH)}`; if (inDoor(x, y + BH / 2)) inner += seg; else outer += seg; }
+      const light = mk('rect', { x: DX0, y: DY0, width: DX1 - DX0, height: Y1 - DY0, fill: grad(defs, 'dl' + uid, 'radialGradient', { cx: 500, cy: 330, r: 220 }, [[0, '#fff6d8', 0.95], [0.6, '#ffe2a0', 0.55], [1, '#e2bd76', 0.15]]), opacity: 0 }, svg);
+      const rays = mk('path', { d: `M${DX0},${Y1} L${DX0 - 160},540 L${DX1 + 160},540 L${DX1},${Y1} Z`, fill: grad(defs, 'dr' + uid, 'linearGradient', { x1: 0, y1: Y1, x2: 0, y2: 540 }, [[0, '#fff1c8', 0.4], [1, '#fff1c8', 0]]), opacity: 0 }, svg);
+      const wallO = line(svg, outer, { c: '#b9ab90', w: 2.4, go: 0.12 });
+      const wallI = line(svg, inner, { c: '#b9ab90', w: 2.4, go: 0.12 });
+      const frame = line(svg, `M${DX0},${Y1} L${DX0},${DY0} L${DX1},${DY0} L${DX1},${Y1}`, { c: GOLD, w: 3.6 });
+      const leaf = mk('rect', { x: DX0 + 3, y: DY0 + 3, width: DX1 - DX0 - 6, height: Y1 - DY0 - 3, fill: 'rgba(40,30,20,.85)', stroke: GOLD, 'stroke-width': 2, opacity: 0 }, svg);
+      gsap.set(leaf, { svgOrigin: `${DX0} ${(DY0 + Y1) / 2}` });
+      const lW = text(svg, 500, 44, '墙', { s: 38, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const lD = text(svg, 500, 44, '门', { s: 40, c: GOLD });
+      const lO = text(svg, 500, 525, '门那边，是你的脸', { s: 36, c: GOLD });
+      const t0 = AT(s.at); DRAW(tl, wallO, t0, 1.4); DRAW(tl, wallI, t0, 1.4); SHOW(tl, lW, t0 + 0.8);
+      gsap.set(frame._p, { strokeDashoffset: 1.01 }); gsap.set([lD, lO], { opacity: 0 });
+      if (s.door !== undefined) { const td = AT(s.door);
+        tl.to(wallI, { opacity: 0, duration: 0.9 }, td); DRAW(tl, frame, td + 0.3, 1.0); tl.to(leaf, { opacity: 1, duration: 0.6 }, td + 0.6);
+        tl.to(lW, { opacity: 0, duration: 0.5 }, td); SHOW(tl, lD, td + 0.6); }
+      if (s.open !== undefined) { const to = AT(s.open);
+        tl.to(leaf, { scaleX: 0.12, duration: 1.3, ease: 'power2.inOut' }, to); tl.to(light, { opacity: 1, duration: 1.2 }, to + 0.2); tl.to(rays, { opacity: 1, duration: 1.4 }, to + 0.5);
+        SHOW(tl, lO, to + 1.0); }
+    },
+    // 灵魂的屋子：小屋（狭隘）→ 撑大（扩充）；墙上屋顶裂缝（毁败）→ 一道道补好（修葺）；屋里一只柜子塞满、锁着 → 打开，亮了（我承认，我知道）
+    // s.big / s.fixed：这一场开始时屋子已经撑大了 / 已经补好了（接着上一场讲）
+    house({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 540);
+      const cx = 500, by = 470, W = 230, H = 160, K = 1.42;
+      const g = mk('g', {}, svg); gsap.set(g, { svgOrigin: `${cx} ${by}` });
+      const body = line(g, `M${cx - W / 2},${by} L${cx - W / 2},${by - H} L${cx + W / 2},${by - H} L${cx + W / 2},${by} Z`, { c: PAPER, w: 3 });
+      const roof = line(g, `M${cx - W / 2 - 24},${by - H} L${cx},${by - H - 100} L${cx + W / 2 + 24},${by - H}`, { c: PAPER, w: 3 });
+      const door = line(g, `M${cx + 40},${by} L${cx + 40},${by - 74} L${cx + 84},${by - 74} L${cx + 84},${by}`, { c: '#cdbfa3', w: 2.4, go: 0.15 });
+      const cracks = line(g, `M${cx - 80},${by - H} L${cx - 70},${by - H + 30} L${cx - 84},${by - H + 52} L${cx - 72},${by - H + 84} M${cx + 20},${by - H - 72} L${cx + 34},${by - H - 46} L${cx + 22},${by - H - 26} M${cx + W / 2},${by - 120} L${cx + W / 2 - 16},${by - 104} L${cx + W / 2 - 8},${by - 86}`, { c: CORAL, w: 2.6, go: 0.25 });
+      const patches = line(g, `M${cx - 92},${by - H + 22} L${cx - 62},${by - H + 22} M${cx - 92},${by - H + 64} L${cx - 62},${by - H + 64} M${cx + 10},${by - H - 52} L${cx + 42},${by - H - 52} M${cx + W / 2 - 30},${by - 104} L${cx + W / 2},${by - 104}`, { c: GOLD, w: 3 });
+      const cab = mk('g', {}, g), cbx = cx - 86, cby = by - 96, cw = 74, ch = 96;
+      const cabBox = line(cab, `M${cbx},${cby} L${cbx + cw},${cby} L${cbx + cw},${cby + ch} L${cbx},${cby + ch} Z`, { c: '#cdbfa3', w: 2.4, go: 0.15 });
+      const cabLight = mk('rect', { x: cbx + 2, y: cby + 2, width: cw - 4, height: ch - 4, fill: grad(defs, 'cl' + uid, 'radialGradient', { cx: cbx + cw / 2, cy: cby + ch / 2, r: 70 }, [[0, '#fff6d8', 0.95], [1, '#e2bd76', 0.25]]), opacity: 0 }, cab);
+      const stuff = line(cab, `M${cbx + cw},${cby + 30} l14,-8 l6,10 M${cbx + cw},${cby + 58} l18,4 l-4,10 M${cbx + 10},${cby} l-6,-14 l12,-4`, { c: CORAL, w: 2.2, go: 0.2 });
+      const leafC = mk('rect', { x: cbx, y: cby, width: cw, height: ch, fill: 'rgba(52,40,28,.9)', stroke: '#cdbfa3', 'stroke-width': 2 }, cab);
+      const lock = mk('circle', { cx: cbx + cw - 12, cy: cby + ch / 2, r: 5, fill: 'none', stroke: GOLD, 'stroke-width': 2 }, cab);
+      gsap.set(leafC, { svgOrigin: `${cbx} ${cby + ch / 2}` });
+      const lab = (t, c, y) => text(svg, 500, y, t, { s: 36, c, font: c === GOLD ? 'Noto Serif SC' : 'LXGW WenKai', wt: c === GOLD ? 500 : 400 });
+      const lNarrow = lab('狭隘：装不下你', '#cdbfa3', 40), lGrow = lab('请你加以扩充', GOLD, 40);
+      const lRuin = lab('毁败：墙裂了，屋顶漏水', '#cdbfa3', 40), lFix = lab('请你加以修葺', GOLD, 40);
+      const lHide = lab('塞进柜子，把门一关', '#cdbfa3', 40), lOpen = lab('我承认，我知道', GOLD, 40);
+      const labs = [lNarrow, lGrow, lRuin, lFix, lHide, lOpen]; gsap.set(labs, { opacity: 0 });
+      gsap.set(cracks._p, { strokeDashoffset: 1.01 }); gsap.set(patches._p, { strokeDashoffset: 1.01 }); gsap.set(cab, { opacity: 0 });
+      if (s.big) gsap.set(g, { scale: K });
+      const t0 = AT(s.at); DRAW(tl, body, t0, 1.1); DRAW(tl, roof, t0 + 0.3, 1.0); DRAW(tl, door, t0 + 0.6, 0.8);
+      if (s.fixed) { gsap.set(cracks, { opacity: 0 }); DRAW(tl, patches, t0 + 0.6, 0.8); }
+      const swap = (from, to, t) => { if (from) tl.to(from, { opacity: 0, duration: 0.5 }, t); SHOW(tl, to, t + 0.3); };
+      let cur = null;
+      if (s.narrow !== undefined) { swap(cur, lNarrow, AT(s.narrow)); cur = lNarrow; }
+      if (s.grow !== undefined) { const tg = AT(s.grow); tl.to(g, { scale: K, duration: 1.6, ease: 'power2.inOut' }, tg); swap(cur, lGrow, tg); cur = lGrow; }
+      if (s.crack !== undefined) { const tc = AT(s.crack); DRAW(tl, cracks, tc, 0.9); swap(cur, lRuin, tc); cur = lRuin; }
+      if (s.fix !== undefined) { const tf = AT(s.fix); tl.to(cracks, { opacity: 0, duration: 0.9 }, tf); DRAW(tl, patches, tf + 0.3, 1.0); swap(cur, lFix, tf); cur = lFix; }
+      if (s.hide !== undefined) { const th = AT(s.hide); tl.to(cab, { opacity: 1, duration: 0.6 }, th); DRAW(tl, cabBox, th, 0.7); DRAW(tl, stuff, th + 0.4, 0.7); swap(cur, lHide, th); cur = lHide; }
+      if (s.open !== undefined) { const to = AT(s.open); tl.to(leafC, { scaleX: 0.1, duration: 1.1, ease: 'power2.inOut' }, to); tl.to(lock, { opacity: 0, duration: 0.4 }, to);
+        tl.to(cabLight, { opacity: 1, duration: 1.0 }, to + 0.3); tl.to(stuff, { opacity: 0.4, duration: 0.8 }, to + 0.3); swap(cur, lOpen, to); cur = lOpen; }
+    },
+    // 一层一层加滤镜：一张自拍（简笔头像）→ 美颜、滤镜、磨皮一层层盖上去，线条越来越虚 → 一层层揭掉，露出本来的样子
+    filters({ tl, el, AT, s }) {
+      const { svg, defs, uid } = base(el, 540);
+      const fx = 330, fy = 280, FW = 300, FH = 400;
+      const frame = line(svg, `M${fx - FW / 2 + 18},${fy - FH / 2} L${fx + FW / 2 - 18},${fy - FH / 2} Q${fx + FW / 2},${fy - FH / 2} ${fx + FW / 2},${fy - FH / 2 + 18} L${fx + FW / 2},${fy + FH / 2 - 18} Q${fx + FW / 2},${fy + FH / 2} ${fx + FW / 2 - 18},${fy + FH / 2} L${fx - FW / 2 + 18},${fy + FH / 2} Q${fx - FW / 2},${fy + FH / 2} ${fx - FW / 2},${fy + FH / 2 - 18} L${fx - FW / 2},${fy - FH / 2 + 18} Q${fx - FW / 2},${fy - FH / 2} ${fx - FW / 2 + 18},${fy - FH / 2} Z`, { c: PAPER, w: 3 });
+      const bf = mk('filter', { id: 'pb' + uid, x: '-30%', y: '-30%', width: '160%', height: '160%' }, defs); const blurE = mk('feGaussianBlur', { stdDeviation: 0 }, bf);
+      const pg = mk('g', { filter: `url(#pb${uid})` }, svg);
+      const hy = fy - 50;
+      const person = line(pg, `M${fx + 62},${hy} A62,62 0 1 1 ${fx - 62},${hy} A62,62 0 1 1 ${fx + 62},${hy} M${fx - 22},${hy - 10} L${fx - 22},${hy - 4} M${fx + 22},${hy - 10} L${fx + 22},${hy - 4} M${fx - 20},${hy + 26} Q${fx},${hy + 38} ${fx + 20},${hy + 26} M${fx - 120},${fy + 190} C${fx - 116},${fy + 90} ${fx - 70},${fy + 40} ${fx},${fy + 40} C${fx + 70},${fy + 40} ${fx + 116},${fy + 90} ${fx + 120},${fy + 190}`, { c: GOLD, w: 3.2 });
+      const cols = ['rgba(255,170,195,.30)', 'rgba(255,214,140,.30)', 'rgba(255,255,255,.26)'];
+      const layers = cols.map(c => mk('rect', { x: fx - FW / 2 + 3, y: fy - FH / 2 + 3, width: FW - 6, height: FH - 6, rx: 16, fill: c, opacity: 0 }, svg));
+      const names = ['美颜', '滤镜', '磨皮'].map((t, i) => text(svg, 760, 170 + i * 70, t, { s: 36, c: '#e8c6c0', font: 'LXGW WenKai', wt: 400 }));
+      const strike = names.map((n, i) => line(svg, `M705,${158 + i * 70} L815,${158 + i * 70}`, { c: '#cdbfa3', w: 2.4, go: 0.1 }));
+      const lMir = text(svg, 760, 410, '镜子里那个人才是假的？', { s: 30, c: '#cdbfa3', font: 'LXGW WenKai', wt: 400 });
+      const lReal = text(svg, 760, 470, '不再给自己修图', { s: 38, c: GOLD });
+      const t0 = AT(s.at); DRAW(tl, frame, t0, 1.0); DRAW(tl, person, t0 + 0.4, 1.2);
+      gsap.set([...names, lMir, lReal], { opacity: 0 }); strike.forEach(g => gsap.set(g._p, { strokeDashoffset: 1.01 }));
+      const tL = s.layers !== undefined ? AT(s.layers) : t0 + 1.5;
+      layers.forEach((L, i) => { const t = tL + i * 0.9; tl.to(L, { opacity: 1, duration: 0.7 }, t); SHOW(tl, names[i], t + 0.1); tl.to(blurE, { attr: { stdDeviation: 1.6 * (i + 1) }, duration: 0.7 }, t); });
+      if (s.mirror !== undefined) SHOW(tl, lMir, AT(s.mirror));
+      if (s.real !== undefined) { const tr = AT(s.real);
+        layers.slice().reverse().forEach((L, i) => { const t = tr + i * 0.45; tl.to(L, { opacity: 0, duration: 0.5 }, t); DRAW(tl, strike[2 - i], t, 0.4); tl.to(names[2 - i], { opacity: 0.35, duration: 0.5 }, t); });
+        tl.to(blurE, { attr: { stdDeviation: 0 }, duration: 1.2 }, tr); tl.to(lMir, { opacity: 0.25, duration: 0.6 }, tr); SHOW(tl, lReal, tr + 1.0); }
+    },
   };
 })();
