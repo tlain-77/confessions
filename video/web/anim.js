@@ -1196,7 +1196,7 @@
       if (s.fix !== undefined) { const tf = AT(s.fix); tl.to(cracks, { opacity: 0, duration: 0.9 }, tf); DRAW(tl, patches, tf + 0.3, 1.0); swap(cur, lFix, tf); cur = lFix; }
       if (s.hide !== undefined) { const th = AT(s.hide); tl.to(cab, { opacity: 1, duration: 0.6 }, th); DRAW(tl, cabBox, th, 0.7); DRAW(tl, stuff, th + 0.4, 0.7); swap(cur, lHide, th); cur = lHide; }
       if (s.open !== undefined) { const to = AT(s.open); tl.to(leafC, { scaleX: 0.1, duration: 1.1, ease: 'power2.inOut' }, to); tl.to(lock, { opacity: 0, duration: 0.4 }, to);
-        tl.to(cabLight, { opacity: 1, duration: 1.0 }, to + 0.3); tl.to(stuff, { opacity: 0.4, duration: 0.8 }, to + 0.3); swap(cur, lOpen, to); cur = lOpen; }
+        tl.to(cabLight, { opacity: 1, duration: 1.0 }, to + 0.3); tl.to(stuff, { opacity: 0.4, duration: 0.8 }, to + 0.3); swap(cur, lOpen, s.say !== undefined ? AT(s.say) - 0.3 : to); cur = lOpen; }   // say：“我承认，我知道”说到时才出字
     },
     // 一层一层加滤镜：一张自拍（简笔头像）→ 美颜、滤镜、磨皮一层层盖上去，线条越来越虚 → 一层层揭掉，露出本来的样子
     filters({ tl, el, AT, s }) {
