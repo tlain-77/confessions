@@ -139,6 +139,11 @@
 | samuel.jpg | 雷诺兹《幼年撒母耳》 1776 | Wikimedia Commons: Joshua Reynolds (1723-1792) - The Infant Samuel - N00162 - National Gallery.jpg |
 | arnolfini.jpg | 凡·艾克《阿尔诺芬尼夫妇像》 1434 | Wikimedia Commons（英国国家美术馆）: Van Eyck - Arnolfini Portrait.jpg |
 | pearl.jpg | 菲蒂（工作室）《重价的珠子》 17世纪 | Wikimedia Commons: Domenico Fetti La Perle de grand prix DSCF2652.JPG —— 照片作者 DamTESC，许可 CC BY-SA 3.0（https://creativecommons.org/licenses/by-sa/3.0/），画面经缩小 |
+| cradle.jpg | 贝尔特·莫里索《摇篮》 1872 | Wikimedia Commons: Berthe Morisot - The Cradle - Google Art Project.jpg |
+| harvest.jpg | 老彼得·勃鲁盖尔《收割者》 1565 | Wikimedia Commons: Pieter Bruegel the Elder- The Harvesters - Google Art Project.jpg |
+| dehooch.jpg | 彼得·德·霍赫《摇篮边系胸衣的母亲》 1659—1660 | Wikimedia Commons: Pieter de Hooch - Mother Lacing Her Bodice beside a Cradle - WGA11698.jpg |
+| breakfast.jpg | 玛丽·卡萨特《床上的早餐》 1897 | Wikimedia Commons: Breakfast in Bed (1897) by Mary Cassatt, Huntington Library.jpg |
+| footwash.jpg | 福特·马多克斯·布朗《耶稣为彼得洗脚》 1852—1856 | Wikimedia Commons: Jesus washing Peter's feet.jpg |
 
 `soft/`、`blur/` 里是同一批画的柔化版和模糊版（tools/focus.py 生成），用作逐句换背景的底图。
 

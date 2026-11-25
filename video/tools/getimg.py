@@ -41,6 +41,6 @@ print(f'{title}\n  {ii["width"]}x{ii["height"]}  license: {lic}\n  artist: {art[
 os.makedirs('web/img', exist_ok=True)
 raw = f'out/img_{name}.raw'
 open(raw, 'wb').write(fetch(url, 120))
-subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', raw, '-vf', f"scale='min({width},iw)':-2:flags=lanczos", '-q:v', '3', f'web/img/{name}.jpg'], check=True)
+subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', raw, '-vf', f"scale='min({width},iw)':-2:flags=lanczos", '-q:v', '3', f'web/img/{name}.jpg'], check=True, stdin=subprocess.DEVNULL)   # 不读标准输入（在 while read 循环里会吃掉下一行的字）
 os.remove(raw)
 print('  saved', f'web/img/{name}.jpg', os.path.getsize(f'web/img/{name}.jpg') // 1024, 'KB')

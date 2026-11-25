@@ -13,7 +13,7 @@ for block in raw.split('\n\n'):
     b = block.strip()
     if not b or b.startswith('【'): continue
     if b.startswith('## '):
-        sec = b[3:].split('、', 1)[-1].strip(); continue
+        sec = re.sub(r'^[一二三四五六七八九十]+、', '', b[3:]).strip(); continue      # 只去掉“一、”这种编号；“第四句、第五句”整个保留
     if b.startswith('### '):
         sec = b[4:].strip(); continue
     # sentence split, keep end punctuation; keep a quoted list together
