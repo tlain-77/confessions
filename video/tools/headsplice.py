@@ -78,11 +78,11 @@ run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', raw, '-vf', 'fps=30,format
 assert nframes(head) == k
 assert extradata(head) == A0, ('参数头不同，不能直接拼', extradata(head).hex(), A0.hex())
 
-# 4) 新开头 + 原片 K 以后的视频（拷贝）+ 原片音轨（拷贝）
+# 4) 新开头 + 原片 K 以后的视频（拷贝）+ 原片音轨（拷贝）。auto_convert 关掉：不然拼接器会往每个关键帧里再塞一份 SPS/PPS
 lst = f'{W}/list.txt'
 open(lst, 'w').write(f"file '{os.path.abspath(head)}'\nfile '{os.path.abspath(src)}'\ninpoint {K:.6f}\n")
 tmp = dst + '.tmp.mp4'
-run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', lst, '-i', src, '-map', '0:v', '-map', '1:a', '-c', 'copy',
+run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-auto_convert', '0', '-i', lst, '-i', src, '-map', '0:v', '-map', '1:a', '-c', 'copy',
      '-movflags', '+faststart', tmp])
 
 # 5) 核对
