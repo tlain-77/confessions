@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>动画预览</title>
+<!-- 单独看一段动画：animtest.html?page=self10&anim=child&n=0（第 n 个叫这个名字的动画；用真的录音时刻），
+     tools/animsheet.mjs 用它一格一格截图拼成总览图。&bg=画名 可以垫一张背景画（看在画上清不清楚）。 -->
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/cormorant-garamond/500.css">
+<link rel="stylesheet" href="/node_modules/lxgw-wenkai-webfont/lxgwwenkai-regular.css">
+<link rel="stylesheet" href="ep1.css">
+<link rel="stylesheet" href="lec.css">
+<style>
+  html, body { margin: 0; background: #05060a; overflow: hidden }
+  #box { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: flex; align-items: center; justify-content: center;
+         background: radial-gradient(ellipse 70% 60% at 50% 45%, #141519 0%, #07080b 70%); }
+  #bgimg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(6px) brightness(.42); }
+  #sub { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; color: #e8dcc4; font: 32px 'LXGW WenKai'; text-shadow: 0 2px 6px #000 }
+  #tc { position: absolute; left: 24px; top: 16px; color: #ffd36b; font: 26px monospace }
+  #a { position: relative }
+</style>
+</head>
+<body>
+<div id="box"><div id="bgimg"></div><div id="a"></div></div>
+<div id="sub"></div><div id="tc"></div>
+<script src="/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  window.atP = function (D, phrase, nth = 0) {
+    const S = D.chars.map(c => c[0]).join(''); let i = -1;
+    for (let k = 0; k <= nth; k++) { i = S.indexOf(phrase, i + 1); if (i < 0) throw new Error('录音里找不到：' + phrase); }
+    return D.chars[i][1];
+  };
+  const Q = new URLSearchParams(location.search), PG = Q.get('page') || 'self10';
+  const load = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error(src)); document.head.appendChild(s); });
+  (async () => {
+    for (const f of [PG + '_data.js', 'anim.js', 'fig.js', 'ill.js', PG + '_lec.js']) await load(f);
+    await window.ILL_LOAD(); await document.fonts.ready;
+    const D = window.EPD || window.EP; const P = (p, n = 0) => atP(D, p, n);
+    const AT = a => typeof a === 'number' ? a : Array.isArray(a) ? P(a[0], a[1]) : a && typeof a === 'object' ? P(a.p, a.n || 0) + (a.d || 0) : P(a);
+    const name = Q.get('anim'), nth = +(Q.get('n') || 0);
+    let k = 0, it = null, sc = null, si = -1;
+    if (Q.get('demo')) { it = { anim: name, at: 0.5, w: +(Q.get('w') || 1150) }; sc = { at: 0 }; }   // 试姿势用：不在场景表里，时刻直接是秒
+    else LEC.forEach((S, i) => (S.items || []).forEach(x => { if (x.anim === name) { if (k === nth) { it = x; sc = S; si = i; } k++; } }));
+    if (!it) throw new Error('场景表里没有这个动画：' + name);
+    if (Q.get('bg')) document.getElementById('bgimg').style.backgroundImage = `url(img/${Q.get('bg')}.jpg)`;
+    const el = document.getElementById('a');
+    const replay = window.ANIM_BUILD(name, el, it, AT); if (it.w) el.style.setProperty('--aw', it.w + 'px');
+    const tl = gsap.timeline({ paused: true }); replay(tl);
+    const t0 = AT(sc.at), t1 = Q.get('demo') ? +(Q.get('dur') || 12) : si + 1 < LEC.length ? AT(LEC[si + 1].at) : D.total;
+    for (let t = 0; t <= t1 + .05; t += 1 / 30) tl.time(t, true);
+    tl.time(0, true);
+    window.RANGE = [t0, t1];
+    window.seek = t => { tl.time(t, false); document.getElementById('tc').textContent = t.toFixed(2);
+      const c = D.cues.find(c => c.start <= t && t < c.end + .25); document.getElementById('sub').textContent = c ? c.sub : ''; };
+    window.READY = true;
+  })().catch(e => { document.body.insertAdjacentHTML('beforeend', `<pre style="color:#f88;font-size:22px;position:absolute;top:60px;left:20px">${e.stack}</pre>`); console.error(e); });
+</script>
+</body>
+</html>

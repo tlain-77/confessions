@@ -57,6 +57,8 @@
   const circ = (cx, cy, r) => `M${cx + r},${cy} A${r},${r} 0 1 1 ${cx - r},${cy} A${r},${r} 0 1 1 ${cx + r},${cy}`;
   const BOTTLE = 'M470,60 L470,150 C470,195 330,215 330,300 L330,498 Q330,520 352,520 L648,520 Q670,520 670,498 L670,300 C670,215 530,195 530,150 L530,60';
 
+  // 公用画法给别的文件用（fig.js：火柴人和各讲例子的动画）
+  window.AH = { mk, rng, base, line, text, DRAW, SHOW, grad, icon, circ, GOLD, PAPER, CORAL, WATER };
   // 记录器：动画函数在搭页面时就执行（这样 SVG 里的字能赶上字体预载）；“说到哪句话”的时刻那时已经能算，
   // 只有对时间轴的调用要先记下来，等时间轴建好，再按原顺序重放到真的时间轴上。
   window.ANIM_BUILD = (name, el, s, AT) => {
