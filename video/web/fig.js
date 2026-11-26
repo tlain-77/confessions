@@ -7,7 +7,7 @@
 // lean 是上身前倾（负的是后仰，-90 就是平躺、头在身后）；head 是低头（负的是抬头）。
 // 腿有两种算法：fk = 0（默认）脚踩在地上，按臀部高低自动弯膝（下蹲、走路都不会滑脚）；fk = 1 按 l1/k1/l2/k2 摆（坐、跪、躺）。
 (function () {
-  const { mk, rng, base, line, text, DRAW, SHOW, grad, icon, circ, GOLD, PAPER, CORAL, WATER } = window.AH;
+  const { mk, rng, line, text, DRAW, SHOW, grad, icon, circ, GOLD, PAPER, CORAL, WATER } = window.AH;
   const R = Math.PI / 180, TAU = Math.PI * 2;
   const n1 = v => Math.round(v * 10) / 10;
   const pt = (p) => `${n1(p[0])},${n1(p[1])}`;
@@ -432,6 +432,8 @@
   // ════════ 第八讲（卷一第六章上）的例子 ════════
   const A = window.ANIMS = window.ANIMS || {};
   const OPT = (AT, s, k, dflt) => s[k] !== undefined ? AT(s[k]) : dflt;
+  // 小人动画垫一层中间深、四边淡出去的底（背景名画还在四周，小人在安静的暗处）
+  const base = (el, h) => { el.classList.add('la-fig'); return window.AH.base(el, h); };
   // 椅子、桌子（侧面）：按坐着的人的身材算高度（坐姿的臀部高 = 小腿长）
   const chair = (par, P, x, y, f = 1, o = {}) => stroke(par, `M${x - f * P.H * .1},${y - P.SH} L${x + f * P.H * .13},${y - P.SH} M${x - f * P.H * .08},${y - P.SH} L${x - f * P.H * .08},${y} M${x + f * P.H * .11},${y - P.SH} L${x + f * P.H * .11},${y} M${x - f * P.H * .1},${y - P.SH} L${x - f * P.H * .14},${y - P.SH - P.H * .3}`, { c: o.c || '#bfae92', w: o.w || 3, op: o.op ?? .85 });
   const desk = (par, x0, x1, top, y, o = {}) => stroke(par, `M${x0 - 8},${top} L${x1 + 8},${top} M${x0},${top} L${x0},${y} M${x1},${top} L${x1},${y}`, { c: o.c || '#bfae92', w: o.w || 3.2, op: o.op ?? .85 });
@@ -523,10 +525,10 @@
     const cL = label(svg, 250, 524, '每一句，都可能被拿去当证据', { s: 27, c: '#e0b4a4' }), cR = label(svg, 750, 524, '最不体面的事，也可以说出来', { s: 27, c: WARM });
     gsap.set([tL, tR, cL, cR], { opacity: 0 });
     // 开场：法庭画出来，法官、那个人出来；说到“慈爱”，右边亮起来
-    DRAW(tl, div, t0, .9); SHOW(tl, tL, t0 + .2);
+    DRAW(tl, div, t0, .9); SHOW(tl, tL, t0 + 1.1);
     tl.to(bench, { opacity: 1, duration: .9 }, t0 + .9); judge.show(tl, t0 + 1.1, .9); man.show(tl, t0 + .5, .8, { y: 8 });
     judge.breathe(tl, t0, tM + 6); man.breathe(tl, t0, tC);
-    tl.to(lightG, { opacity: .55, duration: 1.4 }, tM0); SHOW(tl, tR, tM0 + .2);
+    tl.to(lightG, { opacity: .55, duration: 1.4 }, tM0); SHOW(tl, tR, tM0 + 1.25);
     tl.to(lightG._rays, { rotation: 22, svgOrigin: '820 196', duration: tS - tM0 + 6, ease: 'none' }, tM0);
     // “在法官面前你得小心”：缩着、冒汗，法官敲槌
     man.pose(tl, tC, 'tense', .6); man.face(tl, tC, 'worry'); man.sweat(tl, tC + .4, tM - tC - .4);
@@ -663,9 +665,9 @@
     tl.to(ch0, { opacity: 1, duration: .8 }, t0); ad.show(tl, t0, .8); ad.breathe(tl, t0, tLove + 3);
     kid.show(tl, t0 + .2, .4); kid.walk(tl, t0 + .2, 430, 1.6, { stride: 52 }); kid.face(tl, t0 + 1.9, 'neutral');
     // 讲大事
-    kid.talk(tl, tTalk, tLaugh - tTalk - .2, 'talk', 'look'); POP(tl, bub, tTalk + .1);
+    kid.talk(tl, tTalk, tLaugh - tTalk - .2, 'talk', 'look'); POP(tl, bub, tTalk + 1.05);
     kid.pose(tl, tTalk, { a1: 60, e1: 50, a2: 40, e2: 60 }, .4);
-    tl.fromTo(big, { scale: .8, transformOrigin: '50% 50%' }, { scale: 1.08, duration: .3, yoyo: true, repeat: 3, ease: 'sine.inOut', immediateRender: false }, tTalk + .4);
+    tl.fromTo(big, { scale: .8, transformOrigin: '50% 50%' }, { scale: 1.08, duration: .3, yoyo: true, repeat: 3, ease: 'sine.inOut', immediateRender: false }, tTalk + 1.3);
     kid.face(tl, tFrown, 'talkf', .2);
     const mo = kid.faces.talkf._mo, ry = +mo.getAttribute('ry'); tl.fromTo(mo, { attr: { ry: ry * .35 } }, { attr: { ry: ry * 1.25 }, duration: .085, yoyo: true, repeat: 2 * Math.round((tLaugh - tFrown) / .17) - 1, ease: 'sine.inOut', immediateRender: false }, tFrown);
     kid.gesture(tl, tHand - .1, tLaugh - tHand + .1, 1.3, 2.2); kid.hop(tl, tHand, 10, 3, .2);
@@ -863,7 +865,7 @@
     DRAW(tl, thM, tHer, 1.1); tl.fromTo(womb, { opacity: 0, scale: .3, svgOrigin: `420 ${GY - 104}` }, { opacity: 1, scale: 1, svgOrigin: `420 ${GY - 104}`, duration: 1.2, ease: 'sine.out', immediateRender: false }, tHer + .9);
     tl.to(cap, { opacity: 0, duration: .5 }, tUsed - .4);
     SHOW(tl, lU1, tUsed);
-    SHOW(tl, lG, tGod); tl.to(womb, { scale: 1.5, svgOrigin: `420 ${GY - 104}`, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, tGod);
+    SHOW(tl, lG, tGod + 1.0); tl.to(womb, { scale: 1.5, svgOrigin: `420 ${GY - 104}`, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, tGod);
     kid.face(tl, tGod, 'smile');
   };
 
@@ -970,7 +972,7 @@
     const lDeep = label(svg, 560, 56, '“神布置在事物深处所蕴藏的”', { s: 34, c: GOLD });
     gsap.set([lMom, lNur, lCant, lDeep], { opacity: 0 });
     // 开场
-    DRAW(tl, arch, t0 + .4, 1.4); mom.show(tl, t0, .9); mom.breathe(tl, t0, tDeep + 5); SHOW(tl, lMom, t0 + .6);
+    DRAW(tl, arch, t0 + .4, 1.4); mom.show(tl, t0, .9); mom.breathe(tl, t0, tDeep + 5); SHOW(tl, lMom, tSelf + .3);
     tl.to(earth, { opacity: 1, duration: 1.2 }, t0 + .2);
     bb.face(tl, tSelf, 'suck'); mom.to(tl, tSelf, .6, { head: 26 });
     nur.show(tl, tNurse - .4, .5); nur.walk(tl, tNurse - .4, 648, 1.6); nur.pose(tl, tNurse + 1.3, 'bow', .6); nur.pose(tl, tNurse + 2.2, 'stand', .6); SHOW(tl, lNur, tNurse + 1.2);
@@ -979,7 +981,7 @@
     // 喂不喂，可以选
     tl.to(make, { opacity: .25, duration: .5 }, tChoose - .3);
     tl.to(ch, { opacity: 1, duration: .5 }, tChoose); tl.fromTo(pFeed, { scale: 1, transformOrigin: '50% 50%' }, { scale: 1.12, duration: .3, yoyo: true, repeat: 1, immediateRender: false }, tChoose + .5);
-    tl.to(pNo, { opacity: .5, duration: .4 }, tNot + .3);
+    gsap.set(pNo, { opacity: 0 }); tl.to(pNo, { opacity: .6, duration: .5 }, tNot + .3);
     // 有没有奶：决定不了
     tl.to(ch, { opacity: 0, duration: .5 }, tCant);
     tl.fromTo(dropG, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .6, immediateRender: false }, tCant + .2); SHOW(tl, lCant, tHas);
@@ -1034,7 +1036,7 @@
     cour.pose(tl, tSender - .4, 'stand', .4); cour.walk(tl, tSender - .2, 1060, 2.2); cour.fade(tl, tSender + 1.4, 0, .8);
     tl.to(sun, { opacity: 1, duration: 1 }, tSender); DRAW(tl, trace, tSender + .2, 1.4); tl.to(sun._rays, { rotation: 20, svgOrigin: '860 90', duration: tGod - tSender + 4, ease: 'none' }, tSender);
     you.to(tl, tSender + .6, .6, { head: -18 }); you.face(tl, tSender + .7, 'happy');
-    SHOW(tl, lC, tWho);
+    SHOW(tl, lC, tWho + 1.15);
     SHOW(tl, lG, tGod); tl.to(sun._disc, { attr: { r: 150 }, duration: 1.6, ease: 'sine.inOut' }, tGod);
   };
 
@@ -1121,8 +1123,333 @@
     const ch = mom.chestAt({ ...mom.cur }); gsap.set([heart], { x: ch[0] - 4, y: ch[1] }); gsap.set(hglow, { x: ch[0] - 4, y: ch[1] });
     tl.to(warmBeam, { opacity: 1, duration: 1.6 }, tGod); tl.to(beam, { opacity: .3, duration: 1.6 }, tGod);
     tl.fromTo(heart, { opacity: 0, scale: .3, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .8, ease: 'back.out(2)', immediateRender: false }, tGod + .4); tl.to(hglow, { opacity: 1, duration: 1 }, tGod + .4);
-    SHOW(tl, lName, tName);
+    SHOW(tl, lName, tName + 1.05);
     tl.to(heart, { scale: 1.3, transformOrigin: '50% 50%', duration: .6, yoyo: true, repeat: 3, ease: 'sine.inOut' }, tLove); tl.to(lName, { opacity: 0, duration: .5 }, tLove - .3); SHOW(tl, lLove, tLove);
+  };
+
+
+  // 一串光点沿着一条路流过去（一直流：p 从 0 到 n 圈，每帧按路径长度算位置）
+  function flow(tl, par, path, t0, t1, o = {}) {
+    const L = path.getTotalLength(), n = o.n || 6, g = mk('g', { opacity: 0 }, par), dots = [];
+    for (let i = 0; i < n; i++) dots.push(mk('circle', { r: o.r || 4.5, fill: o.c || '#fff1c8', filter: `url(#${figGlow(svgOf(par))})` }, g));
+    const st = { p: 0 }, sp = o.speed || .45;
+    const upd = () => dots.forEach((d, i) => { const q = ((st.p + i / n) % 1 + 1) % 1, pt = path.getPointAtLength(q * L); d.setAttribute('cx', n1(pt.x)); d.setAttribute('cy', n1(pt.y)); d.setAttribute('opacity', n1(Math.sin(q * Math.PI))); });
+    upd(); tl.to(g, { opacity: 1, duration: .6 }, t0);
+    tl.to(st, { p: (t1 - t0) * sp, duration: t1 - t0, ease: 'none', onUpdate: upd }, t0);
+    return g;
+  }
+
+  // 喂奶的人也得到了好处：母亲坐着摇孩子；身体上的、心里的；孩子吃饱了、睡着了 → 那份满足（心亮起来）→ 别的东西换不来（金币 ≠ 心）
+  A.give = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 410;
+    const t0 = AT(s.at), tBody = OPT(AT, s, 'body', t0 + 2.5), tHeart = OPT(AT, s, 'heart', tBody + 1.3), tWatch = OPT(AT, s, 'watch', tHeart + 1.8), tFull = OPT(AT, s, 'full', tWatch + 1.7),
+      tSleep = OPT(AT, s, 'sleep', tFull + .7), tJoy = OPT(AT, s, 'joy', tSleep + .9), tBuy = OPT(AT, s, 'buy', tJoy + 1.2);
+    ground(svg, 60, 940, GY, { a: .38 });
+    const warm = glow(svg, 380, 270, 230, { a: .5, c0: '#ffe9c4', c1: '#f6c98e' });
+    const mom = person(svg, { x: 380, y: GY, h: 300, op: 0, dress: true, veil: true }); mom.pose(tl, 0, 'sit', .01, { ...POSE.cradle(mom), fk: 1, hy: mom.TH, l1: 90, k1: -90, l2: 84, k2: -86, head: 26 }); mom.face(tl, 0, 'smile', .01);
+    const rc = stroke(svg, `M${380 - 30},${GY - mom.SH} L${380 + 30},${GY - mom.SH} M${380 - 26},${GY - mom.SH} L${380 - 34},${GY - mom.SH - 70} M${380 - 30},${GY - mom.SH} L${380 - 24},${GY - 6} M${380 + 26},${GY - mom.SH} L${380 + 22},${GY - 6} M${380 - 60},${GY - 4} Q${380},${GY + 10} ${380 + 60},${GY - 4}`, { c: '#bfae92', w: 3 });
+    const bb = baby(mom.root, { r: 17 }); mom.hold(bb, 'e1', 0, -15, 0, 1); bb.face(tl, 0, 'suck', .01);
+    const heart = mk('path', { d: HEART(0, 0, 14), fill: '#ffd98a', stroke: '#fff1c8', 'stroke-width': 1.6, opacity: 0 }, svg);
+    const ch = mom.chestAt({ ...mom.st, ...mom.cur }); gsap.set(heart, { x: ch[0] - 6, y: ch[1] - 4 });
+    const lB = label(svg, 190, 150, '身体上的', { s: 30, c: WARM }), lH = label(svg, 580, 150, '心里的', { s: 30, c: WARM });
+    const lJoy = label(svg, 380, 460, '那份满足', { s: 32, c: GOLD });
+    const ne = mk('g', { opacity: 0 }, svg);
+    mk('path', { d: HEART(680, 270, 22), fill: 'rgba(255,217,138,.35)', stroke: '#ffd98a', 'stroke-width': 2.4 }, ne);
+    label(ne, 755, 286, '≠', { s: 50, c: '#e0a08c', font: 'Noto Serif SC', wt: 700, ls: 0 });
+    [[820, 300], [846, 300], [833, 284], [872, 300]].forEach(([x, y]) => mk('ellipse', { cx: x, cy: y, rx: 15, ry: 6, fill: 'rgba(226,189,118,.3)', stroke: GOLD, 'stroke-width': 2 }, ne));
+    mk('path', { d: 'M880,244 L896,262 L880,290 L864,262 Z', fill: 'rgba(143,184,216,.25)', stroke: '#bfe0f6', 'stroke-width': 2 }, ne);
+    label(ne, 780, 360, '别的东西换不来', { s: 28, c: '#e0b4a4' });
+    gsap.set([lB, lH, lJoy], { opacity: 0 });
+    tl.to(rc, { opacity: .85, duration: .8 }, t0); mom.show(tl, t0, .8);
+    tl.to(mom.st, { lean: 6, duration: 1.2, yoyo: true, repeat: Math.floor((tBuy + 5 - t0) / 1.2), ease: 'sine.inOut', onUpdate: mom.draw }, t0 + .6);
+    SHOW(tl, lB, tBody); sparkle(tl, svg, ch[0] - 30, ch[1] + 40, tBody + .3, { r: 24 });
+    SHOW(tl, lH, tHeart); tl.fromTo(heart, { opacity: 0, scale: .3, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .7, ease: 'back.out(2)', immediateRender: false }, tHeart + .2);
+    bb.face(tl, tFull, 'content'); bb.face(tl, tSleep, 'sleep'); zzz(tl, svg, ch[0] + 70, ch[1] - 30, tSleep + .2, tBuy + 4 - tSleep, { s: 24 });
+    mom.face(tl, tWatch, 'happy');
+    tl.to([lB, lH], { opacity: .3, duration: .6 }, tJoy); SHOW(tl, lJoy, tJoy); tl.to(warm, { opacity: 1, duration: 1.4 }, tJoy);
+    tl.to(heart, { scale: 1.3, transformOrigin: '50% 50%', duration: .5, yoyo: true, repeat: 3, ease: 'sine.inOut' }, tJoy + .2); hearts(tl, svg, ch[0], ch[1] - 60, tJoy + .3, 3, { s: 13 });
+    tl.fromTo(ne, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: .8, immediateRender: false }, tBuy);
+  };
+
+  // 来自和通过：上面一团光（源头），金色的光流下来，穿过母亲（她抱着孩子）流到孩子身上 → “来自”在光旁边，“通过”在母亲旁边 → 源头只有一个
+  // s.full：接着上一场（开场就画好、光已经在流）；s.you：右边再来一个人（你），光也流过你，到另一个人手里
+  A.source = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 520), GY = 450, SX = 330, SY = 86;
+    const t0 = AT(s.at), full = !!s.full;
+    ground(svg, 40, 960, GY, { a: .38 });
+    const src = glow(svg, SX, SY, 140, { rays: 11, a: .95 });
+    const mom = person(svg, { x: SX, y: GY, h: 236, op: full ? 1 : 0, dress: true, veil: true }); mom.pose(tl, 0, 'cradle', .01); mom.face(tl, 0, 'smile', .01);
+    const bb = baby(mom.root, { r: 14 }); mom.hold(bb, 'e1', 0, -12, 0, 1); bb.face(tl, 0, 'content', .01);
+    const ch = mom.chestAt({ ...mom.st, ...mom.cur }), bp = mom.handAt(1, { ...mom.st, ...mom.cur });
+    const path1 = mk('path', { d: `M${SX},${SY + 40} C${SX + 10},${SY + 110} ${ch[0] - 10},${ch[1] - 90} ${ch[0] - 4},${ch[1]} C${ch[0]},${ch[1] + 20} ${bp[0] - 30},${bp[1] - 10} ${bp[0] - 6},${bp[1] - 14}`, fill: 'none', stroke: 'none' }, svg);
+    const stream = pen(svg, path1.getAttribute('d'), { c: GOLD, w: 2.4, go: .5 });
+    const heart = mk('path', { d: HEART(ch[0] - 4, ch[1], 11), fill: '#ffd98a', stroke: '#fff1c8', 'stroke-width': 1.4, opacity: full ? 1 : 0 }, svg);
+    const lFrom = label(svg, SX - 150, SY + 14, '来自', { s: 44, c: GOLD, font: 'Noto Serif SC', wt: 500 }), lThru = label(svg, SX - 150, 300, '通过', { s: 44, c: '#e8c9ab', font: 'Noto Serif SC', wt: 500 });
+    const lMom = label(svg, SX, GY + 40, '母亲 · 乳母', { s: 26, c: '#cdbfa3' }), lOne = label(svg, 700, 96, '源头只有一个', { s: 38, c: GOLD });
+    // 你，和你给的那个人
+    const you = person(svg, { x: 650, y: GY, h: 226, op: 0 }); you.pose(tl, 0, 'give', .01); you.face(tl, 0, 'smile', .01);
+    const oth = person(svg, { x: 790, y: GY, h: 200, f: -1, op: 0, beard: true, c: '#d9cfbd' }); oth.pose(tl, 0, 'stand', .01, { a1: 60, e1: 40, a2: 50, e2: 50, curv: 10, lean: 8 }); oth.face(tl, 0, 'sad', .01);
+    const yc = you.chestAt({ ...you.st, ...you.cur }), yh = you.handAt(1, { ...you.st, ...you.cur });
+    const path2 = mk('path', { d: `M${SX + 40},${SY + 10} C${SX + 200},${SY - 10} ${yc[0] - 40},${yc[1] - 160} ${yc[0] - 4},${yc[1]} C${yc[0]},${yc[1] + 20} ${yh[0] - 20},${yh[1]} ${yh[0] + 30},${yh[1] - 6}`, fill: 'none', stroke: 'none' }, svg);
+    const stream2 = pen(svg, path2.getAttribute('d'), { c: GOLD, w: 2.4, go: .5 });
+    const bowl = mk('path', { d: `M${yh[0] + 14},${yh[1] - 14} Q${yh[0] + 34},${yh[1] + 8} ${yh[0] + 54},${yh[1] - 14} Z`, fill: 'rgba(255,217,138,.35)', stroke: GOLD, 'stroke-width': 2.4, opacity: 0 }, svg);
+    const lYou = label(svg, 650, GY + 40, '你', { s: 30, c: '#e8c9ab' }), lAlso = label(svg, 905, 180, '你也可以是那个“通过”', { s: 30, c: WARM, a: 'end' });
+    const all = [lFrom, lThru, lMom, lOne, lYou, lAlso]; gsap.set(all, { opacity: 0 });
+    const T1 = t0 + 14;
+    if (full) { tl.set(src, { opacity: 1 }, t0); shown(stream); flow(tl, svg, path1, t0, T1); if (s.you !== undefined) [lFrom, lThru, lMom].forEach((l, i) => SHOW(tl, l, AT(s.you) + 1.05 + i * .1)); }
+    else {
+      tl.to(src, { opacity: .6, duration: 1 }, t0); mom.show(tl, t0 + .2, .9); gsap.set(stream._p, { strokeDashoffset: 1.01 });
+      const tF = OPT(AT, s, 'from', t0 + 4), tT = OPT(AT, s, 'thru', tF + 2.5), tO = OPT(AT, s, 'one', tT + 3.5);
+      tl.to(src, { opacity: 1, duration: .8 }, tF); SHOW(tl, lFrom, tF);
+      DRAW(tl, stream, tT, 1.2); flow(tl, svg, path1, tT + 1, tO + 6); SHOW(tl, lThru, tT + .5); SHOW(tl, lMom, tT + .9);
+      tl.fromTo(heart, { opacity: 0, scale: .4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .6, ease: 'back.out(2)', immediateRender: false }, tT + .8);
+      SHOW(tl, lOne, tO); tl.to(src._disc, { attr: { r: 180 }, duration: 1.6, ease: 'sine.inOut' }, tO);
+    }
+    tl.to(src._rays, { rotation: 20, svgOrigin: `${SX} ${SY}`, duration: 20, ease: 'none' }, t0);
+    gsap.set(stream2._p, { strokeDashoffset: 1.01 });
+    if (s.you !== undefined) { const ty = AT(s.you);
+      you.show(tl, ty - .2, .8); oth.show(tl, ty + .1, .8); DRAW(tl, stream2, ty + .3, 1.3); flow(tl, svg, path2, ty + 1.4, ty + 10); SHOW(tl, lYou, ty + .4);
+      tl.to(bowl, { opacity: 1, duration: .6 }, ty + 1.2); SHOW(tl, lAlso, ty + .2);
+      if (s.also !== undefined) { const ta = AT(s.also); oth.pose(tl, ta, { a1: 80, e1: 20, a2: 70, e2: 26, curv: 6, lean: 4 }, .6); oth.face(tl, ta + .5, 'happy'); hearts(tl, svg, 790, 230, ta + .8, 2, { s: 13 }); }
+    }
+  };
+
+  // 回头一看：一个人走在雾里的路上（前面看不清），越走越老 → 停下来回头，身后走过的路一段段亮起来，每一步旁边都有一只金色的手
+  A.lookback = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 470), GY = 400;
+    const t0 = AT(s.at), tNow = OPT(AT, s, 'now', t0 + 2.2), tYears = OPT(AT, s, 'years', tNow + 1.4), tBack = OPT(AT, s, 'back', tYears + 1), tHand = OPT(AT, s, 'hand', tBack + 1.2);
+    const road = `M60,${GY} C200,${GY - 8} 300,${GY + 4} 420,${GY - 2} S700,${GY + 6} 940,${GY}`;
+    const rd = pen(svg, road, { c: '#cdbfa3', w: 2.6, go: .15 });
+    const fog = mk('circle', { cx: 830, cy: 300, r: 300, fill: grad(defs, 'lbf' + svg._uid, 'radialGradient', { cx: 830, cy: 300, r: 300 }, [[0, '#a8b4c6', .26], [.5, '#a8b4c6', .12], [1, '#a8b4c6', 0]]), opacity: 0 }, svg);
+    const man = person(svg, { x: 120, y: GY, h: 210, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const old = person(svg, { x: 120, y: GY, h: 204, op: 0, beard: true, c: '#e2d6c0' }); old.pose(tl, 0, 'stand', .01, { curv: 8, lean: 6 }); old.face(tl, 0, 'neutral', .01);
+    const XE = 640, D = tBack - t0 - .4;
+    man.show(tl, t0, .6); man.walk(tl, t0 + .1, XE, D, { ease: 'none' }); old.walk(tl, t0 + .1, XE, D, { ease: 'none' });
+    tl.to(man.outer, { opacity: 0, duration: .8 }, tYears); tl.fromTo(old.outer, { opacity: 0 }, { opacity: 1, duration: .8, immediateRender: false }, tYears);
+    const q = label(svg, 760, 210, '？', { s: 64, c: '#9fb0c8', font: 'Noto Serif SC', wt: 700 });
+    const hands = [160, 260, 360, 460, 560].map((x, i) => { const g = mk('g', { opacity: 0 }, svg), y = GY - 10;
+      mk('circle', { cx: x, cy: y - 16, r: 28, fill: 'rgba(255,226,160,.16)' }, g);
+      mk('path', { d: `M${x - 12},${y} C${x - 16},${y - 16} ${x - 14},${y - 26} ${x - 10},${y - 32} M${x - 5},${y - 2} L${x - 4},${y - 38} M${x + 2},${y - 2} L${x + 4},${y - 36} M${x + 9},${y} L${x + 11},${y - 28} M${x - 12},${y} C${x - 7},${y + 9} ${x + 9},${y + 9} ${x + 12},${y}`, fill: 'none', stroke: GOLD, 'stroke-width': 2.6, 'stroke-linecap': 'round' }, g); return g; });
+    const lit = pen(svg, `M60,${GY} C200,${GY - 8} 300,${GY + 4} 420,${GY - 2} S560,${GY + 2} 640,${GY + 1}`, { c: GOLD, w: 3, go: .5 });
+    const l1 = label(svg, 760, 300, '当下看不懂', { s: 30, c: '#b9c6da' }), l2 = label(svg, 360, 462, '每一步，都有神的手', { s: 32, c: GOLD });
+    gsap.set([q, l1, l2], { opacity: 0 }); gsap.set(lit._p, { strokeDashoffset: 1.01 });
+    DRAW(tl, rd, t0 - .3, 1.2); tl.to(fog, { opacity: 1, duration: 1.2 }, t0);
+    SHOW(tl, l1, tNow); POPT(tl, q, tNow + .2);
+    // 回头
+    old.turn(tl, tBack, -1, .4); old.face(tl, tBack + .2, 'wow'); old.to(tl, tBack + .2, .5, { head: 8 });
+    tl.to([q, l1], { opacity: .3, duration: .6 }, tBack);
+    tl.to(lit._p, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, tBack + .3);
+    hands.slice().reverse().forEach((h, i) => tl.to(h, { opacity: 1, duration: .5 }, tHand - .2 + i * .25));
+    old.face(tl, tHand + .8, 'happy'); SHOW(tl, l2, tHand + .3);
+  };
+
+  // 神一直在说话：一个人站在天地之间；外边：太阳、树、星星一圈圈地向他发出声波 → 里面：胸口的心一下一下地亮（良心），身体也在“说”（心跳线）
+  A.speak = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 470), GY = 410, X = 500;
+    const t0 = AT(s.at), tOut = OPT(AT, s, 'out', t0 + 2), tIn = OPT(AT, s, 'in', tOut + 2.6), tBody = OPT(AT, s, 'body', tIn + 1.9);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const sun = glow(svg, 150, 110, 70, { a: .95 });
+    const tree = pen(svg, `M820,${GY} L820,${GY - 120} M820,${GY - 80} L790,${GY - 112} M820,${GY - 96} L852,${GY - 130} M770,${GY - 150} C760,${GY - 220} 880,${GY - 230} 872,${GY - 150} C900,${GY - 120} 760,${GY - 110} 770,${GY - 150} Z`, { c: '#a9c3a0', w: 2.8, go: .2 });
+    const mtn = pen(svg, `M40,${GY} L160,${GY - 130} L230,${GY - 70} L300,${GY - 150} L420,${GY}`, { c: '#8fa6b8', w: 2.4, go: .12 });
+    const stars = mk('g', { opacity: 0 }, svg); [[640, 70], [700, 120], [760, 60], [880, 90], [940, 140]].forEach(([x, y]) => mk('path', { d: `M${x},${y - 7} L${x + 2},${y - 2} L${x + 7},${y} L${x + 2},${y + 2} L${x},${y + 7} L${x - 2},${y + 2} L${x - 7},${y} L${x - 2},${y - 2} Z`, fill: '#e8eef8' }, stars));
+    const man = person(svg, { x: X, y: GY, h: 222, op: 0, look: 0 }); man.pose(tl, 0, 'stand', .01, { a1: 20, e1: 20, a2: -20, e2: 20 }); man.face(tl, 0, 'neutral', .01);
+    const hd = man.headAt({ ...man.st, ...man.cur }), ch = man.chestAt({ ...man.st, ...man.cur });
+    // 声波：从三处向人一圈圈地发
+    const waves = [[150, 110], [820, 230], [760, 90]].map(([x, y]) => { const a = Math.atan2(hd[1] - y, hd[0] - x); return [0, 1, 2].map(k => { const r = 40 + k * 26, a1 = a - .5, a2 = a + .5;
+      return mk('path', { d: `M${n1(x + r * Math.cos(a1))},${n1(y + r * Math.sin(a1))} A${r},${r} 0 0 1 ${n1(x + r * Math.cos(a2))},${n1(y + r * Math.sin(a2))}`, fill: 'none', stroke: '#ffe7b0', 'stroke-width': 2.6, 'stroke-linecap': 'round', opacity: 0 }, svg); }); }).flat();
+    const heart = mk('path', { d: HEART(ch[0], ch[1], 12), fill: '#ffd98a', stroke: '#fff1c8', 'stroke-width': 1.4, opacity: 0 }, svg);
+    const hg = glow(svg, ch[0], ch[1], 50, { a: .8, c0: '#fff3cf', c1: '#ffd98a' });
+    const beat = pen(svg, `M${X + 36},${ch[1]} L${X + 80},${ch[1]} L${X + 92},${ch[1] - 24} L${X + 106},${ch[1] + 22} L${X + 120},${ch[1] - 12} L${X + 130},${ch[1]} L${X + 200},${ch[1]}`, { c: CORAL, w: 2.4, go: .3 });
+    const lOut = label(svg, 820, 452, '外边：天地万物在说', { s: 28, c: WARM }), lIn = label(svg, 230, 452, '里面：良心、身体在说', { s: 28, c: WARM });
+    gsap.set([lOut, lIn], { opacity: 0 }); gsap.set(beat._p, { strokeDashoffset: 1.01 });
+    DRAW(tl, mtn, t0 - .2, 1.2); DRAW(tl, tree, t0, 1.2); tl.to([sun, stars], { opacity: 1, duration: 1 }, t0); man.show(tl, t0 + .2, .8); man.breathe(tl, t0, tBody + 4);
+    waves.forEach((w, i) => { const k = i % 3; tl.fromTo(w, { opacity: 0 }, { opacity: .9, duration: .45, yoyo: true, repeat: 2 * Math.round((tBody + 3 - tOut) / 1.8) - 1, ease: 'sine.inOut', repeatDelay: .45, immediateRender: false }, tOut + k * .3 + Math.floor(i / 3) * .15); });
+    SHOW(tl, lOut, tOut); man.to(tl, tOut + .3, .6, { head: -12 }); man.face(tl, tOut + .4, 'look');
+    tl.fromTo(heart, { opacity: 0, scale: .4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .6, ease: 'back.out(2)', immediateRender: false }, tIn); tl.to(hg, { opacity: 1, duration: .8 }, tIn);
+    tl.to(heart, { scale: 1.25, transformOrigin: '50% 50%', duration: .3, yoyo: true, repeat: 9, ease: 'power1.inOut', repeatDelay: .25 }, tIn + .6);
+    SHOW(tl, lIn, tIn); man.to(tl, tIn + .2, .6, { head: 14 }); man.face(tl, tIn + .3, 'sleep');
+    DRAW(tl, beat, tBody, 1.2);
+  };
+
+
+  // 圣经这副眼镜：一片朦胧的风景，一个人走在弯路上 → 读了圣经（一本打开的书，发光）→ 书变成一副眼镜落下来，镜片里清楚了；
+  // 他回头看：路的起头是一只摇篮（吃奶的那段日子），一路上每一步旁边都有一只金色的手
+  A.glasses = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 540);
+    const t0 = AT(s.at), tBible = OPT(AT, s, 'bible', t0 + 6.7), tOn = OPT(AT, s, 'on', tBible + 2.5), tBack = OPT(AT, s, 'back', tOn + 2), tMilk = OPT(AT, s, 'milk', tBack + 1.5), tSee = OPT(AT, s, 'see', tMilk + 1.7);
+    const bf = mk('filter', { id: 'gb' + svg._uid, x: '-20%', y: '-20%', width: '140%', height: '140%' }, defs); mk('feGaussianBlur', { stdDeviation: 7 }, bf);
+    const L1 = 330, L2 = 670, LY = 300, RR = 150;
+    const clip = mk('clipPath', { id: 'gc' + svg._uid }, defs); const c1 = mk('circle', { cx: L1, cy: LY, r: RR }, clip), c2 = mk('circle', { cx: L2, cy: LY, r: RR }, clip);
+    const ROAD = 'M150,540 C230,450 330,430 420,390 C520,346 610,330 720,296 C790,276 860,262 960,250';
+    const scene = (g, sharp) => [
+      line(g, 'M40,340 C180,260 300,280 420,310 C540,340 660,240 800,260 C880,272 930,300 980,310', { c: '#a9c3a0', w: 3, go: sharp ? .25 : .1, glow: sharp }),
+      line(g, 'M40,410 C220,370 360,410 520,390 C700,368 820,410 980,390', { c: '#8fa6b8', w: 2.6, go: .1, glow: sharp }),
+      line(g, ROAD, { c: '#e8d9b8', w: 3, go: .2, glow: sharp })];
+    const fog = mk('g', { filter: `url(#gb${svg._uid})`, opacity: 0 }, svg), clear = mk('g', { 'clip-path': `url(#gc${svg._uid})`, opacity: 0 }, svg);
+    const lands = [...scene(fog, false), ...scene(clear, true)];
+    // 摇篮（路的起头）、路上的手（都在镜片里才看得清）
+    const crad = mk('g', { opacity: 0, transform: 'translate(66,-30)' }, clear); const cg = glow(crad, 222, 452, 60, { a: .8, op: 1 });
+    mk('path', { d: 'M190,446 Q222,478 254,446 M192,442 L252,442 M196,446 L186,428', fill: 'none', stroke: WARM, 'stroke-width': 3, 'stroke-linecap': 'round' }, crad);
+    baby(crad, { x: 208, y: 432, r: 9, face: 'sleep' });
+    const hands = [[392, 396], [490, 366], [590, 336], [690, 305]].map(([x, y]) => { const h = mk('g', { opacity: 0 }, clear);
+      mk('path', { d: `M${x - 10},${y + 10} C${x - 14},${y - 4} ${x - 12},${y - 14} ${x - 8},${y - 20} M${x - 4},${y + 8} L${x - 3},${y - 24} M${x + 2},${y + 8} L${x + 4},${y - 22} M${x + 8},${y + 10} L${x + 10},${y - 16} M${x - 10},${y + 10} C${x - 6},${y + 18} ${x + 8},${y + 18} ${x + 10},${y + 10}`, fill: 'none', stroke: GOLD, 'stroke-width': 2.4, 'stroke-linecap': 'round' }, h);
+      mk('circle', { cx: x, cy: y, r: 26, fill: 'rgba(255,226,160,.18)' }, h); return h; });
+    // 走路的人（在路上，镜片外也看得见）
+    const walker = person(svg, { x: 610, y: 333, h: 96, op: 0, w: 3 }); walker.face(tl, 0, 'neutral', .01);
+    // 圣经（一本打开的书，发光）→ 变成眼镜
+    const bk = mk('g', { opacity: 0 }, svg); const bglow = glow(bk, 500, 96, 70, { a: .7, op: 1 });
+    mk('path', { d: 'M440,80 Q470,70 500,84 Q530,70 560,80 L560,124 Q530,114 500,128 Q470,114 440,124 Z M500,84 L500,128', fill: 'rgba(226,189,118,.18)', stroke: GOLD, 'stroke-width': 2.6, 'stroke-linejoin': 'round' }, bk);
+    mk('path', { d: 'M470,92 L470,112 M462,100 L478,100', stroke: GOLD, 'stroke-width': 2 }, bk);
+    const specs = mk('g', { opacity: 0 }, svg);
+    const specL = line(specs, `M${L1 + RR},${LY} A${RR},${RR} 0 1 1 ${L1 - RR},${LY} A${RR},${RR} 0 1 1 ${L1 + RR},${LY} M${L2 + RR},${LY} A${RR},${RR} 0 1 1 ${L2 - RR},${LY} A${RR},${RR} 0 1 1 ${L2 + RR},${LY} M${L1 + RR},${LY - 20} C${L1 + RR + 30},${LY - 44} ${L2 - RR - 30},${LY - 44} ${L2 - RR},${LY - 20} M${L1 - RR},${LY - 30} L${L1 - RR - 60},${LY - 60} M${L2 + RR},${LY - 30} L${L2 + RR + 60},${LY - 60}`, { c: GOLD, w: 4 });
+    shown(specL); [...lands].forEach(shown);
+    const lBible = label(svg, 500, 60, '有了圣经这副眼镜', { s: 34, c: GOLD }), lMilk = label(svg, 250, 490, '吃奶的那段日子', { s: 26, c: WARM }), lHand = label(svg, 620, 530, '神一直在那里', { s: 32, c: '#f3dcae' });
+    gsap.set([lBible, lMilk, lHand], { opacity: 0 });
+    tl.to(fog, { opacity: .9, duration: 1.2 }, t0); walker.show(tl, t0 + .4, .8);
+    walker.walk(tl, t0 + .6, 700, tBible - t0 - .8, { stride: 26, ease: 'none' }); walker.to(tl, t0 + .6, tBible - t0 - .8, { y: 300 }, 'none');
+    walker.face(tl, t0 + 1, 'worry');
+    tl.fromTo(bk, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .8, immediateRender: false }, tBible);
+    tl.to(bk, { opacity: 0, scale: .6, svgOrigin: '500 100', duration: .5 }, tOn - .1);
+    tl.fromTo(specs, { opacity: 0, y: -260 }, { opacity: 1, y: 0, duration: 1.4, ease: 'power3.out', immediateRender: false }, tOn);
+    [c1, c2].forEach(c => tl.fromTo(c, { attr: { cy: LY - 260 } }, { attr: { cy: LY }, duration: 1.4, ease: 'power3.out', immediateRender: false }, tOn));
+    tl.to(clear, { opacity: 1, duration: .6 }, tOn + .2); SHOW(tl, lBible, tOn + .3);
+    walker.turn(tl, tBack, -1, .4); walker.face(tl, tBack + .2, 'look');
+    tl.to(crad, { opacity: 1, duration: .8 }, tMilk); SHOW(tl, lMilk, tMilk + .2);
+    hands.forEach((h, i) => tl.to(h, { opacity: 1, duration: .6 }, tSee + i * .3)); SHOW(tl, lHand, tSee + .8); walker.face(tl, tSee + .4, 'happy');
+  };
+
+
+  // 奶瓶
+  const BOTTLE = (par) => { const g = mk('g', {}, par); mk('path', { d: 'M-9,-30 L9,-30 L9,20 Q9,26 3,26 L-3,26 Q-9,26 -9,20 Z', fill: 'rgba(246,239,224,.3)', stroke: '#f6efe0', 'stroke-width': 2.2 }, g); mk('path', { d: 'M-6,-30 L-4,-40 Q0,-46 4,-40 L6,-30 M-9,-6 L9,-6', fill: 'none', stroke: '#f6efe0', 'stroke-width': 2 }, g); return g; };
+  // 一个婴儿知道什么：吃（奶瓶）、舒服了就睡（Z）、疼了就哭（扎了一下）→ 他不知道给奶的是谁、半夜抱他的是谁、更不知道神（四周暗暗地浮出来，各带一个问号）
+  // → 他只是接受：金色的光点落进他张开的小手
+  A.infant = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 470), GY = 420, BX = 470, BY = 300;
+    const t0 = AT(s.at), tEat = OPT(AT, s, 'eat', t0 + .6), tSleep = OPT(AT, s, 'sleep', tEat + 1.4), tCry = OPT(AT, s, 'cry', tSleep + 1.3),
+      tWho = OPT(AT, s, 'who', tCry + 1.4), tNight = OPT(AT, s, 'night', tWho + 4.2), tGod = OPT(AT, s, 'god', tNight + 1.5), tTake = OPT(AT, s, 'take', tGod + 1.4);
+    const bed = stroke(svg, `M${BX - 50},${BY + 30} Q${BX + 50},${BY + 110} ${BX + 160},${BY + 30} M${BX - 56},${BY + 24} L${BX + 166},${BY + 24}`, { c: '#bfae92', w: 3.2 });
+    const bb = baby(svg, { x: BX - 10, y: BY - 6, r: 36, face: 'content', op: 0, st: { a1: -60, a2: -30 } });
+    const bot = BOTTLE(svg); gsap.set(bot, { x: BX - 120, y: BY - 60, rotation: 50, opacity: 0, transformOrigin: '50% 50%' });
+    const pin = mk('g', { opacity: 0 }, svg); mk('path', { d: `M${BX + 150},${BY - 40} l10,-6 l2,12 l10,-4 l-6,10 l10,6 l-12,2 l2,12 l-10,-8 l-8,8 l0,-12 l-12,-2 l10,-6 l-6,-10 Z`, fill: 'rgba(235,162,124,.35)', stroke: CORAL, 'stroke-width': 2 }, pin);
+    const wah = label(svg, BX + 70, BY - 90, '哇——', { s: 36, c: '#e0b4a4' });
+    const L3 = [['吃', BX - 130], ['睡', BX + 50], ['哭', BX + 220]].map(([t, x]) => label(svg, x, GY + 34, t, { s: 34, c: WARM, font: 'Noto Serif SC', wt: 500 }));
+    // 四周暗暗浮出来：给奶的人、半夜抱他的人、光（神）
+    const giver = person(svg, { x: 170, y: GY, h: 250, op: 0, dress: true, veil: true, c: '#a89f90' }); giver.pose(tl, 0, 'give', .01); giver.face(tl, 0, 'smile', .01);
+    const gb = BOTTLE(giver.root); giver.hold(gb, 1, 6, -10);
+    const nightP = person(svg, { x: 830, y: GY, h: 246, f: -1, op: 0, c: '#a89f90' }); nightP.pose(tl, 0, 'carry', .01); nightP.face(tl, 0, 'smile', .01);
+    const lamp = mk('g', {}, nightP.root); mk('path', { d: 'M-8,-14 L8,-14 L6,10 L-6,10 Z M0,-14 L0,-24', fill: 'rgba(255,217,138,.3)', stroke: '#ffd98a', 'stroke-width': 2 }, lamp); nightP.hold(lamp, 1, 0, 10);
+    const god = glow(svg, BX + 40, 60, 110, { rays: 9, a: .8 });
+    const qs = [[170, 120], [820, 120], [BX + 40, 150]].map(([x, y]) => { const q = label(svg, x, y, '？', { s: 44, c: '#c9d6ea', font: 'Noto Serif SC', wt: 700 }); gsap.set(q, { opacity: 0 }); return q; });
+    const lTake = label(svg, BX + 40, GY + 34, '他只是接受', { s: 34, c: GOLD });
+    gsap.set([wah, ...L3, lTake], { opacity: 0 });
+    tl.to(bed, { opacity: 1, duration: .8 }, t0 - .3); bb.show(tl, t0, .8);
+    // 吃
+    tl.to(bot, { opacity: 1, x: BX - 62, y: BY - 20, duration: .6, ease: 'power2.out' }, tEat - .2); bb.face(tl, tEat, 'suck'); SHOW(tl, L3[0], tEat);
+    // 睡
+    tl.to(bot, { opacity: 0, x: BX - 120, y: BY - 60, duration: .5 }, tSleep - .1); bb.face(tl, tSleep, 'sleep'); zzz(tl, svg, BX + 30, BY - 60, tSleep + .1, 1.2, { s: 46 }); SHOW(tl, L3[1], tSleep);
+    // 哭
+    tl.fromTo(pin, { opacity: 0, scale: .4, svgOrigin: `${BX + 160} ${BY - 30}` }, { opacity: 1, scale: 1, svgOrigin: `${BX + 160} ${BY - 30}`, duration: .3, ease: 'back.out(3)', immediateRender: false }, tCry - .1); tl.to(pin, { opacity: 0, duration: .4 }, tCry + .6);
+    bb.face(tl, tCry, 'cry'); bb.flail(tl, tCry, 1.4, 1.2); bb.tears(tl, tCry + .1, 1.3); tl.fromTo(wah, { opacity: 0, scale: .7, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .3, ease: 'back.out(2)', immediateRender: false }, tCry + .1); tl.to(wah, { opacity: 0, duration: .4 }, tCry + 1.3);
+    SHOW(tl, L3[2], tCry);
+    // 不知道是谁
+    bb.face(tl, tWho - .2, 'sleep'); tl.to(L3, { opacity: .3, duration: .5 }, tWho);
+    tl.fromTo(giver.outer, { opacity: 0 }, { opacity: .7, duration: .9, immediateRender: false }, tWho); POPT(tl, qs[0], tWho + .5);
+    tl.fromTo(nightP.outer, { opacity: 0 }, { opacity: .7, duration: .9, immediateRender: false }, tNight - .5); POPT(tl, qs[1], tNight);
+    tl.to(god, { opacity: .7, duration: 1 }, tGod - .2); POPT(tl, qs[2], tGod + .2);
+    // 他只是接受：手张开，光点落下来
+    tl.to(qs, { opacity: 0, duration: .5 }, tTake - .2); tl.to(L3, { opacity: 0, duration: .4 }, tTake - .2); SHOW(tl, lTake, tTake + .1);
+    bb.to(tl, tTake, .5, { a1: -100, a2: -70 }); bb.face(tl, tTake + .2, 'content'); tl.to(god, { opacity: 1, duration: .8 }, tTake);
+    tl.to([giver.outer, nightP.outer], { opacity: .95, duration: .8 }, tTake);
+    for (let i = 0; i < 7; i++) { const d = mk('circle', { cx: BX + 10 + (i % 3 - 1) * 26, cy: 120, r: 4, fill: '#fff1c8', opacity: 0, filter: `url(#${figGlow(svg)})` }, svg);
+      tl.fromTo(d, { opacity: 0, y: 0 }, { opacity: 1, y: BY - 150 - (i % 2) * 10, duration: 1.1, ease: 'sine.in', immediateRender: false }, tTake + .2 + i * .22); tl.to(d, { opacity: 0, duration: .3 }, tTake + 1.3 + i * .22); }
+  };
+
+  // 顺的时候把神忘了，疼了才来找神：一个人躺在太阳底下的躺椅上，端着杯子，舒舒服服 → 背过身去，光暗下来（把神忘了）
+  // → 一团乌云、一道闪电，他摔下来、哭 → 跪下来，向着光伸手，光又亮起来
+  A.forget = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tRest = OPT(AT, s, 'rest', t0 + 1.2), tForget = OPT(AT, s, 'forget', tRest + 1.3), tHit = OPT(AT, s, 'hit', tForget + 1.5), tCry = OPT(AT, s, 'cry', tHit + 1.7), tSeek = OPT(AT, s, 'seek', tCry + 1.3);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const sun = glow(svg, 820, 90, 90, { a: 1, c0: '#fff6dc', c1: '#ffd27a' });
+    const god = glow(svg, 190, 90, 130, { rays: 11, a: .85 });
+    const man = person(svg, { x: 520, y: GY, h: 230, op: 0 }); man.pose(tl, 0, 'sit', .01, { lean: -34, head: -6, l1: 76, k1: -60, l2: 70, k2: -64, a1: 60, e1: 70, a2: -30, e2: 30 }); man.face(tl, 0, 'happy', .01);
+    const lounge = stroke(svg, `M${520 - 60},${GY - man.SH + 4} L${520 + 70},${GY - man.SH + 4} M${520 - 60},${GY - man.SH + 4} L${520 - 110},${GY - man.SH - 70} M${520 - 40},${GY - man.SH + 4} L${520 - 50},${GY} M${520 + 50},${GY - man.SH + 4} L${520 + 60},${GY}`, { c: '#bfae92', w: 3 });
+    const cup = mk('path', { d: 'M-8,-14 L8,-14 L5,6 L-5,6 Z M-10,-14 L10,-14', fill: 'rgba(143,184,216,.3)', stroke: '#bfe0f6', 'stroke-width': 2 }, man.root); man.hold(cup, 1, 4, -6);
+    const cloud = mk('g', { opacity: 0 }, svg);
+    mk('path', { d: 'M560,170 q-34,0 -30,-28 q4,-28 38,-24 q12,-34 50,-26 q34,-26 64,6 q32,-2 30,26 q22,16 0,40 Z', fill: 'rgba(70,76,92,.7)', stroke: '#8f9bb0', 'stroke-width': 2.4 }, cloud);
+    const bolt = mk('path', { d: 'M612,172 l-22,42 l22,0 l-18,46', fill: 'none', stroke: '#f0d28a', 'stroke-width': 4, 'stroke-linejoin': 'round', opacity: 0 }, svg);
+    const l1 = label(svg, 520, 466, '舒服了，就安息，把神忘了', { s: 28, c: WARM }), l2 = label(svg, 520, 466, '疼了，就哭，就来找神', { s: 28, c: '#e0b4a4' });
+    gsap.set([l1, l2], { opacity: 0 });
+    tl.to([sun, lounge], { opacity: 1, duration: .8 }, t0); tl.to(god, { opacity: .8, duration: .8 }, t0); man.show(tl, t0, .8);
+    tl.to(man.st, { e1: 100, duration: .5, yoyo: true, repeat: 3, ease: 'sine.inOut', onUpdate: man.draw }, tRest);   // 喝一口
+    SHOW(tl, l1, tRest);
+    // 把神忘了：背过去，光暗下来
+    man.turn(tl, tForget, -1, .5); man.face(tl, tForget + .3, 'sleep'); tl.to(god, { opacity: .12, duration: 1.2 }, tForget + .3);
+    // 碰痛了：乌云、闪电，摔下来
+    tl.to(sun, { opacity: .2, duration: .8 }, tHit - .3); tl.fromTo(cloud, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: .7, immediateRender: false }, tHit - .3);
+    tl.fromTo(bolt, { opacity: 0 }, { opacity: 1, duration: .08, yoyo: true, repeat: 3, immediateRender: false }, tHit + .3);
+    man.face(tl, tHit + .4, 'wow'); tl.to(cup, { opacity: 0, duration: .3 }, tHit + .5);
+    man.to(tl, tHit + .5, .6, { y: GY, hy: man.LEG - 8, fk: 1, l1: 88, k1: -4, l2: 84, k2: -2, lean: -20, rot: 0, a1: 120, e1: 30, a2: 110, e2: 30 }, 'power2.in');
+    tl.to(lounge, { opacity: .3, duration: .4 }, tHit + .6);
+    man.face(tl, tCry, 'cry'); man.tears(tl, tCry + .1, tSeek - tCry + .3); man.to(tl, tCry, .4, { lean: 10, a1: 34, e1: 140, a2: 30, e2: 144 }); tl.to(l1, { opacity: 0, duration: .4 }, tCry - .3); SHOW(tl, l2, tCry);
+    // 来找神：转过来，跪着向光伸手
+    man.turn(tl, tSeek - .2, 1, .4); man.pose(tl, tSeek, 'kneelUp', .7, { a1: 130, e1: 10, a2: 120, e2: 14, head: -18 }); man.set(tl, tSeek, { x: 470 });
+    tl.to(god, { opacity: 1, duration: 1 }, tSeek + .3); man.face(tl, tSeek + .6, 'sad');
+  };
+
+  // 他完全依靠：婴儿在母亲怀里睡得软软的；旁边一个大人举着一摞“证明”（我配得），满头大汗 → 纸飞散，婴儿什么都不用证明，就有奶喝
+  A.rely = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 440), GY = 390;
+    const t0 = AT(s.at), tProve = OPT(AT, s, 'prove', t0 + 1.6);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const warm = glow(svg, 300, 230, 200, { a: .5, c0: '#ffe9c4', c1: '#f6c98e' });
+    const mom = person(svg, { x: 300, y: GY, h: 250, op: 0, dress: true, veil: true }); mom.pose(tl, 0, 'cradle', .01); mom.face(tl, 0, 'smile', .01);
+    const bb = baby(mom.root, { r: 15, st: { a1: 10, a2: 30 } }); mom.hold(bb, 'e1', 0, -13, 0, 1); bb.face(tl, 0, 'sleep', .01);
+    const ad = person(svg, { x: 720, y: GY, h: 236, f: -1, op: 0 }); ad.pose(tl, 0, 'up', .01, { a1: 150, e1: 30, a2: 140, e2: 34, head: -6 }); ad.face(tl, 0, 'worry', .01);
+    const papers = mk('g', {}, ad.root); [0, 1, 2, 3].forEach(i => { const g = mk('g', { transform: `translate(${i * 4},${-i * 9}) rotate(${i % 2 ? 4 : -3})` }, papers); mk('rect', { x: -26, y: -20, width: 52, height: 34, rx: 2, fill: 'rgba(241,232,214,.18)', stroke: PAPER, 'stroke-width': 2 }, g); mk('path', { d: 'M-18,-10 L18,-10 M-18,-2 L14,-2 M-18,6 L10,6', stroke: PAPER, 'stroke-width': 1.4, opacity: .7 }, g); });
+    ad.hold(papers, 1, 0, -14);
+    const tag = label(svg, 860, 200, '证明：我配得！', { s: 28, c: '#e0b4a4' });
+    const lR = label(svg, 300, 432, '他完全依靠', { s: 32, c: GOLD }), lN = label(svg, 720, 432, '不用证明自己配得', { s: 30, c: WARM });
+    gsap.set([tag, lR, lN], { opacity: 0 });
+    mom.show(tl, t0 - .2, .8); tl.to(warm, { opacity: 1, duration: 1.2 }, t0); SHOW(tl, lR, t0 + .1); mom.breathe(tl, t0, tProve + 14);
+    tl.to(mom.st, { lean: 5, duration: 1.3, yoyo: true, repeat: 9, ease: 'sine.inOut', onUpdate: mom.draw }, t0 + .4); zzz(tl, svg, 370, 200, t0 + .4, 6, { s: 24 });
+    ad.show(tl, tProve - .6, .6); SHOW(tl, tag, tProve - .3); ad.sweat(tl, tProve, 2.2); ad.hop(tl, tProve, 8, 2, .2);
+    // 纸飞散
+    const fly = [...papers.children];
+    fly.forEach((p, i) => tl.to(p, { x: (i - 1.5) * 70, y: -120 - i * 30, rotation: (i % 2 ? 1 : -1) * 120, opacity: 0, duration: 1.2, ease: 'power2.out' }, tProve + 1.8 + i * .1));
+    ad.pose(tl, tProve + 1.9, 'stand', .6); ad.face(tl, tProve + 2.1, 'wow'); tl.to(tag, { opacity: 0, duration: .5 }, tProve + 1.8);
+    SHOW(tl, lN, tProve + .5); bb.face(tl, tProve + 1.4, 'content'); hearts(tl, svg, 330, 160, tProve + 1.6, 2, { s: 12 });
+  };
+
+  // 下一次：会笑了 → 想让大人听他的（指着要“要！”）→ 大人不照着做（“不行”）→ 哭、蹬腿，用哭来“报复”，大人捂耳朵
+  A.tantrum = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tLaugh = OPT(AT, s, 'laugh', t0 + 2.9), tWant = OPT(AT, s, 'want', tLaugh + 1.2), tNo = OPT(AT, s, 'no', tWant + 2.8), tCry = OPT(AT, s, 'cry', tNo + 1.6), tRev = OPT(AT, s, 'rev', tCry + 1.2);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const kid = person(svg, { x: 360, y: GY, h: 156, kind: 'child', hair: true, op: 0 }); kid.pose(tl, 0, 'sitFloor', .01); kid.face(tl, 0, 'smile', .01);
+    const ad = person(svg, { x: 620, y: GY, h: 236, f: -1, op: 0 }); ad.face(tl, 0, 'smile', .01);
+    const shelf = stroke(svg, `M760,250 L900,250 M772,250 L772,420 M888,250 L888,420`, { c: '#bfae92', w: 3 });
+    const toy = BOTTLE(svg); gsap.set(toy, { x: 830, y: 222 });
+    const want = bubble(svg, 230, 190, 130, 70, 340, 318, { t: '要！', s: 38, kind: 'shout', c: '#f0c2b2' });
+    const no = bubble(svg, 700, 120, 140, 66, 640, 186, { t: '不行。', s: 32 });
+    const wah = bubble(svg, 220, 180, 200, 92, 340, 318, { t: '哇——！', s: 40, kind: 'shout', c: '#e0a08c', tc: '#f0b4a0' });
+    const lab = label(svg, 640, 462, '用哭来“报复”', { s: 32, c: '#e0b4a4' }); gsap.set(lab, { opacity: 0 });
+    tl.to(shelf, { opacity: 1, duration: .6 }, t0); kid.show(tl, t0, .8); ad.show(tl, t0 + .2, .8); ad.breathe(tl, t0, tRev + 6);
+    // 会笑了
+    kid.face(tl, tLaugh, 'laugh'); kid.shakeBody(tl, tLaugh, 1.1, .8); kid.to(tl, tLaugh, .4, { a1: 60, e1: 60, a2: 50, e2: 60 }); hearts(tl, svg, 380, 280, tLaugh + .2, 2, { s: 11 });
+    // 想让大人听他的：指着奶瓶
+    kid.face(tl, tWant, 'talkf'); kid.pose(tl, tWant, 'sitFloor', .4, { a1: 100, e1: 0, lean: 6 }); POP(tl, want, tWant + .2); kid.hop(tl, tWant + .3, 6, 3, .16);
+    // 大人不照着做
+    ad.pose(tl, tNo - .2, 'crossF', .5); ad.set(tl, tNo - .2, {}); ad.face(tl, tNo, 'frown'); POP(tl, no, tNo + .1); UNPOP(tl, want, tNo);
+    // 哭，蹬腿
+    UNPOP(tl, no, tCry); kid.face(tl, tCry, 'cry'); kid.tears(tl, tCry, tRev - tCry + 3);
+    kid.pose(tl, tCry, 'sitFloor', .3, { lean: -14, head: -16, a1: 140, e1: 20, a2: 130, e2: 24 });
+    tl.to(kid.st, { l1: 120, l2: 60, duration: .18, yoyo: true, repeat: 2 * Math.round((tRev + 2.6 - tCry) / .36) - 1, ease: 'sine.inOut', onUpdate: kid.draw }, tCry + .2);
+    kid.gesture(tl, tCry + .2, tRev - tCry + 2.4, 1.2, 3);
+    POP(tl, wah, tCry + .2); tl.to(wah, { scale: 1.08, svgOrigin: '340 318', duration: .2, yoyo: true, repeat: 9 }, tCry + .8);
+    // 用哭来报复：大人捂耳朵
+    ad.pose(tl, tRev, { a1: 150, e1: 130, a2: 140, e2: 136, head: 8, lean: -4 }, .5); ad.face(tl, tRev + .2, 'worry'); ad.sweat(tl, tRev + .4, 2.4);
+    SHOW(tl, lab, tRev + .1);
   };
 
   window.FIG = { person, baby, POSE, stroke, pen, shown, ground, glow, bubble, POP, UNPOP, hearts, zzz, haha, sparkle, label, HEART, rgba, figGlow, SKY, DIM, WARM, ROSE };
