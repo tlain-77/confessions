@@ -1775,16 +1775,16 @@
   // 病历上清清楚楚，吃药、贴膏药，都不管用 → 跪下来，向着光伸手：“除了向你外，我向谁呼号呢？”
   A.cure = function ({ tl, el, AT, s }) {
     const { svg } = base(el, 480), GY = 420;
-    const t0 = AT(s.at), tThink = OPT(AT, s, 'thk', t0 + 1.8), tSolved = OPT(AT, s, 'solved', tThink + 1.6), tBegin = OPT(AT, s, 'begin', tSolved + 2.6), tDirty = OPT(AT, s, 'dirty', tBegin + 2.2),
+    const t0 = AT(s.at), tThink = OPT(AT, s, 'thk', t0 + 1.8), tSolved = OPT(AT, s, 'solved', tThink + 1.6), tDone = OPT(AT, s, 'done', tSolved + .9), tBegin = OPT(AT, s, 'begin', tSolved + 2.6), tDirty = OPT(AT, s, 'dirty', tBegin + 2.2),
       tStill = OPT(AT, s, 'still', tDirty + 1.3), tSick = OPT(AT, s, 'sick', tStill + 2.1), tClear = OPT(AT, s, 'clear', tSick + 2.1), tCant = OPT(AT, s, 'cant', tClear + 1.4), tYou = OPT(AT, s, 'you', tCant + 2), tCry = OPT(AT, s, 'cry', tYou + 1.4);
     ground(svg, 40, 960, GY, { a: .38 });
     const lightG = glow(svg, 840, 80, 160, { rays: 11, a: .9 });
     const man = person(svg, { x: 470, y: GY, h: 222, op: 0 }); man.face(tl, 0, 'neutral', .01);
-    // 单子：□ 承认 → ✓
-    const sheet = mk('g', { opacity: 0 }, svg); mk('rect', { x: 120, y: 110, width: 200, height: 150, rx: 6, fill: 'rgba(14,13,16,.85)', stroke: '#d9c9a8', 'stroke-width': 2.2 }, sheet);
-    mk('rect', { x: 144, y: 140, width: 26, height: 26, rx: 3, fill: 'none', stroke: '#d9c9a8', 'stroke-width': 2 }, sheet); label(sheet, 186, 162, '承认', { s: 26, c: PAPER, a: 'start' });
-    mk('rect', { x: 144, y: 196, width: 26, height: 26, rx: 3, fill: 'none', stroke: '#8f8270', 'stroke-width': 2 }, sheet); label(sheet, 186, 218, '干净了', { s: 26, c: '#8f8270', a: 'start' });
-    const tick = pen(sheet, 'M148,152 L156,162 L170,140', { c: '#9fd39a', w: 3.4, go: .3 });
+    // 单子：□ 承认 → ✓（“承认”两个字说到才出来，说到“解决了”才打勾）
+    const sheet = mk('g', { opacity: 0 }, svg); mk('rect', { x: 120, y: 120, width: 200, height: 100, rx: 6, fill: 'rgba(14,13,16,.85)', stroke: '#d9c9a8', 'stroke-width': 2.2 }, sheet);
+    mk('rect', { x: 148, y: 156, width: 30, height: 30, rx: 3, fill: 'none', stroke: '#d9c9a8', 'stroke-width': 2 }, sheet);
+    const lAdmit = label(sheet, 196, 182, '承认了', { s: 30, c: PAPER, a: 'start' });
+    const tick = pen(sheet, 'M153,170 L162,181 L178,157', { c: '#9fd39a', w: 3.8, go: .3 });
     const lBegin = label(svg, 220, 300, '承认，只是开始', { s: 30, c: GOLD });
     // 脏屋子（一小间，墙上一块块污迹）
     const room = house(svg, 220, GY, 200, 120, { rh: 46, op: 0 });
@@ -1797,11 +1797,11 @@
     const pill = mk('g', { opacity: 0 }, svg); mk('rect', { x: -14, y: -6, width: 28, height: 12, rx: 6, fill: 'rgba(235,162,124,.4)', stroke: CORAL, 'stroke-width': 2 }, pill);
     const xMark = label(svg, 470, 150, '✗', { s: 50, c: '#e0a08c', font: 'Noto Serif SC', wt: 700 });
     const cry = bubble(svg, 640, 150, 170, 70, 560, 222, { t: '主啊！', s: 34, c: GOLD });
-    gsap.set([lBegin, lDirty, xMark], { opacity: 0 }); gsap.set(tick._p, { strokeDashoffset: 1.01 });
+    gsap.set([lBegin, lDirty, xMark, lAdmit], { opacity: 0 }); gsap.set(tick._p, { strokeDashoffset: 1.01 });
     man.show(tl, t0, .8); man.breathe(tl, t0, tCry + 4);
     // 很多人以为：勾上“承认”，就解决了
     tl.to(sheet, { opacity: 1, duration: .6 }, tThink); man.pose(tl, tThink, 'point', .5, { a1: 70 }); man.turn(tl, tThink - .3, -1, .3);
-    DRAW(tl, tick, tSolved, .5); man.face(tl, tSolved + .3, 'happy'); man.pose(tl, tSolved + .4, 'stand', .5);
+    SHOW(tl, lAdmit, tSolved); DRAW(tl, tick, tDone, .5); man.face(tl, tDone + .3, 'happy'); man.pose(tl, tDone + .4, 'stand', .5);
     SHOW(tl, lBegin, tBegin); man.face(tl, tBegin, 'neutral');
     // 知道屋子脏：屋子还是脏的
     tl.to([sheet, lBegin], { opacity: 0, duration: .5 }, tDirty - .3); tl.to(room.g, { opacity: 1, duration: .6 }, tDirty);
@@ -1816,6 +1816,43 @@
     tl.to([chart, xMark], { opacity: 0, duration: .5 }, tYou - .2); tl.to(lightG, { opacity: .8, duration: 1.2 }, tYou); tl.to(lightG._rays, { rotation: 18, svgOrigin: '840 80', duration: 10, ease: 'none' }, tYou);
     man.pose(tl, tYou, 'kneelUp', .7, { a1: 130, e1: 10, a2: 120, e2: 16, head: -20 }); man.face(tl, tYou + .3, 'look');
     POP(tl, cry, tCry); tl.to(lightG, { opacity: 1, duration: .6 }, tCry);
+  };
+
+  // 约翰福音六章：很多门徒转身走了（耶稣不画成人，只画成右边的一团光）→ 剩下十二个人，你看我、我看你
+  // → 光里传出一句：“你们也要去吗？” → 彼得往前走几步，跪下，抬头望着光：主啊，你有永生之道
+  A.leave = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 420), GY = 356;
+    const t0 = AT(s.at), tLeave = OPT(AT, s, 'leave', t0 + 1.5), tTwelve = OPT(AT, s, 'twelve', tLeave + 3.2), tAsk = OPT(AT, s, 'ask', tTwelve + 1.8),
+      tPeter = OPT(AT, s, 'peter', tAsk + 1.2), tLord = OPT(AT, s, 'lord', tPeter + 1.9);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const LX = 880, LY = 170;
+    const light = glow(svg, LX, LY, 130, { rays: 12, a: .95 });
+    // 后排站在前排两人中间（错开半个身位，十二个人一个都不挡住）
+    const back = Array.from({ length: 10 }, (_, i) => person(svg, { x: 122 + i * 64, y: GY - 34, h: 116, c: '#b3a993', op: 0 }));
+    const front = Array.from({ length: 10 }, (_, i) => person(svg, { x: 90 + i * 64, y: GY, h: 140, op: 0 }));
+    const GO = [[back, 0], [front, 1], [back, 3], [front, 4], [back, 6], [front, 6], [back, 9], [front, 9]].map(([r, k]) => r[k]);
+    const stay = [...back, ...front].filter(p => !GO.includes(p)), peter = front[8];
+    const lJn = label(svg, 150, 46, '约翰福音 · 第六章', { s: 26, c: '#cdbfa3' });
+    const lTwelve = label(svg, 362, GY + 48, '剩下的十二个人', { s: 28, c: GOLD });
+    const lPeter = label(svg, 742, GY - 184, '彼得', { s: 26, c: WARM });
+    const ask = bubble(svg, 690, 62, 250, 66, 812, 126, { t: '你们也要去吗？', s: 32, c: GOLD });
+    gsap.set([lJn, lTwelve, lPeter], { opacity: 0 }); SHOW(tl, lJn, t0);
+    tl.to(light, { opacity: .8, duration: 1.2 }, t0 - .3); tl.to(light._rays, { rotation: 24, svgOrigin: `${LX} ${LY}`, duration: 16, ease: 'none' }, t0);
+    [...back, ...front].forEach((p, i) => { p.show(tl, t0 - .2 + (i % 10) * .04, .7); p.breathe(tl, t0, tLord + 5); });
+    // 很多门徒转身走了（越远的走得越久，走到一半慢慢看不见）
+    GO.forEach((p, i) => { const t = tLeave + i * .2, d = Math.max(1.4, (p.cur.x + 60) / 250);
+      p.face(tl, t, 'frown'); p.walk(tl, t, -60, d, { stride: p.H * .3 }); p.fade(tl, t + d - 1.1, 0, 1.1); });
+    // 剩下的十二个人：有点不知所措，你看我、我看你
+    stay.forEach((p, i) => p.face(tl, tTwelve - .4 + (i % 6) * .05, 'worry'));
+    [stay[1], stay[4], stay[8]].forEach((p, i) => { p.turn(tl, tTwelve + .2 + i * .25, -1); p.turn(tl, tTwelve + 1.3 + i * .2, 1); });
+    SHOW(tl, lTwelve, tTwelve);
+    // 光里传出：你们也要去吗？
+    POP(tl, ask, tAsk); tl.to(light, { opacity: 1, duration: .5 }, tAsk);
+    // 彼得往前走，跪下，抬头望着光
+    SHOW(tl, lPeter, tPeter); peter.face(tl, tPeter, 'look'); peter.walk(tl, tPeter + .1, 742, 1, { stride: 46 });
+    peter.pose(tl, tLord - .5, 'kneelUp', .7, { a1: 118, e1: 10, a2: 106, e2: 16, head: -24 }); peter.face(tl, tLord, 'smile');
+    tl.to(lPeter, { y: 30, duration: .7 }, tLord - .5); UNPOP(tl, ask, tLord + 1.4);
+    stay.filter(p => p !== peter).forEach((p, i) => p.face(tl, tLord + .5 + (i % 5) * .08, 'look'));
   };
 
   // 他试过所有的门，最后只剩这一扇：一排门，一个人一扇一扇去推，都推不开（✗）→ 最后一扇开了，里面是光
