@@ -2042,6 +2042,40 @@
     man.pose(tl, tSay - .3, 'kneel', .6, { a1: 60, e1: 40, a2: 50, e2: 46, head: 10 }); POP(tl, bub, tSay);
   };
 
+
+  // 小学生在台上，眼睛往台下找爸妈的脸：孩子在台上说话，头左右张望 → 中间座位上爸妈在笑、挥手 → 孩子不怕了，挺起胸来
+  // → 要是那个座位空着：座位上的人淡去，孩子还在演，可脸垮下来，心里是空的
+  A.seats = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 500), SY = 200, GY = 470;
+    const t0 = AT(s.at), tTalk = OPT(AT, s, 'talk', t0 + 2.5), tLook = OPT(AT, s, 'look', tTalk + 1.9), tFace = OPT(AT, s, 'face', tLook + 4.6), tBrave = OPT(AT, s, 'brave', tFace + 1.9), tEmpty = OPT(AT, s, 'empty', tBrave + 1.4), tHollow = OPT(AT, s, 'hollow', tEmpty + 2.7);
+    const stage = stroke(svg, `M160,${SY} Q500,${SY - 14} 840,${SY} L840,${SY + 16} L160,${SY + 16} Z`, { c: '#cdbfa3', w: 2.6, fill: 'rgba(30,27,24,.6)' });
+    const spot = mk('path', { d: `M470,0 L530,0 L600,${SY} L400,${SY} Z`, fill: 'rgba(255,231,176,.1)' }, svg);
+    const kid = person(svg, { x: 500, y: SY, h: 150, kind: 'child', hair: true, op: 0, look: 0 }); kid.face(tl, 0, 'worry', .01);
+    // 观众席：一排座位，中间那个是爸妈
+    const SX = [220, 340, 500, 660, 780];
+    const seatD = x => `M${x - 46},${GY} L${x - 46},${GY - 40} M${x + 46},${GY} L${x + 46},${GY - 40} M${x - 50},${GY - 40} L${x + 50},${GY - 40} M${x - 40},${GY - 40} L${x - 40},${GY - 96} Q${x},${GY - 112} ${x + 40},${GY - 96} L${x + 40},${GY - 40}`;
+    SX.forEach(x => stroke(svg, seatD(x), { c: '#8f8270', w: 2.4 }));
+    const aud = [220, 340, 660, 780].map((x, i) => { const p = person(svg, { x, y: GY + 2, h: 150, c: '#7f8aa0', op: 0, look: 0 }); p.pose(tl, 0, 'sit', .01, { hy: p.LEG - 40, a1: 30, e1: 30 }); return p; });
+    const par = person(svg, { x: 500, y: GY + 2, h: 160, op: 0, look: 0, dress: true, veil: true }); par.pose(tl, 0, 'sit', .01, { hy: par.LEG - 40, a1: 30, e1: 30 }); par.face(tl, 0, 'happy', .01);
+    const pg = glow(svg, 500, GY - 80, 90, { a: .7, c0: '#ffe9c4', c1: '#f6c98e' }); svg.insertBefore(pg, par.outer);
+    const bub = bubble(svg, 660, 70, 150, 56, 560, 110, { t: '……然后……', s: 24 });
+    const lBrave = label(svg, 300, 120, '他就不怕了', { s: 30, c: GOLD }), lEmpty = label(svg, 300, 120, '心里也是空的', { s: 30, c: '#b9c6da' });
+    gsap.set([lBrave, lEmpty], { opacity: 0 });
+    tl.to(stage, { opacity: 1, duration: .6 }, t0 - .2); kid.show(tl, t0, .8); kid.breathe(tl, t0, tHollow + 4);
+    aud.forEach((p, i) => tl.fromTo(p.outer, { opacity: 0 }, { opacity: .7, duration: .6, immediateRender: false }, t0 + .2 + i * .1));
+    // 台上说话，眼睛往台下找
+    POP(tl, bub, tTalk); kid.talk(tl, tTalk, tFace - tTalk - .2, 'talk', 'worry'); kid.gesture(tl, tTalk, 1.5, .5);
+    [0, 1, 2, 3].forEach(k => kid.to(tl, tLook + k * .9, .26, { head: 16 + (k % 2) * 4, f: k % 2 ? -1 : 1 }, 'sine.inOut'));
+    // 看见那张脸在笑：爸妈挥手，孩子亮起来
+    par.show(tl, tFace - .3, .7); tl.to(pg, { opacity: 1, duration: .8 }, tFace); par.pose(tl, tFace + .2, 'sit', .4, { hy: par.LEG - 40, a1: 150, e1: 20 }); par.waveHand(tl, tFace + .5, 1.8, 1);
+    kid.to(tl, tFace + .1, .4, { f: 1, head: 14 }); kid.face(tl, tFace + .4, 'happy'); UNPOP(tl, bub, tFace + .2);
+    kid.pose(tl, tBrave, 'open', .5, { head: -6, f: 1 }); kid.hop(tl, tBrave + .3, 10, 1, .2); SHOW(tl, lBrave, tBrave); sparkle(tl, svg, 500, 60, tBrave + .3, { r: 30 });
+    // 要是那个座位空着
+    tl.to([par.outer, pg], { opacity: 0, duration: 1 }, tEmpty); tl.to(lBrave, { opacity: 0, duration: .5 }, tEmpty);
+    kid.pose(tl, tEmpty + .6, 'stand', .6, { head: 22, lean: 4 }); kid.face(tl, tEmpty + .6, 'sad');
+    kid.gesture(tl, tHollow - 1.2, 2.2, .35, 1.2); SHOW(tl, lEmpty, tHollow); tl.to(spot, { opacity: .35, duration: 1 }, tEmpty + .5);
+  };
+
   window.FIG = { person, baby, POSE, stroke, pen, shown, ground, glow, bubble, POP, UNPOP, hearts, zzz, haha, sparkle, label, HEART, rgba, figGlow, SKY, DIM, WARM, ROSE };
   window.ANIMS = window.ANIMS || {};
 })();
