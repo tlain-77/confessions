@@ -2053,6 +2053,42 @@
     POP(tl, ok, tMercy - .1); judge.face(tl, tMercy + .6, 'smile');
   };
 
+  // 通读时的比方：这一段越往后，越像一个人在法庭上（法官席上不画人，只有一团光）→ 先是抬头想看法官的脸 →
+  // 然后走到自己的屋子前，把门打开给他看（里面乱七八糟）→ 最后转过身来，低下头，两手一摊：“我不辩了”
+  A.court3 = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 400), GY = 344;
+    const t0 = AT(s.at), tFace = OPT(AT, s, 'face', t0 + 2), tOpen = OPT(AT, s, 'open', tFace + 3.2), tGive = OPT(AT, s, 'give', tOpen + 2.4);
+    ground(svg, 40, 960, GY, { a: .38 });
+    // 法官席（右边）：高桌子，桌子后面一团光
+    const BX0 = 690, BX1 = 900, BT = GY - 150;
+    const light = glow(svg, 795, BT - 62, 118, { rays: 12, a: .9 });
+    mk('path', { d: `M${BX0},${BT} L${BX1},${BT} L${BX1},${GY} L${BX0},${GY} Z`, fill: 'rgba(12,11,10,.92)' }, svg);
+    stroke(svg, `M${BX0 - 12},${BT} L${BX1 + 12},${BT} M${BX0},${BT} L${BX0},${GY} M${BX1},${BT} L${BX1},${GY} M${BX0},${BT + 34} L${BX1},${BT + 34}`, { c: '#bfae92', w: 3.2 });
+    // 屋子（左边）：前门可以打开，里面乱七八糟
+    house(svg, 200, GY, 196, 132, { rh: 58 });
+    [[146, GY - 22, 0, -8], [188, GY - 18, 3, 10], [236, GY - 26, 1, -4], [166, GY - 62, 4, 6], [214, GY - 66, 2, -12], [252, GY - 64, 0, 14], [196, GY - 96, 2, 20]].forEach(([x, y, k, r]) => junk(svg, x, y, k, { r }));
+    const DX0 = 120, DX1 = 280, DT = GY - 118;
+    const door = mk('g', {}, svg);
+    mk('rect', { x: DX0, y: DT, width: DX1 - DX0, height: GY - DT, rx: 2, fill: 'rgba(22,20,18,.98)', stroke: '#bfae92', 'stroke-width': 2.6 }, door);
+    mk('circle', { cx: DX1 - 16, cy: GY - 56, r: 4.5, fill: '#bfae92' }, door);
+    const dst = { o: 0 }, drawDoor = () => door.setAttribute('transform', `translate(${DX0},0) scale(${(1 - .9 * dst.o).toFixed(4)},1) translate(${-DX0},0)`);
+    const man = person(svg, { x: 480, y: GY, h: 196, op: 0 }); man.face(tl, 0, 'worry', .01);
+    const c1 = label(svg, 795, GY + 40, '想看法官的脸', { s: 28, c: WARM }), c2 = label(svg, 200, GY + 40, '打开屋子给他看', { s: 28, c: WARM });
+    const no = bubble(svg, 450, 66, 190, 62, 362, 126, { t: '我不辩了', s: 32, c: GOLD });
+    gsap.set([c1, c2], { opacity: 0 });
+    tl.to(light, { opacity: .7, duration: 1 }, t0 - .3); tl.to(light._rays, { rotation: 20, svgOrigin: `795 ${BT - 62}`, duration: 14, ease: 'none' }, t0);
+    man.show(tl, t0, .7); man.breathe(tl, t0, tGive + 5);
+    // 先是想看法官的脸：抬头望着光
+    man.to(tl, tFace, .6, { head: -26 }); man.face(tl, tFace + .1, 'look'); tl.to(light, { opacity: 1, duration: .6 }, tFace); SHOW(tl, c1, tFace);
+    // 然后把屋子打开给他看
+    man.to(tl, tOpen - .9, .3, { head: 0 }); man.walk(tl, tOpen - .8, 330, .8, { stride: 52 });
+    man.pose(tl, tOpen - .1, 'reach', .3, { a1: 70, e1: 10 }); tl.to(dst, { o: 1, duration: .7, ease: 'power2.inOut', onUpdate: drawDoor }, tOpen + .1); SHOW(tl, c2, tOpen);
+    man.turn(tl, tOpen + .9, 1); man.pose(tl, tOpen + 1, 'open', .5, { a2: -40, e2: 10 }); man.face(tl, tOpen + 1, 'sad');
+    // 最后：我不辩了
+    man.pose(tl, tGive - .2, { a1: 30, e1: 20, a2: -26, e2: 20, lean: 12, head: 26 }, .6); man.face(tl, tGive, 'sleep'); POP(tl, no, tGive);
+    drawDoor();
+  };
+
   // 最后一个问题：我心里那间屋子，还有没有一个柜子，到现在还锁着？客人来之前赶紧塞进去、把门关上 → 学奥古斯丁：打开它，“我承认，我知道。”
   A.closetq = function ({ tl, el, AT, s }) {
     const { svg } = base(el, 440), GY = 400;
