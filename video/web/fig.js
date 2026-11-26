@@ -1775,7 +1775,7 @@
   // 病历上清清楚楚，吃药、贴膏药，都不管用 → 跪下来，向着光伸手：“除了向你外，我向谁呼号呢？”
   A.cure = function ({ tl, el, AT, s }) {
     const { svg } = base(el, 480), GY = 420;
-    const t0 = AT(s.at), tThink = OPT(AT, s, 'think', t0 + 1.8), tSolved = OPT(AT, s, 'solved', tThink + 1.6), tBegin = OPT(AT, s, 'begin', tSolved + 2.6), tDirty = OPT(AT, s, 'dirty', tBegin + 2.2),
+    const t0 = AT(s.at), tThink = OPT(AT, s, 'thk', t0 + 1.8), tSolved = OPT(AT, s, 'solved', tThink + 1.6), tBegin = OPT(AT, s, 'begin', tSolved + 2.6), tDirty = OPT(AT, s, 'dirty', tBegin + 2.2),
       tStill = OPT(AT, s, 'still', tDirty + 1.3), tSick = OPT(AT, s, 'sick', tStill + 2.1), tClear = OPT(AT, s, 'clear', tSick + 2.1), tCant = OPT(AT, s, 'cant', tClear + 1.4), tYou = OPT(AT, s, 'you', tCant + 2), tCry = OPT(AT, s, 'cry', tYou + 1.4);
     ground(svg, 40, 960, GY, { a: .38 });
     const lightG = glow(svg, 840, 80, 160, { rays: 11, a: .9 });
@@ -1838,6 +1838,208 @@
     tl.to(lastLeaf, { scaleX: .08, svgOrigin: `${LX + 50} ${GY}`, duration: .7, ease: 'power2.out' }, tLast + .5); tl.to(inside, { opacity: 1, duration: .8 }, tLast + .6);
     man.face(tl, tLast + .8, 'happy'); man.pose(tl, tLast + 1, 'open', .5, { x: LX - 70 });
     svg.insertBefore(inside, lastFrame);
+  };
+
+
+  // 闻不到的味道：客人进门，一股味道（一缕缕绿烟）冲出来，他捂住鼻子；主人坐在沙发上笑眯眯的，天天住在里面，早就闻惯了
+  A.smell = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 440), GY = 390;
+    const t0 = AT(s.at), tVisit = OPT(AT, s, 'visit', t0 + 1.3), tSmell = OPT(AT, s, 'smell', tVisit + 1.3), tHost = OPT(AT, s, 'host', tSmell + 2.8), tLive = OPT(AT, s, 'live', tHost + 1.6), tOurs = OPT(AT, s, 'ours', tLive + 7.3);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, 640, GY, 520, 240, { rh: 80 });
+    const sofa = stroke(svg, `M640,${GY} L640,${GY - 50} L820,${GY - 50} L820,${GY} M630,${GY - 50} Q630,${GY - 100} 660,${GY - 96} L800,${GY - 96} Q830,${GY - 100} 830,${GY - 50}`, { c: '#bfae92', w: 3 });
+    const host = person(svg, { x: 720, y: GY, h: 214, op: 0, f: -1 }); host.pose(tl, 0, 'sit', .01, { lean: -14, a1: 40, e1: 40, a2: -20, e2: 30 }); host.set(tl, 0, { hy: host.LEG - 50 }); host.face(tl, 0, 'happy', .01);
+    const guest = person(svg, { x: 60, y: GY, h: 214, op: 0 }); guest.face(tl, 0, 'smile', .01);
+    const wisps = [0, 1, 2, 3, 4].map(i => mk('path', { d: `M${470 + i * 26},${GY - 30} q-12,-26 0,-50 q12,-26 0,-52`, fill: 'none', stroke: '#9fc39a', 'stroke-width': 2.6, 'stroke-linecap': 'round', opacity: 0 }, svg));
+    const lHost = label(svg, 200, 120, '主人自己闻不到', { s: 28, c: WARM }), lUsed = label(svg, 200, 156, '天天住在里面，早就习惯了', { s: 24, c: '#cdbfa3' });
+    const lOurs = label(svg, 500, 432, '最危险的，是我们闻不到的那些', { s: 30, c: GOLD });
+    gsap.set([lHost, lUsed, lOurs], { opacity: 0 });
+    host.show(tl, t0, .8); guest.show(tl, t0 + .2, .6); host.breathe(tl, t0, tOurs + 4);
+    guest.walk(tl, tVisit - .3, 400, 1.4);
+    // 一进门：味道冲出来
+    wisps.forEach((w, i) => tl.fromTo(w, { opacity: 0, y: 10 }, { opacity: .85, y: -20, duration: .9, repeat: Math.max(1, Math.round((tOurs + 3 - tSmell) / 1.8)), yoyo: true, ease: 'sine.inOut', immediateRender: false }, tSmell + i * .18));
+    guest.face(tl, tSmell + .2, 'frown'); guest.pose(tl, tSmell + .2, { a1: 30, e1: 148, a2: 10, e2: 40, lean: -8, head: -4 }, .4); guest.hop(tl, tSmell + .2, 8, 1, .16);
+    // 主人闻不到
+    SHOW(tl, lHost, tHost); host.nod(tl, tHost + .2, 2, 6, .3); SHOW(tl, lUsed, tLive);
+    tl.to([lHost, lUsed], { opacity: .3, duration: .6 }, tOurs - .2); SHOW(tl, lOurs, tOurs);
+  };
+
+  // 跟着别人犯的罪（偷梨）：一个人的时候，他摇头不去 → 那帮朋友来了：“走，干一票！”你不去多丢人 → 他脸一红，跟着去了，
+  // 一起摇树、扔梨 → 别人说那句话，他也跟着笑（笑得很勉强，冒汗）
+  A.follow = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tAlone = OPT(AT, s, 'alone', t0 + 4.4), tNo = OPT(AT, s, 'notgo', tAlone + 1.3), tFr = OPT(AT, s, 'friends', tNo + 1.7), tGo = OPT(AT, s, 'go', tFr + 1.6), tShame = OPT(AT, s, 'shame', tGo + 1.4),
+      tOthers = OPT(AT, s, 'others', tShame + 4.2), tMe = OPT(AT, s, 'me', tOthers + 1.9), tSay = OPT(AT, s, 'say', tMe + 1.3), tLaugh = OPT(AT, s, 'laugh', tSay + 1.9), tClean = OPT(AT, s, 'clean', tLaugh + 3.7);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const wall = stroke(svg, `M640,${GY} L640,${GY - 80} L960,${GY - 80} L960,${GY}`, { c: '#9f9585', w: 3 });
+    const tree = pen(svg, `M800,${GY - 80} L800,${GY - 200} M800,${GY - 160} L760,${GY - 200} M800,${GY - 170} L846,${GY - 214} M720,${GY - 230} C700,${GY - 330} 900,${GY - 340} 890,${GY - 230} C910,${GY - 190} 710,${GY - 180} 720,${GY - 230} Z`, { c: '#a9c3a0', w: 3, go: .2 }); shown(tree);
+    const pears = [[750, GY - 240], [790, GY - 270], [840, GY - 250], [870, GY - 222], [770, GY - 212]].map(([x, y]) => { const g = mk('path', { d: `M${x},${y - 12} q-12,8 -9,18 q3,10 9,10 q6,0 9,-10 q3,-10 -9,-18 Z M${x},${y - 12} l2,-6`, fill: 'rgba(218,200,120,.4)', stroke: '#e2d38a', 'stroke-width': 2 }, svg); return g; });
+    const boy = person(svg, { x: 260, y: GY, h: 196, op: 0, hair: true }); boy.face(tl, 0, 'neutral', .01);
+    const fr = [[60, 0], [130, 1], [-20, 2]].map(([x]) => { const p = person(svg, { x, y: GY, h: 200, c: SKY, op: 0 }); p.face(tl, 0, 'grin', .01); return p; });
+    const goB = bubble(svg, 190, 120, 220, 70, 150, 196, { t: '走，干一票！', s: 30, c: '#c9d6ea' });
+    const lClean = label(svg, 500, 466, '这些跟着别人犯的，也求你清除', { s: 30, c: GOLD });
+    gsap.set(lClean, { opacity: 0 });
+    boy.show(tl, t0, .8); boy.breathe(tl, t0, tClean + 4);
+    // 一个人：不去
+    boy.to(tl, tAlone, .5, { head: -10 }); boy.face(tl, tAlone, 'look');
+    boy.turn(tl, tNo, -1, .3); boy.turn(tl, tNo + .4, 1, .3); boy.face(tl, tNo + .2, 'frown');
+    // 那帮朋友来了
+    fr.forEach((p, i) => { p.show(tl, tFr - .2 + i * .12, .4); p.walk(tl, tFr - .2 + i * .12, [150, 70, 10][i], 1.2); });
+    POP(tl, goB, tGo); fr[0].pose(tl, tGo, 'wave', .4); fr[0].waveHand(tl, tGo + .3, 1.4);
+    fr.forEach((p, i) => { p.pose(tl, tShame + i * .1, i === 1 ? 'point' : { a1: 40, e1: 110, lean: -6 }, .4); p.face(tl, tShame, 'laugh'); p.shakeBody(tl, tShame + .1, 1.6, .8); });
+    haha(tl, svg, 120, 200, tShame + .2, 1.4, { c: '#c9d6ea' }); boy.blush(tl, tShame + .4); boy.face(tl, tShame + .4, 'worry');
+    // 跟着去了：一起走到树下，摇树、梨掉下来
+    UNPOP(tl, goB, tShame + 1.4);
+    const tRun = tShame + 1.8;
+    [boy, ...fr].forEach((p, i) => { p.pose(tl, tRun - .2, 'stand', .3); p.walk(tl, tRun, [700, 590, 500, 410][i], 1.6); });
+    fr[0].pose(tl, tRun + 1.8, 'up', .4); fr[0].waveHand(tl, tRun + 2, 1.6, .8); tl.to(tree, { x: 3, duration: .08, yoyo: true, repeat: 9 }, tRun + 2);
+    pears.forEach((p, i) => tl.to(p, { y: GY - 18 - [GY - 240, GY - 270, GY - 250, GY - 222, GY - 212][i], duration: .5, ease: 'bounce.out' }, tRun + 2.2 + i * .15));
+    // 别人这么做，我也这么做
+    fr[1].pose(tl, tOthers, { a1: 150, e1: 30 }, .3); fr[1].pose(tl, tOthers + .4, { a1: 60, e1: 10 }, .2);
+    boy.pose(tl, tMe, { a1: 150, e1: 30 }, .3); boy.pose(tl, tMe + .4, { a1: 60, e1: 10 }, .2);
+    // 别人说那句话，我也跟着笑
+    fr.forEach((p, i) => { p.face(tl, tSay, 'laugh'); p.shakeBody(tl, tSay + .1, 3, .9); }); haha(tl, svg, 560, 220, tSay + .1, 2.4, { c: '#c9d6ea' });
+    boy.face(tl, tLaugh, 'grin'); boy.shakeBody(tl, tLaugh, 2, .6); boy.sweat(tl, tLaugh + .2, 2.2);
+    SHOW(tl, lClean, tClean);
+  };
+
+  // 打碎了花瓶：孩子拍球，碰倒了桌上的花瓶，碎了 → 跑到妈妈面前：“妈妈，我把花瓶打碎了……” → 妈妈蹲下来抱住他
+  // → 要是他觉得说了就会被赶出去：（想的泡泡里）他躲在沙发后面发抖 → 能认罪，是因为有信心
+  A.vase = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tTell = OPT(AT, s, 'tell', t0 + 4.2), tTrust = OPT(AT, s, 'trust', tTell + 2.2), tIf = OPT(AT, s, 'if', tTrust + 2.8), tOut = OPT(AT, s, 'out', tIf + 2.6), tHide = OPT(AT, s, 'hide', tOut + 1.4), tFaith = OPT(AT, s, 'faith', tHide + 1.8);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const table = stroke(svg, `M120,${GY - 90} L250,${GY - 90} M136,${GY - 90} L136,${GY} M234,${GY - 90} L234,${GY}`, { c: '#bfae92', w: 3 });
+    const vase = mk('path', { d: `M185,${GY - 92} q-22,-4 -20,-34 q2,-22 12,-30 l-4,-12 l24,0 l-4,12 q10,8 12,30 q2,30 -20,34 Z`, fill: 'rgba(143,184,216,.25)', stroke: '#bfe0f6', 'stroke-width': 2.4 }, svg);
+    const shards = [[-30, 6, -40], [-12, 10, 20], [8, 8, 70], [26, 6, -60]].map(([dx, dy, r]) => mk('path', { d: `M${185 + dx},${GY - 2} l10,-8 l6,8 Z`, fill: 'rgba(143,184,216,.3)', stroke: '#bfe0f6', 'stroke-width': 1.8, opacity: 0, transform: `rotate(${r} ${185 + dx} ${GY - 4})` }, svg));
+    const ball = mk('circle', { cx: 0, cy: 0, r: 14, fill: 'rgba(235,162,124,.35)', stroke: CORAL, 'stroke-width': 2.4 }, svg); gsap.set(ball, { x: 330, y: GY - 14 });
+    const kid = person(svg, { x: 360, y: GY, h: 140, kind: 'child', hair: true, op: 0 }); kid.face(tl, 0, 'happy', .01);
+    const mom = person(svg, { x: 760, y: GY, h: 230, f: -1, op: 0, dress: true, veil: true }); mom.face(tl, 0, 'smile', .01);
+    const say = bubble(svg, 560, 140, 370, 70, 600, 236, { t: '妈妈，我把花瓶打碎了……', s: 28 });
+    const crash = label(svg, 185, GY - 150, '哐！', { s: 34, c: '#e0b4a4' });
+    // 想的泡泡：要是怕被赶出去，他就躲起来
+    const th = bubble(svg, 250, 120, 300, 150, 330, 270, { kind: 'think', c: '#b9c6da' });
+    stroke(th.inner, `M180,170 L180,140 Q250,128 320,140 L320,170 Z`, { c: '#9f9585', w: 2.4, glow: false });
+    const hid = person(th.inner, { x: 290, y: 178, h: 70, kind: 'child', hair: true, w: 2.4 }); hid.pose(tl, 0, 'hugKnees', .01); hid.face(tl, 0, 'cry', .01);
+    const lFaith = label(svg, 500, 466, '能认罪，是因为有信心', { s: 32, c: GOLD });
+    gsap.set([crash, lFaith], { opacity: 0 });
+    tl.to(table, { opacity: 1, duration: .5 }, t0 - .3); kid.show(tl, t0, .6); mom.show(tl, t0 + .2, .6); mom.breathe(tl, t0, tFaith + 4);
+    // 拍球 → 碰倒花瓶
+    tl.to(ball, { y: GY - 60, duration: .25, yoyo: true, repeat: 3, ease: 'sine.out' }, t0 + .2); kid.waveHand(tl, t0 + .2, 1, .6);
+    tl.to(ball, { x: 196, y: GY - 120, duration: .4, ease: 'power1.out' }, t0 + 1.3); tl.to(ball, { x: 120, y: GY - 14, duration: .5, ease: 'bounce.out' }, t0 + 1.7);
+    tl.to(vase, { rotation: -80, x: -20, y: 70, svgOrigin: `185 ${GY - 92}`, duration: .45, ease: 'power2.in' }, t0 + 1.6); tl.to(vase, { opacity: 0, duration: .1 }, t0 + 2.05);
+    shards.forEach(sh => tl.to(sh, { opacity: 1, duration: .1 }, t0 + 2.05)); tl.fromTo(crash, { opacity: 0, scale: .6, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .3, ease: 'back.out(3)', immediateRender: false }, t0 + 2.05); tl.to(crash, { opacity: 0, duration: .4 }, t0 + 3);
+    kid.face(tl, t0 + 2.1, 'wow'); kid.hop(tl, t0 + 2.1, 10, 1, .16);
+    // 跑去告诉妈妈
+    kid.walk(tl, tTell - .9, 620, .9, { stride: 46 }); kid.face(tl, tTell, 'sad'); POP(tl, say, tTell); kid.talk(tl, tTell, 1.4, 'talk', 'sad');
+    // 妈妈抱住他
+    UNPOP(tl, say, tTrust); mom.pose(tl, tTrust, 'squat', .6, { a1: 60, e1: 80, a2: 50, e2: 86, lean: 20, head: 10 }); mom.face(tl, tTrust, 'smile');
+    kid.to(tl, tTrust + .1, .6, { x: 690 }); kid.pose(tl, tTrust + .2, 'hug', .5);
+    hearts(tl, svg, 700, 250, tTrust + .6, 3, { s: 13 }); kid.face(tl, tTrust + .6, 'content');
+    // 要是怕被赶出去：他会藏起来
+    POP(tl, th, tIf); tl.to(th, { opacity: .95, duration: .1 }, tOut);
+    tl.to(hid.st, { sph: 40, shake: .8, duration: 3, ease: 'none', onUpdate: hid.draw }, tHide);
+    UNPOP(tl, th, tFaith - .2); SHOW(tl, lFaith, tFaith);
+  };
+
+  // 说心里话最累的是解释：一句一句解释（我不是那个意思……我当时是这样想的……你得弄明白我的处境……），说了半天，对方还是误会
+  // → 在神面前不用解释：跪在光里，什么都不用说，祂完全了解
+  A.explain = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tE = [OPT(AT, s, 'e1', t0 + 3.5), OPT(AT, s, 'e2', t0 + 4.8), OPT(AT, s, 'e3', t0 + 6.5)], tLong = OPT(AT, s, 'long', t0 + 9.1), tMis = OPT(AT, s, 'mis', tLong + 1), tGod = OPT(AT, s, 'god', tMis + 1.5), tKnow = OPT(AT, s, 'know', tGod + 2.3);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const sp = person(svg, { x: 170, y: GY, h: 214, op: 0 }); sp.face(tl, 0, 'worry', .01);
+    const li = person(svg, { x: 380, y: GY, h: 214, f: -1, c: SKY, op: 0, look: 0 }); li.pose(tl, 0, 'crossF', .01); li.face(tl, 0, 'frown', .01);
+    const bs = ['我不是那个意思……', '我当时是这样想的……', '你得弄明白我之前的处境……'].map(t => bubble(svg, 250, 160, 340, 56, 200, 236, { t, s: 24 }));
+    const mis = bubble(svg, 470, 60, 200, 80, 400, 230, { kind: 'think', t: '？？', s: 34, c: '#c9d6ea' });
+    const lit = glow(svg, 780, 200, 170, { rays: 11, a: .9 });
+    const me = person(svg, { x: 780, y: GY, h: 214, op: 0 }); me.pose(tl, 0, 'kneelPray', .01); me.face(tl, 0, 'sleep', .01);
+    const lNo = label(svg, 780, 456, '不用解释', { s: 30, c: WARM }), lKnow = label(svg, 780, 456, '祂完全了解——比你自己还了解你', { s: 28, c: GOLD });
+    gsap.set([lNo, lKnow], { opacity: 0 });
+    sp.show(tl, t0, .7); li.show(tl, t0 + .2, .7); li.breathe(tl, t0, tKnow + 4);
+    bs.forEach((b, i) => { POP(tl, b, tE[i]); sp.talk(tl, tE[i], 1.1, 'talk', 'worry'); sp.gesture(tl, tE[i], 1.2, .8 + i * .2);
+      bs.slice(0, i).forEach((o, j) => tl.to(o, { y: -62 * (i - j), opacity: .42, duration: .4, ease: 'power2.out' }, tE[i] - .05)); });   // 新的一句在最下面（贴着头），旧的往上推、变淡
+    sp.sweat(tl, tE[2], 2.5); li.nod(tl, tE[1], 1, -6, .3);
+    tl.to(bs[2], { opacity: .5, duration: .5 }, tLong); POP(tl, mis, tMis); li.face(tl, tMis, 'angry');
+    // 在神面前
+    tl.to([...bs, mis], { opacity: 0, duration: .6 }, tGod - .2); tl.to([sp.outer, li.outer], { opacity: .3, duration: .6 }, tGod);
+    tl.to(lit, { opacity: 1, duration: 1.2 }, tGod); tl.to(lit._rays, { rotation: 18, svgOrigin: '780 200', duration: 10, ease: 'none' }, tGod); me.show(tl, tGod + .2, .8); SHOW(tl, lNo, tGod + .4);
+    tl.to(lNo, { opacity: 0, duration: .4 }, tKnow - .2); SHOW(tl, lKnow, tKnow); me.face(tl, tKnow, 'content'); sparkle(tl, svg, 780, 280, tKnow + .4, { r: 34 });
+  };
+
+  // 给自己的罪起好听的名字：三个写着“罪”的罐子，一句一句往上贴好看的标签（原生家庭、压力大、状态不好）→ 放在一起看：标签一角翘起来，底下还是“罪”
+  A.names = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 440), GY = 400;
+    const t0 = AT(s.at), tN = [[OPT(AT, s, 'n1', t0 + 3.5), OPT(AT, s, 'l1', t0 + 4.8)], [OPT(AT, s, 'n2', t0 + 6.5), OPT(AT, s, 'l2', t0 + 8)], [OPT(AT, s, 'n3', t0 + 9.7), OPT(AT, s, 'l3', t0 + 12.3)]], tAll = OPT(AT, s, 'all', t0 + 17.7), tName = OPT(AT, s, 'name', tAll + 2.7);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const man = person(svg, { x: 150, y: GY, h: 214, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const JX = [430, 620, 810], tags = ['原生家庭', '压力大', '状态不太好'];
+    const jars = JX.map(x => { const g = mk('g', {}, svg); mk('path', { d: `M${x - 56},${GY} L${x - 60},${GY - 120} Q${x - 60},${GY - 150} ${x - 30},${GY - 154} L${x + 30},${GY - 154} Q${x + 60},${GY - 150} ${x + 60},${GY - 120} L${x + 56},${GY} Z`, fill: 'rgba(30,26,24,.9)', stroke: '#9f9585', 'stroke-width': 2.6 }, g);
+      label(g, x, GY - 62, '罪', { s: 44, c: '#e0a08c', font: 'Noto Serif SC', wt: 700 }); return g; });
+    const labels = JX.map((x, i) => { const g = mk('g', { opacity: 0 }, svg); mk('rect', { x: x - 54, y: GY - 108, width: 108, height: 62, rx: 8, fill: 'rgba(250,236,214,.95)', stroke: '#e8c9ab', 'stroke-width': 2 }, g);
+      label(g, x, GY - 70, tags[i], { s: i === 2 ? 19 : 22, c: '#7a5a48', ls: '0.02em' }).style.stroke = 'none'; mk('path', { d: `M${x - 44},${GY - 98} l6,-6 l6,6 l-6,6 Z M${x + 38},${GY - 56} l5,-5 l5,5 l-5,5 Z`, fill: '#e8a0b0' }, g); return g; });
+    const bubbles = ['不是我的问题', '不是我脾气差', '不是我不亲近神'].map(t => bubble(svg, 200, 140, 230, 60, 170, 206, { t, s: 26 }));
+    const lName = label(svg, 560, 438, '给自己的罪起好听的名字', { s: 30, c: GOLD });
+    gsap.set(lName, { opacity: 0 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tName + 4);
+    tN.forEach(([tn, tl2], i) => { POP(tl, bubbles[i], tn); if (i) UNPOP(tl, bubbles[i - 1], tn - .1); man.talk(tl, tn, 1.2, 'talk', 'smile');
+      tl.fromTo(labels[i], { opacity: 0, y: -40, rotation: -8, transformOrigin: '50% 50%' }, { opacity: 1, y: 0, rotation: 0, duration: .5, ease: 'back.out(2)', immediateRender: false }, tl2); sparkle(tl, svg, JX[i], GY - 78, tl2 + .4, { r: 30, c: '#f6d6e0' }); });
+    UNPOP(tl, bubbles[2], tAll - .3);
+    // 放在一起看：标签一角翘起来，露出“罪”
+    labels.forEach((g, i) => tl.to(g, { rotation: 14, transformOrigin: '0% 0%', y: -6, duration: .5, ease: 'power2.out' }, tAll + .2 + i * .2));
+    man.face(tl, tAll + .4, 'worry'); SHOW(tl, lName, tName);
+  };
+
+  // 法庭：被告站在栏杆里，证据一件件摆上法官的台子；他还想狡辩，话里全是窟窿，证据越摆越多 → 不辩了，跪下：“我认了，求你开恩。”
+  A.trial = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 480), GY = 420;
+    const t0 = AT(s.at), tStand = OPT(AT, s, 'stand', t0 + 1.5), tEvid = OPT(AT, s, 'evid', tStand + 1.7), tArgue = OPT(AT, s, 'argue', tEvid + 2.1), tHoles = OPT(AT, s, 'holes', tArgue + 1.4), tBest = OPT(AT, s, 'best', tHoles + 2.2), tStop = OPT(AT, s, 'stop', tBest + 1.8), tMercy = OPT(AT, s, 'mercy', tStop + 1.6);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const judge = person(svg, { x: 210, y: 362, h: 236, c: '#cdbfa3', op: 0 }); judge.pose(tl, 0, 'stand', .01, { a1: 40, e1: 70 }); judge.face(tl, 0, 'neutral', .01);
+    const bench = mk('g', { opacity: 0 }, svg); mk('path', { d: `M100,250 L330,250 L330,${GY} L100,${GY} Z`, fill: '#0b0b0f', stroke: '#bfb3a0', 'stroke-width': 3.2 }, bench); mk('path', { d: `M86,250 L344,250`, stroke: '#bfb3a0', 'stroke-width': 2.4 }, bench);
+    const dock = stroke(svg, `M560,${GY} L560,${GY - 110} L760,${GY - 110} L760,${GY} M560,${GY - 60} L760,${GY - 60} M610,${GY - 110} L610,${GY} M660,${GY - 110} L660,${GY} M710,${GY - 110} L710,${GY}`, { c: '#9f9585', w: 2.6 }); gsap.set(dock, { opacity: 0 });
+    const def = person(svg, { x: 660, y: GY, h: 214, f: -1, op: 0 }); def.face(tl, 0, 'worry', .01);
+    const evid = [0, 1, 2, 3, 4, 5].map(i => { const g = mk('g', { opacity: 0 }, svg); mk('rect', { x: -30, y: -13, width: 60, height: 26, rx: 4, fill: 'rgba(200,120,100,.2)', stroke: '#e0a08c', 'stroke-width': 2 }, g); label(g, 0, 7, '证据', { s: 18, c: '#f0c2b2', ls: '0.2em', font: 'Noto Serif SC', wt: 500 }); return g; });
+    const arg = bubble(svg, 760, 130, 280, 80, 690, 218, { t: '那是因为……其实……', s: 26 });
+    const holes = [[690, 118], [770, 140], [840, 122], [720, 150]].map(([x, y]) => mk('circle', { cx: x, cy: y, r: 9, fill: '#050608', stroke: '#9f9585', 'stroke-width': 1.6, opacity: 0 }, svg));
+    const q = label(svg, 660, 150, '……', { s: 36, c: '#cdbfa3' });
+    const ok = bubble(svg, 780, 150, 260, 70, 700, 250, { t: '我认了，求你开恩。', s: 28, c: WARM });
+    gsap.set(q, { opacity: 0 });
+    tl.to(bench, { opacity: 1, duration: .7 }, t0); judge.show(tl, t0 + .2, .8); judge.breathe(tl, t0, tMercy + 4);
+    tl.to(dock, { opacity: 1, duration: .6 }, tStand - .3); def.show(tl, tStand, .7); def.sweat(tl, tEvid + .5, tStop - tEvid);
+    evid.slice(0, 4).forEach((g, i) => tl.fromTo(g, { opacity: 0, x: 215, y: 200 }, { opacity: 1, x: 140 + i * 50, y: 236 - (i % 2) * 6, duration: .5, ease: 'power2.out', immediateRender: false }, tEvid + i * .35));
+    POP(tl, arg, tArgue); def.talk(tl, tArgue, tBest - tArgue - .3, 'talk', 'worry'); def.gesture(tl, tArgue, tBest - tArgue - .3, 1.1, 2.2);
+    holes.forEach((h, i) => tl.fromTo(h, { opacity: 0, scale: .2, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .25, ease: 'back.out(3)', immediateRender: false }, tHoles + i * .25));
+    evid.slice(4).forEach((g, i) => tl.fromTo(g, { opacity: 0, x: 215, y: 190 }, { opacity: 1, x: 160 + i * 70, y: 214, duration: .5, ease: 'power2.out', immediateRender: false }, tHoles + .6 + i * .35));
+    UNPOP(tl, arg, tBest); tl.to(holes, { opacity: 0, duration: .3 }, tBest); SHOW(tl, q, tBest + .1); def.face(tl, tBest, 'sad');
+    tl.to(q, { opacity: 0, duration: .3 }, tStop - .2); def.pose(tl, tStop, 'kneel', .6, { a1: 40, e1: 96, a2: 44, e2: 90, lean: 10, head: 18 }); def.face(tl, tStop + .2, 'sleep');
+    POP(tl, ok, tMercy - .1); judge.face(tl, tMercy + .6, 'smile');
+  };
+
+  // 最后一个问题：我心里那间屋子，还有没有一个柜子，到现在还锁着？客人来之前赶紧塞进去、把门关上 → 学奥古斯丁：打开它，“我承认，我知道。”
+  A.closetq = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 440), GY = 400;
+    const t0 = AT(s.at), tCab = OPT(AT, s, 'cab', t0 + 2), tLocked = OPT(AT, s, 'locked', tCab + 1.3), tStuff = OPT(AT, s, 'stuff', tLocked + 3.9), tShut = OPT(AT, s, 'shut', tStuff + 2), tLearn = OPT(AT, s, 'learn', tShut + 3.5), tOpen = OPT(AT, s, 'open', tLearn + 1.2), tSay = OPT(AT, s, 'say', tOpen + 1.7);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, 500, GY, 600, 250, { rh: 90 });
+    const lightG = glow(svg, 500, 40, 160, { rays: 11, a: .9 });
+    const C = cabinet(svg, 300, GY - 200, 150, 200);
+    const inside = [0, 1, 2, 3, 4].map((k, i) => { const g = junk(C.inside, C.cx - 40 + (i % 3) * 36, C.y + 40 + (i % 3) * 52, k, { r: i * 50 }); return g; });
+    const lock = padlock(svg, C.cx, C.cy - 8); gsap.set(lock, { opacity: 1 });
+    const pulse = glow(svg, C.cx, C.cy, 130, { a: .35, c0: '#ffe9c4', c1: '#f6c98e' }); svg.insertBefore(pulse, C.g);
+    const man = person(svg, { x: 640, y: GY, h: 210, f: -1, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const extra = [1, 3].map(k => { const g = junk(C.inside, 0, 0, k); gsap.set(g, { x: 560, y: GY - 14 }); return g; });
+    const bub = bubble(svg, 700, 120, 300, 70, 640, 196, { t: '我承认，我知道。', s: 30, c: GOLD });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tSay + 4);
+    tl.to(pulse, { opacity: 1, duration: .8, yoyo: true, repeat: 3 }, tCab); tl.to(lock, { x: 3, duration: .07, yoyo: true, repeat: 7 }, tLocked);
+    // 客人来之前：开锁、把东西塞进去、门关上
+    tl.to(lock, { opacity: 0, duration: .3 }, tStuff - .6); openDoors(tl, C, tStuff - .5, .4); man.to(tl, tStuff - .5, .5, { x: C.x + C.w + 40 }); man.face(tl, tStuff - .4, 'worry');
+    extra.forEach((g, i) => tl.to(g, { x: C.cx - 20 + i * 30, y: C.y + 150, rotation: 120, duration: .45, ease: 'power2.in' }, tStuff + i * .4));
+    closeDoors(tl, C, tShut); tl.to(lock, { opacity: 1, duration: .3 }, tShut + .4); man.pose(tl, tShut, { a1: -30, e1: 10, lean: -10 }, .4);
+    // 学奥古斯丁：打开它
+    man.pose(tl, tLearn, 'reach', .5); tl.to(lock, { opacity: 0, y: 30, duration: .5, ease: 'power2.in' }, tOpen); openDoors(tl, C, tOpen + .3, .6);
+    tl.to(lightG, { opacity: 1, duration: 1.2 }, tOpen + .3); man.face(tl, tOpen + .4, 'neutral');
+    man.pose(tl, tSay - .3, 'kneel', .6, { a1: 60, e1: 40, a2: 50, e2: 46, head: 10 }); POP(tl, bub, tSay);
   };
 
   window.FIG = { person, baby, POSE, stroke, pen, shown, ground, glow, bubble, POP, UNPOP, hearts, zzz, haha, sparkle, label, HEART, rgba, figGlow, SKY, DIM, WARM, ROSE };
