@@ -229,6 +229,8 @@
       F.face(tl, t + d, back || prev, .2); return F;
     };
     F.tears = (tl, t, d) => { drops(tl, FC.tears, t, d, HR); return F; };
+    F.blush = (tl, t, d = .5) => { if (!F._bl) { F._bl = [FC.e1, FC.e2].map(x => mk('ellipse', { cx: x + (x > 0 ? HR * .08 : -HR * .08), cy: FC.ey + HR * .38, rx: HR * .2, ry: HR * .11, fill: 'rgba(235,110,90,.6)', opacity: 0 }, headG)); }
+      tl.to(F._bl, { opacity: 1, duration: d }, t); return F; };
     F.sweat = (tl, t, d = 1.2) => { tl.fromTo(FC.sweat, { opacity: 0, y: -HR * .1 }, { opacity: 1, y: 0, duration: .3, immediateRender: false }, t); tl.to(FC.sweat, { opacity: 0, y: HR * .35, duration: .5 }, t + d); return F; };
     F.show = (tl, t, d = .7, from = {}) => { gsap.set(outer, { opacity: 0 }); tl.fromTo(outer, { opacity: 0, y: 0, ...from }, { opacity: 1, x: 0, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, t); return F; };
     F.fade = (tl, t, o = 0, d = .7) => { tl.to(outer, { opacity: o, duration: d }, t); return F; };
@@ -1450,6 +1452,392 @@
     // 用哭来报复：大人捂耳朵
     ad.pose(tl, tRev, { a1: 150, e1: 130, a2: 140, e2: 136, head: 8, lean: -4 }, .5); ad.face(tl, tRev + .2, 'worry'); ad.sweat(tl, tRev + .4, 2.4);
     SHOW(tl, lab, tRev + .1);
+  };
+
+
+  // ════════ 第七讲（卷一第五章下）的例子：灵魂的屋子 ════════
+  // 房子（剖面）：中心 cx、地面 gy、宽 w、墙高 h、屋顶高 rh；st 可以补间（扩建），每帧重画
+  const houseD = (cx, gy, w, h, rh) => `M${n1(cx - w / 2)},${gy} L${n1(cx - w / 2)},${n1(gy - h)} L${n1(cx)},${n1(gy - h - rh)} L${n1(cx + w / 2)},${n1(gy - h)} L${n1(cx + w / 2)},${gy}`;
+  function house(par, cx, gy, w, h, o = {}) {
+    const g = mk('g', { opacity: o.op ?? 1 }, par);
+    const fill = mk('path', { fill: o.fill || 'rgba(16,15,14,.6)' }, g);
+    const p = mk('path', { fill: 'none', stroke: o.c || '#d9c9a8', 'stroke-width': o.w || 3.2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', filter: `url(#${figGlow(svgOf(par))})` }, g);
+    const st = { w, h, rh: o.rh ?? w * .3 };
+    const H = { g, p, fill, st, cx, gy };
+    H.draw = () => { const d = houseD(cx, gy, st.w, st.h, st.rh); p.setAttribute('d', d); fill.setAttribute('d', d + ' Z'); if (H.onDraw) H.onDraw(st); };
+    H.to = (tl, t, d, props, ease = 'power2.inOut') => { tl.to(st, { ...props, duration: d, ease, onUpdate: H.draw }, t); };
+    H.draw(); return H;
+  }
+  // 杂物：箱子、袜子、纸团、瓶子、书（中心 0,0）
+  const JUNK = [
+    'M-16,-14 L16,-14 L16,12 L-16,12 Z M-16,-4 L16,-4',
+    'M-6,-14 L4,-14 L4,4 L14,8 L12,14 L-6,10 Z',
+    'M-10,-6 Q-12,-14 -2,-12 Q8,-16 10,-6 Q14,4 4,8 Q-8,12 -10,-6 Z M-4,-4 L4,2 M2,-8 L-2,0',
+    'M-5,-16 L5,-16 L5,-10 L9,-4 L9,14 L-9,14 L-9,-4 L-5,-10 Z',
+    'M-14,-10 L14,-14 L16,8 L-12,12 Z M-12,-2 L14,-6',
+  ];
+  const junk = (par, x, y, k, o = {}) => { const g = mk('g', { transform: `translate(${x},${y}) rotate(${o.r || 0})` }, par); mk('path', { d: JUNK[k % JUNK.length], fill: o.fill || 'rgba(205,191,163,.18)', stroke: o.c || '#bfae92', 'stroke-width': 2.2, 'stroke-linejoin': 'round' }, g); return g; };
+
+  // 贵客要来：一个人盼了很多年（日历一页页翻）→ 一封信飞来：贵客要来 → 高兴得跳起来 → 转身一看自己那间又小又乱的屋子，脸一下子红了
+  A.guest = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 410;
+    const t0 = AT(s.at), tCome = OPT(AT, s, 'come', t0 + 3.1), tJoy = OPT(AT, s, 'joy', tCome + 2.9), tTurn = OPT(AT, s, 'turn', tJoy + 2), tRed = OPT(AT, s, 'red', tTurn + 2);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const man = person(svg, { x: 560, y: GY, h: 220, op: 0 }); man.pose(tl, 0, 'stand', .01, { a1: 20, e1: 40, head: -6 }); man.face(tl, 0, 'neutral', .01);
+    // 日历
+    const cal = mk('g', { opacity: 0 }, svg); mk('rect', { x: 720, y: 96, width: 120, height: 130, rx: 6, fill: 'rgba(16,15,14,.8)', stroke: '#cdbfa3', 'stroke-width': 2.4 }, cal); mk('rect', { x: 720, y: 96, width: 120, height: 30, rx: 6, fill: 'rgba(224,160,140,.35)' }, cal);
+    const pages = []; for (let i = 0; i < 8; i++) { const g = mk('g', {}, cal); mk('rect', { x: 726, y: 132, width: 108, height: 88, fill: '#151413', stroke: '#8f8270', 'stroke-width': 1.2 }, g); label(g, 780, 194, String(2000 + 3 * (7 - i)), { s: 26, c: '#cdbfa3', font: 'Cormorant Garamond', wt: 500, ls: 0 }); pages.push(g); }
+    const lWait = label(svg, 780, 262, '盼了很多年', { s: 26, c: '#cdbfa3' });
+    // 信
+    const env = mk('g', { opacity: 0 }, svg); mk('path', { d: 'M-34,-22 L34,-22 L34,22 L-34,22 Z M-34,-22 L0,4 L34,-22', fill: 'rgba(241,232,214,.16)', stroke: PAPER, 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, env); mk('circle', { cx: 0, cy: 6, r: 7, fill: GOLD }, env);
+    const lGuest = label(svg, 560, 120, '贵客要来！', { s: 36, c: GOLD, font: 'Noto Serif SC', wt: 500 });
+    // 身后那间小屋子（左边），里面乱七八糟
+    const hs = house(svg, 210, GY, 250, 150, { rh: 70, op: 0 });
+    const mess = [[150, GY - 20, 0, -8], [196, GY - 16, 2, 10], [240, GY - 24, 4, -14], [282, GY - 18, 1, 20], [170, GY - 52, 3, 6], [262, GY - 56, 0, -18]].map(([x, y, k, r]) => junk(hs.g, x, y, k, { r }));
+    const web = mk('path', { d: `M86,${GY - 150} q18,8 30,26 M86,${GY - 130} q22,-2 40,-14 M96,${GY - 150} L110,${GY - 112}`, stroke: '#8f8270', 'stroke-width': 1.4, fill: 'none' }, hs.g);
+    const lRed = label(svg, 560, 120, '脸一下子就红了', { s: 32, c: '#e8a08c' });
+    gsap.set([lWait, lGuest, lRed], { opacity: 0 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tRed + 4); tl.to(cal, { opacity: 1, duration: .6 }, t0 + .2); SHOW(tl, lWait, t0 + .6);
+    man.to(tl, t0 + .3, .6, { head: -14 }); man.face(tl, t0 + .4, 'worry');
+    pages.slice(1).reverse().forEach((p, i) => { const t = t0 + .7 + i * ((tCome - t0 - 1) / 7); tl.to(p, { opacity: 0, y: 40, rotation: 20, svgOrigin: '780 176', duration: .35, ease: 'power1.in' }, t); });   // 最上面一页是 2000，一页页撕掉
+    // 信来了
+    tl.fromTo(env, { opacity: 0, x: 980, y: 120, rotation: -30 }, { opacity: 1, x: 640, y: 260, rotation: 8, duration: .9, ease: 'power2.out', immediateRender: false }, tCome);
+    man.pose(tl, tCome + .5, { a1: 60, e1: 40, head: 6 }, .5); man.face(tl, tCome + .8, 'wow'); SHOW(tl, lGuest, tCome + .7);
+    // 高兴得不得了
+    tl.to([cal, lWait], { opacity: .25, duration: .5 }, tJoy - .2); tl.to(env, { opacity: 0, duration: .4 }, tJoy);
+    man.face(tl, tJoy, 'laugh'); man.pose(tl, tJoy, 'up', .4); man.hop(tl, tJoy + .2, 26, 2, .22); sparkle(tl, svg, 560, 150, tJoy + .4, { r: 36 }); hearts(tl, svg, 600, 160, tJoy + .3, 2, { s: 13 });
+    // 转身一看：小屋子又小又乱
+    tl.to(hs.g, { opacity: 1, duration: .9 }, tTurn - .3); man.turn(tl, tTurn, -1, .4); man.pose(tl, tTurn + .1, 'stand', .5, { head: 4 }); man.face(tl, tTurn + .2, 'wow'); tl.to(lGuest, { opacity: 0, duration: .5 }, tTurn);
+    // 脸红了
+    man.face(tl, tRed, 'worry'); man.blush(tl, tRed + .1); man.sweat(tl, tRed + .3, 2.5); man.pose(tl, tRed, { a1: 30, e1: 140, a2: 20, e2: 60, head: 10 }, .5); SHOW(tl, lRed, tRed + .2);
+  };
+
+  // 灵魂的屋子太小：一个人缩在小屋子里，头顶着屋顶；门外一团光（贵客）进不来 → 他自己推墙，推不动 → 求神“请你加以扩充”：屋子撑大，光进来，他站直了
+  A.narrow = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420, CX = 400;
+    const t0 = AT(s.at), tFit = OPT(AT, s, 'fit', t0 + 2.9), tSelf = OPT(AT, s, 'self', tFit + 2.1), tAsk = OPT(AT, s, 'ask', tSelf + 1.1), tGrow = OPT(AT, s, 'grow', tAsk + 1.3);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, CX, GY, 170, 118, { rh: 52 });
+    const man = person(svg, { x: CX - 10, y: GY, h: 200, op: 0 }); man.pose(tl, 0, 'squat', .01, { hy: 92, lean: 30, head: 20, a1: 30, e1: 60, a2: 20, e2: 70 }); man.face(tl, 0, 'worry', .01);
+    const door = mk('path', { d: '', fill: 'none', stroke: '#d9c9a8', 'stroke-width': 2.4 }, svg);
+    hs.onDraw = st => door.setAttribute('d', `M${n1(CX + st.w / 2)},${GY} L${n1(CX + st.w / 2)},${n1(GY - Math.min(70, st.h * .6))}`);
+    hs.draw();
+    const lit = glow(svg, 760, 300, 120, { rays: 9, a: .9 });
+    const lNo = label(svg, 760, 150, '装不下', { s: 32, c: '#e0b4a4' }), lSelf = label(svg, CX, 150, '自己扩建？', { s: 30, c: '#cdbfa3' }), lAsk = label(svg, CX, 92, '“请你加以扩充”', { s: 34, c: GOLD });
+    gsap.set([lNo, lSelf, lAsk], { opacity: 0 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tGrow + 6);
+    tl.to(lit, { opacity: 1, duration: 1 }, t0 + .4); tl.to(lit._rays, { rotation: 20, svgOrigin: '760 300', duration: 20, ease: 'none' }, t0);
+    // 装不下：光往门口挤，挤不进去
+    tl.to(lit, { x: -130, duration: .7, ease: 'power2.in', yoyo: true, repeat: 1 }, tFit); SHOW(tl, lNo, tFit + .4);
+    // 自己扩建：推墙，推不动
+    man.turn(tl, tSelf - .3, -1, .3); man.to(tl, tSelf, .4, { a1: 86, e1: 10, a2: 80, e2: 14, lean: 24 }); SHOW(tl, lSelf, tSelf);
+    tl.to(man.st, { lean: 30, duration: .14, yoyo: true, repeat: 5, onUpdate: man.draw }, tSelf + .4); man.sweat(tl, tSelf + .4, 1.4);
+    tl.to(lSelf, { opacity: 0, duration: .4 }, tAsk);
+    // 求神：屋子撑大
+    man.turn(tl, tAsk, 1, .3); man.pose(tl, tAsk + .2, 'kneelPray', .5); man.face(tl, tAsk + .3, 'sleep'); SHOW(tl, lAsk, tGrow - .1); tl.to(lNo, { opacity: 0, duration: .4 }, tGrow);
+    hs.to(tl, tGrow, 1.8, { w: 470, h: 230, rh: 100 }, 'power2.inOut');
+    tl.to(lit, { x: -340, y: -70, scale: 1.3, svgOrigin: '760 300', duration: 1.8, ease: 'power2.inOut' }, tGrow + .5);
+    man.pose(tl, tGrow + 1.6, 'stand', .8, { head: -14, a1: 40, e1: 30, a2: -30, e2: 30 }); man.face(tl, tGrow + 1.8, 'happy');
+    sparkle(tl, svg, CX, GY - 260, tGrow + 1.6, { r: 40 });
+  };
+
+  // 只装得下自己：屋子里一个个箱子冒出来（情绪、委屈、计划），把人挤到墙角 → 神来，第一件事：把屋子撑大
+  A.selfroom = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 440), GY = 400, CX = 500;
+    const t0 = AT(s.at), tB = [OPT(AT, s, 'b1', t0 + 3), OPT(AT, s, 'b2', t0 + 4.2), OPT(AT, s, 'b3', t0 + 5.4)], tGod = OPT(AT, s, 'god', t0 + 6.7), tBig = OPT(AT, s, 'big', tGod + 1.9);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, CX, GY, 330, 170, { rh: 70 });
+    const man = person(svg, { x: CX - 120, y: GY, h: 170, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const boxes = [['情绪', CX - 40, 96, 74], ['委屈', CX + 60, 90, 70], ['计划', CX + 10, 84, 66]].map(([t, x, w, hh], i) => {
+      const g = mk('g', { opacity: 0 }, svg), y = i === 2 ? GY - 70 - hh : GY - hh;
+      mk('rect', { x: x - w / 2, y, width: w, height: hh, rx: 4, fill: 'rgba(224,160,140,.14)', stroke: '#e0b4a4', 'stroke-width': 2.4 }, g);
+      label(g, x, y + hh / 2 + 10, t, { s: 26, c: '#f0c2b2', ls: '0.1em' }); g._x = x; return g; });
+    const lit = glow(svg, CX, GY - 120, 160, { a: .55, c0: '#fff3cf', c1: '#ffd98a' });
+    const lBig = label(svg, CX, 40, '撑大', { s: 38, c: GOLD, font: 'Noto Serif SC', wt: 500 });
+    gsap.set(lBig, { opacity: 0 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tBig + 5);
+    boxes.forEach((g, i) => { tl.fromTo(g, { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: .5, ease: 'bounce.out', immediateRender: false }, tB[i]); });
+    man.pose(tl, tB[1] + .2, 'squat', .5, { hy: 40, lean: 10, head: 14 }); man.face(tl, tB[1] + .2, 'worry'); man.to(tl, tB[2] + .2, .5, { x: CX - 140 });
+    // 神来：屋子撑大，箱子散开，光进来
+    hs.to(tl, tBig - .3, 1.8, { w: 600, h: 230, rh: 100 }); tl.to(lit, { opacity: 1, duration: 1.4 }, tGod);
+    boxes.forEach((g, i) => tl.to(g, { x: [-160, 170, 60][i] + 0, y: i === 2 ? 70 : 0, duration: 1.6, ease: 'power2.inOut' }, tBig - .1));
+    man.pose(tl, tBig + .6, 'stand', .8, { head: -10, a1: 60, e1: 20, a2: -50, e2: 20 }); man.face(tl, tBig + .8, 'happy'); man.to(tl, tBig + .4, 1.2, { x: CX - 40 });
+    SHOW(tl, lBig, tBig);
+  };
+
+
+  // 老房子和两种房东：墙裂了、屋顶漏水（水滴进桶里）、地板翘起来，住着不安全 → 一种房东：“那你自己想办法。”抱着胳膊走了
+  // → 另一种房东：二话不说，提着工具箱、架上梯子，爬上屋顶就修（当当当），漏停了，裂缝补上了 → 奥古斯丁求的是后一种
+  A.oldhouse = function ({ tl, el, AT, s }) {
+    const { svg, defs } = base(el, 500), GY = 432, CX = 270;
+    const t0 = AT(s.at), tCrack = OPT(AT, s, 'crack', t0 + 1), tLeak = OPT(AT, s, 'leak', tCrack + 1.3), tFloor = OPT(AT, s, 'floor', tLeak + 1.2), tUnsafe = OPT(AT, s, 'unsafe', tFloor + 1.2),
+      tA = OPT(AT, s, 'a', tUnsafe + 1.5), tTell = OPT(AT, s, 'tell', tA + 2), tSelf = OPT(AT, s, 'self', tTell + 2.3), tB = OPT(AT, s, 'b', tSelf + 1), tGo = OPT(AT, s, 'go', tB + 1.8), tFix = OPT(AT, s, 'fix', tGo + 2.2), tAug = OPT(AT, s, 'aug', tFix + 1.5);
+    ground(svg, 30, 970, GY, { a: .38 });
+    const hs = house(svg, CX, GY, 360, 200, { rh: 92 });
+    const crack = pen(svg, `M${CX - 180},${GY - 170} l16,22 l-10,16 l18,20 l-8,18 l14,22`, { c: '#e0a08c', w: 2.6, go: .2 });
+    const goldCrack = pen(svg, `M${CX - 180},${GY - 170} l16,22 l-10,16 l18,20 l-8,18 l14,22`, { c: GOLD, w: 3.2, go: .5 });
+    const bucket = stroke(svg, `M${CX + 40},${GY} L${CX + 34},${GY - 34} L${CX + 86},${GY - 34} L${CX + 80},${GY} Z`, { c: '#9fb0c8', w: 2.4 }); gsap.set(bucket, { opacity: 0 });
+    const drops = [0, 1, 2].map(i => mk('path', { d: `M${CX + 60},${GY - 210} q-5,9 0,13 q5,-4 0,-13 Z`, fill: '#a9cdea', opacity: 0 }, svg));
+    const plank = mk('path', { d: `M${CX - 120},${GY - 2} L${CX - 50},${GY - 2}`, stroke: '#cdbfa3', 'stroke-width': 3.4, 'stroke-linecap': 'round' }, svg);
+    const ten = person(svg, { x: CX - 20, y: GY, h: 196, op: 0 }); ten.face(tl, 0, 'neutral', .01);
+    const lUnsafe = label(svg, CX, GY - 330, '住着不安全', { s: 30, c: '#e0a08c' });
+    // 房东甲（冷色，一串钥匙）、房东乙（暖色，工具箱）
+    const la = person(svg, { x: 760, y: GY, h: 214, f: -1, c: SKY, op: 0 }); la.face(tl, 0, 'neutral', .01);
+    const keys = mk('g', {}, la.root); mk('circle', { cx: 0, cy: 8, r: 8, fill: 'none', stroke: SKY, 'stroke-width': 2 }, keys); mk('path', { d: 'M4,14 l4,12 M-4,14 l-2,12', stroke: SKY, 'stroke-width': 2 }, keys); la.hold(keys, 1, 0, 0);
+    const lb = person(svg, { x: 1060, y: GY, h: 214, f: -1, c: WARM, op: 0 }); lb.pose(tl, 0, 'carry', .01, { a2: -10, e2: 10, a1: 10, e1: 10 }); lb.face(tl, 0, 'smile', .01);
+    const box = mk('g', {}, lb.root); mk('path', { d: 'M-18,0 L18,0 L18,22 L-18,22 Z M-8,0 L-8,-8 L8,-8 L8,0', fill: 'rgba(226,189,118,.25)', stroke: GOLD, 'stroke-width': 2.2 }, box); lb.hold(box, 1, 0, 0);
+    const hammer = mk('g', { opacity: 0 }, lb.root); mk('path', { d: 'M0,0 L0,-26', stroke: WARM, 'stroke-width': 3, 'stroke-linecap': 'round' }, hammer); mk('rect', { x: -10, y: -34, width: 20, height: 9, rx: 2, fill: 'rgba(226,189,118,.4)', stroke: GOLD, 'stroke-width': 2 }, hammer); lb.hold(hammer, 1, 0, 0);
+    const ladder = stroke(svg, `M${CX + 196},${GY} L${CX + 172},${GY - 210} M${CX + 226},${GY} L${CX + 202},${GY - 210}` + [1, 2, 3, 4, 5, 6].map(k => ` M${n1(CX + 196 - k * 3.4)},${GY - k * 30} L${n1(CX + 226 - k * 3.4)},${GY - k * 30}`).join(''), { c: '#cdbfa3', w: 2.6 }); gsap.set(ladder, { opacity: 0 });
+    const tell = bubble(svg, 560, 200, 190, 62, 590, 262, { t: '屋顶漏水了！', s: 28 });
+    const noB = bubble(svg, 820, 150, 230, 62, 768, 222, { t: '那你自己想办法。', s: 28, c: '#b9c6da' });
+    const bang = label(svg, CX + 140, GY - 300, '当 当 当', { s: 28, c: WARM });
+    const lAug = label(svg, 560, 486, '奥古斯丁求的：后一种', { s: 30, c: GOLD });
+    gsap.set([lUnsafe, bang, lAug], { opacity: 0 }); gsap.set(goldCrack._p, { strokeDashoffset: 1.01 });
+    ten.show(tl, t0, .8); ten.breathe(tl, t0, tAug + 4);
+    DRAW(tl, crack, tCrack, .8); ten.turn(tl, tCrack + .2, -1, .3); ten.face(tl, tCrack + .3, 'wow');
+    // 漏水
+    tl.to(bucket, { opacity: 1, duration: .4 }, tLeak); ten.turn(tl, tLeak, 1, .3); ten.to(tl, tLeak, .4, { head: -22 }); ten.face(tl, tLeak + .2, 'worry');
+    const leakEnd = tFix + .6;
+    drops.forEach((d, i) => tl.fromTo(d, { opacity: 0, y: 0 }, { opacity: 1, y: 176, duration: .7, ease: 'power1.in', repeat: Math.max(1, Math.floor((leakEnd - tLeak) / 1.05)), repeatDelay: .35, immediateRender: false }, tLeak + i * .35));
+    // 地板翘起来，绊一下
+    tl.to(plank, { rotation: -18, svgOrigin: `${CX - 50} ${GY - 2}`, duration: .35, ease: 'back.out(3)' }, tFloor); ten.hop(tl, tFloor + .2, 14, 1, .2); ten.to(tl, tFloor + .2, .4, { head: 0 });
+    SHOW(tl, lUnsafe, tUnsafe); ten.sweat(tl, tUnsafe, 2);
+    // 房东甲
+    la.show(tl, tA - .2, .7); ten.walk(tl, tA + .1, 560, 1.4); ten.face(tl, tA + .2, 'neutral');
+    POP(tl, tell, tTell); ten.talk(tl, tTell, 1.3, 'talk', 'worry'); ten.gesture(tl, tTell, 1.3, .6);
+    la.pose(tl, tSelf - .3, 'crossF', .4); la.face(tl, tSelf - .2, 'frown'); POP(tl, noB, tSelf); UNPOP(tl, tell, tSelf);
+    la.turn(tl, tSelf + 1.4, 1, .3); la.walk(tl, tSelf + 1.6, 1040, 1.8); la.fade(tl, tSelf + 2.4, 0, 1); UNPOP(tl, noB, tSelf + 1.6);
+    // 房东乙：提着工具箱上来，架梯子，爬上屋顶修
+    lb.show(tl, tB - .3, .4); lb.walk(tl, tB - .3, 560, Math.max(1.2, tGo - tB + .2)); ten.face(tl, tB + .4, 'smile');
+    tl.to(ladder, { opacity: 1, duration: .5 }, tGo); lb.walk(tl, tGo + .3, CX + 230, 1.0); lb.turn(tl, tGo + 1.3, -1, .2);
+    lb.to(tl, tGo + 1.5, 1.4, { x: CX + 186, y: GY - 196, a1: 120, e1: 20, a2: 100, e2: 30 }, 'power1.inOut'); tl.to(box, { opacity: 0, duration: .3 }, tGo + 1.5); tl.to(hammer, { opacity: 1, duration: .3 }, tGo + 2.4);
+    lb.pose(tl, tGo + 2.9, 'stand', .4, { y: GY - 196, lean: 18, a1: 110, e1: 60 });
+    lb.waveHand(tl, tFix - .2, 2.6, 1.6, 3.4); tl.fromTo(bang, { opacity: 0 }, { opacity: 1, duration: .2, yoyo: true, repeat: 5, immediateRender: false }, tFix);
+    DRAW(tl, goldCrack, tFix + .6, 1.2); tl.to(crack, { opacity: 0, duration: .8 }, tFix + 1.4); tl.to(drops, { opacity: 0, duration: .3 }, leakEnd);
+    sparkle(tl, svg, CX + 150, GY - 250, tFix + 1.2, { r: 30 }); ten.face(tl, tFix + 1.2, 'happy'); tl.to(lUnsafe, { opacity: 0, duration: .6 }, tFix + 1.2);
+    SHOW(tl, lAug, tAug);
+  };
+
+  // 成圣：神住进来，一边住，一边修。屋子里亮起一团光；日历一天天翻；今天补这道裂缝（金线补上），明天换掉那根烂掉的梁（换成金色的）
+  A.renovate = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 420), GY = 380, CX = 470;
+    const t0 = AT(s.at), tLife = OPT(AT, s, 'life', t0 + 2), tIn = OPT(AT, s, 'in', tLife + 1.7), tLive = OPT(AT, s, 'live', tIn + 1.5), tToday = OPT(AT, s, 'today', tLive + 2.3), tTmr = OPT(AT, s, 'tmr', tToday + 1.7);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, CX, GY, 430, 210, { rh: 90 });
+    const C1 = `M${CX - 150},${GY - 200} l14,26 l-12,18 l16,24 l-10,20`, C2 = `M${CX + 120},${GY - 130} l-12,18 l14,16 l-10,22`;
+    const cr1 = pen(svg, C1, { c: '#e0a08c', w: 2.4, go: .2 }), cr2 = pen(svg, C2, { c: '#e0a08c', w: 2.4, go: .2 }); shown(cr1); shown(cr2);
+    const g1 = pen(svg, C1, { c: GOLD, w: 3.2, go: .5 }), g2 = pen(svg, C2, { c: GOLD, w: 3.2, go: .5 });
+    const beamBad = stroke(svg, `M${CX - 200},${GY - 160} L${CX - 40},${GY - 168} M${CX - 30},${GY - 158} L${CX + 120},${GY - 176} L${CX + 200},${GY - 166}`, { c: '#7f7264', w: 6 });
+    const beamNew = pen(svg, `M${CX - 200},${GY - 166} L${CX + 200},${GY - 166}`, { c: GOLD, w: 6, go: .5 });
+    const lit = glow(svg, CX, GY - 90, 150, { a: .6, c0: '#fff3cf', c1: '#ffd98a' });
+    // 日历：第 1 天、第 2 天……一页页翻过去
+    const cal = mk('g', { opacity: 0 }, svg); mk('rect', { x: 800, y: 60, width: 130, height: 96, rx: 6, fill: 'rgba(16,15,14,.85)', stroke: '#cdbfa3', 'stroke-width': 2.2 }, cal);
+    const days = ['第 1 天', '第 2 天', '第 3 天', '第 100 天', '第 1000 天', '……'].map((t, i) => { const e = label(cal, 865, 118, t, { s: 26, c: '#e8dcc4' }); gsap.set(e, { opacity: i ? 0 : 1 }); return e; });
+    const lLife = label(svg, 865, 196, '一辈子的工程', { s: 26, c: WARM }), lToday = label(svg, CX - 150, GY - 26, '今天', { s: 24, c: GOLD }), lTmr = label(svg, CX + 120, GY - 196, '明天', { s: 24, c: GOLD });
+    gsap.set([lLife, lToday, lTmr], { opacity: 0 }); gsap.set([g1._p, g2._p, beamNew._p].flat(), { strokeDashoffset: 1.01 });
+    tl.to(cal, { opacity: 1, duration: .6 }, t0 + .2);
+    days.forEach((d, i) => { if (!i) return; const t = t0 + .6 + i * ((tLife + 1 - t0) / days.length); tl.to(days[i - 1], { opacity: 0, y: -10, duration: .3 }, t); tl.fromTo(d, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .3, immediateRender: false }, t); });
+    SHOW(tl, lLife, tLife);
+    tl.to(lit, { opacity: 1, duration: 1.4 }, tIn); sparkle(tl, svg, CX, GY - 90, tIn + .5, { r: 40 });
+    tl.to(lit._disc, { attr: { r: 175 }, duration: 1, yoyo: true, repeat: 3, ease: 'sine.inOut' }, tLive);
+    DRAW(tl, g1, tToday, 1.2); tl.to(cr1, { opacity: 0, duration: .8 }, tToday + .8); SHOW(tl, lToday, tToday + .3); DRAW(tl, g2, tToday + .8, 1);  tl.to(cr2, { opacity: 0, duration: .8 }, tToday + 1.4);
+    tl.to(beamBad, { opacity: 0, duration: .7 }, tTmr + .4); DRAW(tl, beamNew, tTmr + .6, 1.2); SHOW(tl, lTmr, tTmr + .3);
+  };
+
+  // 修了这么多年还是这么破？一个人看着自己的屋子发愁 → 修房子的时候：搭起脚手架、地上堆着砖、墙上刨开口子，看着更乱了
+  // → “那不是坏了，是在修”：立起一块“施工中”的牌子，屋里亮起修房子的光
+  A.mess = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420, CX = 600;
+    const t0 = AT(s.at), tWhy = OPT(AT, s, 'why', t0 + 3.9), tFix = OPT(AT, s, 'fixing', tWhy + 2.6), tBrick = OPT(AT, s, 'brick', tFix + 5.3), tHole = OPT(AT, s, 'hole', tBrick + 1.8), tOk = OPT(AT, s, 'ok', tHole + 1.9);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const hs = house(svg, CX, GY, 380, 200, { rh: 86 });
+    const man = person(svg, { x: 210, y: GY, h: 214, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const thinkB = bubble(svg, 300, 120, 230, 90, 236, 196, { kind: 'think', t: '还是这么破？', s: 28, c: '#b9c6da' });
+    const scaff = pen(svg, `M${CX - 210},${GY} L${CX - 210},${GY - 250} M${CX + 210},${GY} L${CX + 210},${GY - 250} M${CX - 230},${GY - 80} L${CX + 230},${GY - 80} M${CX - 230},${GY - 170} L${CX + 230},${GY - 170} M${CX - 210},${GY} L${CX - 150},${GY - 80} M${CX + 210},${GY} L${CX + 150},${GY - 80}`, { c: '#9f9585', w: 2.4, go: .1 });
+    const bricks = mk('g', { opacity: 0 }, svg); [[0, 0], [1, 0], [2, 0], [3, 0], [.5, 1], [1.5, 1], [2.5, 1], [1, 2], [2, 2]].forEach(([i, j]) => mk('rect', { x: CX - 340 + i * 30, y: GY - 16 - j * 16, width: 28, height: 14, rx: 2, fill: 'rgba(224,160,140,.25)', stroke: '#e0a08c', 'stroke-width': 1.8 }, bricks));
+    const hole = mk('path', { d: `M${CX + 40},${GY - 150} l30,-10 l26,18 l-4,34 l-30,14 l-28,-16 Z`, fill: '#050608', stroke: '#9f9585', 'stroke-width': 2.2, opacity: 0 }, svg);
+    const dust = [0, 1, 2].map(i => mk('circle', { cx: CX + 60 + i * 18, cy: GY - 130, r: 10 + i * 4, fill: 'rgba(205,191,163,.18)', opacity: 0 }, svg));
+    const sign = mk('g', { opacity: 0 }, svg); mk('path', { d: `M${CX - 120},${GY} L${CX - 120},${GY - 70} M${CX - 186},${GY - 118} L${CX - 54},${GY - 118} L${CX - 54},${GY - 70} L${CX - 186},${GY - 70} Z`, fill: 'rgba(226,189,118,.18)', stroke: GOLD, 'stroke-width': 2.4 }, sign); label(sign, CX - 120, GY - 84, '施工中', { s: 26, c: GOLD, font: 'Noto Serif SC', wt: 500 });
+    const lit = glow(svg, CX, GY - 110, 150, { a: .55, c0: '#fff3cf', c1: '#ffd98a' });
+    const lOk = label(svg, 500, 466, '那不是坏了，是在修。', { s: 32, c: GOLD });
+    gsap.set(lOk, { opacity: 0 }); gsap.set(scaff._p, { strokeDashoffset: 1.01 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tOk + 4); man.face(tl, t0 + .4, 'worry'); man.to(tl, t0 + .3, .5, { head: 6, a1: 28, e1: 140 });
+    POP(tl, thinkB, tWhy);
+    UNPOP(tl, thinkB, tFix + 1); DRAW(tl, scaff, tFix, 1.4);
+    tl.fromTo(bricks, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: .6, ease: 'bounce.out', immediateRender: false }, tBrick);
+    tl.to(hole, { opacity: 1, duration: .3 }, tHole); dust.forEach((d, i) => { tl.fromTo(d, { opacity: 0, scale: .4, transformOrigin: '50% 50%' }, { opacity: .9, scale: 1.4, duration: .5, immediateRender: false }, tHole + i * .1); tl.to(d, { opacity: 0, y: -30, duration: .8 }, tHole + .5 + i * .1); });
+    man.face(tl, tHole + .2, 'wow');
+    tl.fromTo(sign, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .6, ease: 'back.out(2)', immediateRender: false }, tOk); tl.to(lit, { opacity: 1, duration: 1.2 }, tOk + .2);
+    sparkle(tl, svg, CX + 70, GY - 140, tOk + .6, { r: 30 }); sparkle(tl, svg, CX - 290, GY - 30, tOk + .9, { r: 24 });
+    man.face(tl, tOk + .4, 'smile'); man.to(tl, tOk + .3, .6, { head: 0, a1: 10, e1: 20 }); SHOW(tl, lOk, tOk + .2);
+  };
+
+
+  // 柜子（正面）：x、y 是左上角；两扇门绕各自的门轴开合（C.st.l / C.st.r：1 关着，0.12 打开）；
+  // C.inside 是柜子里面的一层（放东西：门关上就挡住）
+  function cabinet(par, x, y, w, h, o = {}) {
+    const g = mk('g', { opacity: o.op ?? 1 }, par), c = o.c || '#cdbfa3';
+    mk('rect', { x, y, width: w, height: h, rx: 4, fill: 'rgba(14,13,12,.92)', stroke: c, 'stroke-width': 3 }, g);
+    mk('path', { d: `M${x + 8},${y + h * .36} L${x + w - 8},${y + h * .36} M${x + 8},${y + h * .68} L${x + w - 8},${y + h * .68}`, stroke: '#6f6658', 'stroke-width': 2.4 }, g);   // 隔板
+    const inside = mk('g', {}, g);
+    const doorL = mk('g', {}, g), doorR = mk('g', {}, g);
+    mk('rect', { x: x + 4, y: y + 4, width: w / 2 - 6, height: h - 8, rx: 2, fill: 'rgba(30,27,24,.97)', stroke: c, 'stroke-width': 2.2 }, doorL); mk('circle', { cx: x + w / 2 - 12, cy: y + h / 2, r: 3.5, fill: c }, doorL);
+    mk('rect', { x: x + w / 2 + 2, y: y + 4, width: w / 2 - 6, height: h - 8, rx: 2, fill: 'rgba(30,27,24,.97)', stroke: c, 'stroke-width': 2.2 }, doorR); mk('circle', { cx: x + w / 2 + 12, cy: y + h / 2, r: 3.5, fill: c }, doorR);
+    const C = { g, inside, doorL, doorR, x, y, w, h, cx: x + w / 2, cy: y + h / 2, st: { l: o.open ? .12 : 1, r: o.open ? .12 : 1 } };
+    C.draw = () => { const hl = x + 4, hr = x + w - 4;
+      doorL.setAttribute('transform', `translate(${hl},0) scale(${C.st.l.toFixed(3)},1) translate(${-hl},0)`); doorR.setAttribute('transform', `translate(${hr},0) scale(${C.st.r.toFixed(3)},1) translate(${-hr},0)`); };
+    C.draw(); return C;
+  }
+  const openDoors = (tl, C, t, d = .6) => tl.to(C.st, { l: .12, r: .12, duration: d, ease: 'power2.out', onUpdate: C.draw }, t);
+  const closeDoors = (tl, C, t, d = .35) => tl.to(C.st, { l: 1, r: 1, duration: d, ease: 'power3.in', onUpdate: C.draw }, t);
+  // 锁（挂锁 + 一条链子）
+  const padlock = (par, x, y) => { const g = mk('g', { opacity: 0 }, par);
+    mk('path', { d: `M${x - 60},${y - 6} Q${x},${y + 14} ${x + 60},${y - 6}`, fill: 'none', stroke: '#9fb0c8', 'stroke-width': 4, 'stroke-dasharray': '7 4' }, g);
+    mk('rect', { x: x - 14, y: y, width: 28, height: 24, rx: 4, fill: 'rgba(20,20,26,.95)', stroke: '#e0a08c', 'stroke-width': 2.4 }, g);
+    mk('path', { d: `M${x - 8},${y} L${x - 8},${y - 8} A8,8 0 0 1 ${x + 8},${y - 8} L${x + 8},${y}`, fill: 'none', stroke: '#e0a08c', 'stroke-width': 2.6 }, g); return g; };
+
+  // 塞进柜子：客人来了（叮咚），赶紧把满地的东西往柜子里塞，门一关，背靠着顶住 → 开门“请进请进，地方小，别嫌弃”
+  // → 在神面前也常常这样：柜子上了锁（链子、挂锁），人跪在前面很体面地祷告，柜子还在一下一下地鼓
+  A.closet = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 480), GY = 420;
+    const t0 = AT(s.at), tBell = OPT(AT, s, 'bell', t0 + 1.6), tRush = OPT(AT, s, 'rush', tBell + .8), tShut = OPT(AT, s, 'shut', tRush + 3), tIn = OPT(AT, s, 'come', tShut + 1.1), tSmall = OPT(AT, s, 'small', tIn + 1.5),
+      tGod = OPT(AT, s, 'god', tSmall + 1.3), tLock = OPT(AT, s, 'lock', tGod + 6.7), tPray = OPT(AT, s, 'pray', tLock + 1.2);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const C = cabinet(svg, 120, GY - 220, 170, 220, { open: 1 });
+    const door = pen(svg, `M820,${GY} L820,${GY - 240} L920,${GY - 240} L920,${GY}`, { c: '#cdbfa3', w: 3, go: .15 });
+    const leaf = mk('rect', { x: 820, y: GY - 240, width: 100, height: 240, fill: 'rgba(30,27,24,.96)', stroke: '#cdbfa3', 'stroke-width': 2.4 }, svg);
+    const man = person(svg, { x: 520, y: GY, h: 214, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    // 满地的杂物（飞进柜子里）
+    const spots = [[360, GY - 14, 0, -6], [420, GY - 12, 1, 20], [480, GY - 14, 2, 0], [600, GY - 14, 3, -10], [650, GY - 12, 4, 14], [700, GY - 16, 0, 8], [560, GY - 70, 2, 30], [390, GY - 60, 4, -20]];
+    const items = spots.map(([x, y, k, r]) => junk(C.inside, 0, 0, k, { r }));
+    items.forEach((g, i) => gsap.set(g, { x: spots[i][0], y: spots[i][1], rotation: spots[i][3] }));
+    const bell = label(svg, 870, GY - 280, '叮咚！', { s: 32, c: WARM });
+    const guest = person(svg, { x: 980, y: GY, h: 210, f: -1, c: SKY, op: 0 }); guest.face(tl, 0, 'smile', .01);
+    const hi = bubble(svg, 650, 150, 270, 70, 600, 222, { t: '请进请进～', s: 30 });
+    const sm = bubble(svg, 650, 150, 300, 70, 600, 222, { t: '地方小，别嫌弃。', s: 30 });
+    const sock = junk(svg, C.x + C.w / 2 + 4, C.y + C.h * .55, 1, { r: 80 }); gsap.set(sock, { opacity: 0 });
+    const lock = padlock(svg, C.cx, C.cy - 8);
+    const pray = bubble(svg, 700, 150, 240, 70, 640, 230, { t: '感谢主……', s: 30, c: WARM });
+    const lGod = label(svg, 500, 470, '在神面前，也常常是这样', { s: 30, c: '#e0b4a4' });
+    gsap.set([bell, lGod], { opacity: 0 });
+    tl.to(leaf, { opacity: 1, duration: .01 }, 0); man.show(tl, t0, .8); man.breathe(tl, t0, tPray + 4); man.face(tl, t0 + .3, 'smile');
+    // 叮咚
+    tl.fromTo(bell, { opacity: 0, scale: .6, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: .25, yoyo: true, repeat: 3, ease: 'back.out(2)', immediateRender: false }, tBell);
+    man.face(tl, tBell + .2, 'wow'); man.hop(tl, tBell + .2, 10, 1, .18);
+    // 赶紧往柜子里塞
+    const tA = tRush, span = Math.max(2.4, tShut - tRush - .2), n = items.length;
+    man.walk(tl, tA, 360, .7, { stride: 60 }); man.face(tl, tA, 'worry'); man.sweat(tl, tA + .5, span);
+    items.forEach((g, i) => { const t = tA + .5 + i * (span - .7) / n;
+      tl.to(g, { x: C.cx - 30 + (i % 3) * 30, y: C.y + 40 + (i % 4) * 40, rotation: 200 + i * 30, scale: .9, duration: .45, ease: 'power2.in' }, t);
+      if (i % 2 === 0) man.to(tl, t - .1, .25, { a1: 140, e1: 20, lean: -10 }); else man.to(tl, t - .1, .25, { a1: 40, e1: 20, lean: 30 }); });
+    // 门一关，背靠着顶住；露出一只袜子
+    closeDoors(tl, C, tShut); man.turn(tl, tShut - .1, 1, .25); man.to(tl, tShut + .1, .4, { x: C.x + C.w + 26, lean: -14, a1: -40, e1: 10, a2: -30, e2: 10 });
+    tl.to(sock, { opacity: 1, duration: .2 }, tShut + .35); tl.to(C.g, { x: 3, duration: .08, yoyo: true, repeat: 5 }, tShut + .4);
+    // 请进请进
+    tl.to(leaf, { scaleX: .1, svgOrigin: `920 ${GY}`, duration: .5, ease: 'power2.out' }, tIn - .4); guest.show(tl, tIn - .3, .5); guest.walk(tl, tIn - .2, 760, 1.1);
+    man.face(tl, tIn, 'grin'); man.pose(tl, tIn, 'open', .5, { x: C.x + C.w + 26, lean: 0 }); POP(tl, hi, tIn + .1);
+    UNPOP(tl, hi, tSmall - .2); POP(tl, sm, tSmall); man.pose(tl, tSmall, 'bow', .5, { x: C.x + C.w + 26 });
+    // 在神面前也一样：客人退去，柜子上锁，跪下来体面地祷告
+    UNPOP(tl, sm, tGod - .2); guest.fade(tl, tGod, 0, .8); tl.to(leaf, { scaleX: 1, svgOrigin: `920 ${GY}`, duration: .5 }, tGod); SHOW(tl, lGod, tGod + .1);
+    man.walk(tl, tGod + .6, 560, 1.2);
+    tl.to(lock, { opacity: 1, duration: .5 }, tLock); tl.fromTo(lock, { y: -14 }, { y: 0, duration: .5, ease: 'bounce.out', immediateRender: false }, tLock);
+    man.turn(tl, tLock - .4, 1, .3); man.pose(tl, tPray - .4, 'kneelPray', .6); man.face(tl, tPray - .2, 'smile'); POP(tl, pray, tPray);
+    tl.to(C.g, { x: 3, duration: .1, yoyo: true, repeat: 3 }, tPray + 1); tl.to(C.g, { x: -3, duration: .1, yoyo: true, repeat: 3 }, tPray + 2.2);
+  };
+
+  // 他把柜子打开了：上了锁的柜子 → 打开锁、拉开门，东西倒出来一地，上面的光照下来 → 他跪在那一堆前面：“我承认，我知道。”
+  A.opencab = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 470), GY = 420;
+    const t0 = AT(s.at), tOpen = OPT(AT, s, 'open', t0 + 1.8), tSay = OPT(AT, s, 'say', tOpen + 1.8), tNo = OPT(AT, s, 'nohide', tSay + 5.2);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const lightG = glow(svg, 500, 60, 170, { rays: 11, a: .9 });
+    const C = cabinet(svg, 330, GY - 220, 170, 220);
+    const lock = padlock(svg, C.cx, C.cy - 8); gsap.set(lock, { opacity: 1 });
+    const man = person(svg, { x: 640, y: GY, h: 214, f: -1, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    const items = [0, 1, 2, 3, 4, 0, 2, 3].map((k, i) => { const g = junk(C.inside, 0, 0, k, { r: i * 40 }); gsap.set(g, { x: C.cx - 40 + (i % 3) * 40, y: C.y + 40 + (i % 4) * 44, opacity: 0 }); return g; });
+    const bub = bubble(svg, 770, 150, 300, 72, 690, 236, { t: '我承认，我知道。', s: 32, c: GOLD });
+    const lNo = label(svg, 500, 470, '在神面前，不藏了。', { s: 32, c: GOLD });
+    gsap.set(lNo, { opacity: 0 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tNo + 4);
+    // 打开
+    man.walk(tl, tOpen - .8, C.x + C.w + 40, .7); man.pose(tl, tOpen - .1, 'reach', .4, { x: C.x + C.w + 40 });
+    tl.to(lock, { opacity: 0, y: 30, duration: .5, ease: 'power2.in' }, tOpen); openDoors(tl, C, tOpen + .4, .6);
+    tl.to(lightG, { opacity: .9, duration: 1.2 }, tOpen + .4); tl.to(lightG._rays, { rotation: 20, svgOrigin: '500 60', duration: 12, ease: 'none' }, tOpen);
+    items.forEach((g, i) => { tl.set(g, { opacity: 1 }, tOpen + .6); tl.to(g, { x: C.x - 60 + i * 44, y: GY - 14 - (i % 2) * 18, rotation: i * 70 + 20, duration: .6 + (i % 3) * .1, ease: 'bounce.out' }, tOpen + .6 + i * .07); });
+    man.face(tl, tOpen + .8, 'sad');
+    // 我承认，我知道
+    man.pose(tl, tSay - .3, 'kneel', .6, { x: C.x + C.w + 60, a1: 60, e1: 40, a2: 50, e2: 46, head: 10 }); POP(tl, bub, tSay);
+    sparkle(tl, svg, C.cx, C.y + 60, tSay + .8, { r: 40 });
+    SHOW(tl, lNo, tNo); man.face(tl, tNo, 'neutral');
+  };
+
+  // 知道了，可是自己治不好：一个人在单子上勾了“承认”，松一口气 → 承认只是开始；知道屋子脏，屋子还是脏的 → 知道自己有病，
+  // 病历上清清楚楚，吃药、贴膏药，都不管用 → 跪下来，向着光伸手：“除了向你外，我向谁呼号呢？”
+  A.cure = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 480), GY = 420;
+    const t0 = AT(s.at), tThink = OPT(AT, s, 'think', t0 + 1.8), tSolved = OPT(AT, s, 'solved', tThink + 1.6), tBegin = OPT(AT, s, 'begin', tSolved + 2.6), tDirty = OPT(AT, s, 'dirty', tBegin + 2.2),
+      tStill = OPT(AT, s, 'still', tDirty + 1.3), tSick = OPT(AT, s, 'sick', tStill + 2.1), tClear = OPT(AT, s, 'clear', tSick + 2.1), tCant = OPT(AT, s, 'cant', tClear + 1.4), tYou = OPT(AT, s, 'you', tCant + 2), tCry = OPT(AT, s, 'cry', tYou + 1.4);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const lightG = glow(svg, 840, 80, 160, { rays: 11, a: .9 });
+    const man = person(svg, { x: 470, y: GY, h: 222, op: 0 }); man.face(tl, 0, 'neutral', .01);
+    // 单子：□ 承认 → ✓
+    const sheet = mk('g', { opacity: 0 }, svg); mk('rect', { x: 120, y: 110, width: 200, height: 150, rx: 6, fill: 'rgba(14,13,16,.85)', stroke: '#d9c9a8', 'stroke-width': 2.2 }, sheet);
+    mk('rect', { x: 144, y: 140, width: 26, height: 26, rx: 3, fill: 'none', stroke: '#d9c9a8', 'stroke-width': 2 }, sheet); label(sheet, 186, 162, '承认', { s: 26, c: PAPER, a: 'start' });
+    mk('rect', { x: 144, y: 196, width: 26, height: 26, rx: 3, fill: 'none', stroke: '#8f8270', 'stroke-width': 2 }, sheet); label(sheet, 186, 218, '干净了', { s: 26, c: '#8f8270', a: 'start' });
+    const tick = pen(sheet, 'M148,152 L156,162 L170,140', { c: '#9fd39a', w: 3.4, go: .3 });
+    const lBegin = label(svg, 220, 300, '承认，只是开始', { s: 30, c: GOLD });
+    // 脏屋子（一小间，墙上一块块污迹）
+    const room = house(svg, 220, GY, 200, 120, { rh: 46, op: 0 });
+    const dirt = [[170, GY - 60, 16], [236, GY - 90, 12], [270, GY - 40, 18], [200, GY - 22, 10]].map(([x, y, r]) => mk('ellipse', { cx: x, cy: y, rx: r, ry: r * .7, fill: 'rgba(120,100,70,.55)', opacity: 0 }, svg));
+    const lDirty = label(svg, 220, 226, '知道屋子脏，屋子还是脏的', { s: 26, c: '#cdbfa3' });
+    // 病历（片子上一块阴影）、药、膏药
+    const chart = mk('g', { opacity: 0 }, svg); mk('rect', { x: 600, y: 170, width: 150, height: 180, rx: 6, fill: 'rgba(20,26,34,.9)', stroke: '#9fb0c8', 'stroke-width': 2.2 }, chart);
+    mk('path', { d: 'M640,210 Q675,190 710,210 L710,300 Q675,320 640,300 Z M675,200 L675,310', fill: 'none', stroke: '#9fb0c8', 'stroke-width': 1.8, opacity: .8 }, chart);
+    const spot = mk('circle', { cx: 692, cy: 250, r: 13, fill: 'rgba(224,120,100,.55)' }, chart);
+    const pill = mk('g', { opacity: 0 }, svg); mk('rect', { x: -14, y: -6, width: 28, height: 12, rx: 6, fill: 'rgba(235,162,124,.4)', stroke: CORAL, 'stroke-width': 2 }, pill);
+    const xMark = label(svg, 470, 150, '✗', { s: 50, c: '#e0a08c', font: 'Noto Serif SC', wt: 700 });
+    const cry = bubble(svg, 640, 150, 170, 70, 560, 222, { t: '主啊！', s: 34, c: GOLD });
+    gsap.set([lBegin, lDirty, xMark], { opacity: 0 }); gsap.set(tick._p, { strokeDashoffset: 1.01 });
+    man.show(tl, t0, .8); man.breathe(tl, t0, tCry + 4);
+    // 很多人以为：勾上“承认”，就解决了
+    tl.to(sheet, { opacity: 1, duration: .6 }, tThink); man.pose(tl, tThink, 'point', .5, { a1: 70 }); man.turn(tl, tThink - .3, -1, .3);
+    DRAW(tl, tick, tSolved, .5); man.face(tl, tSolved + .3, 'happy'); man.pose(tl, tSolved + .4, 'stand', .5);
+    SHOW(tl, lBegin, tBegin); man.face(tl, tBegin, 'neutral');
+    // 知道屋子脏：屋子还是脏的
+    tl.to([sheet, lBegin], { opacity: 0, duration: .5 }, tDirty - .3); tl.to(room.g, { opacity: 1, duration: .6 }, tDirty);
+    dirt.forEach((d, i) => tl.to(d, { opacity: 1, duration: .4 }, tDirty + .2 + i * .15)); SHOW(tl, lDirty, tStill);
+    // 知道自己有病，自己治不好
+    tl.to([room.g, ...dirt, lDirty], { opacity: 0, duration: .5 }, tSick - .3); man.turn(tl, tSick - .2, 1, .3);
+    tl.to(chart, { opacity: 1, duration: .6 }, tSick); man.face(tl, tSick + .2, 'worry'); man.pose(tl, tSick, 'think', .5);
+    tl.fromTo(spot, { scale: 1, transformOrigin: '50% 50%' }, { scale: 1.5, duration: .4, yoyo: true, repeat: 3, immediateRender: false }, tClear);
+    man.pose(tl, tCant - .2, { a1: 30, e1: 150, a2: 20, e2: 40 }, .4); gsap.set(pill, { x: 520, y: 300 }); tl.to(pill, { opacity: 1, duration: .2 }, tCant - .1); tl.to(pill, { x: 482, y: 196, duration: .5 }, tCant);
+    tl.to(pill, { opacity: 0, duration: .2 }, tCant + .55); POPT(tl, xMark, tCant + .9); man.face(tl, tCant + .8, 'sad');
+    // 除了向你外，我向谁呼号呢
+    tl.to([chart, xMark], { opacity: 0, duration: .5 }, tYou - .2); tl.to(lightG, { opacity: .8, duration: 1.2 }, tYou); tl.to(lightG._rays, { rotation: 18, svgOrigin: '840 80', duration: 10, ease: 'none' }, tYou);
+    man.pose(tl, tYou, 'kneelUp', .7, { a1: 130, e1: 10, a2: 120, e2: 16, head: -20 }); man.face(tl, tYou + .3, 'look');
+    POP(tl, cry, tCry); tl.to(lightG, { opacity: 1, duration: .6 }, tCry);
+  };
+
+  // 他试过所有的门，最后只剩这一扇：一排门，一个人一扇一扇去推，都推不开（✗）→ 最后一扇开了，里面是光
+  A.doors = function ({ tl, el, AT, s }) {
+    const { svg } = base(el, 360), GY = 320;
+    const t0 = AT(s.at), tTry = OPT(AT, s, 'try', t0 + 1.3), tLast = OPT(AT, s, 'last', tTry + 1.6);
+    ground(svg, 40, 960, GY, { a: .38 });
+    const DX = [180, 340, 500, 660], LX = 830;
+    const doors = DX.map(x => { const g = mk('g', {}, svg); mk('rect', { x: x - 44, y: GY - 200, width: 88, height: 200, rx: 3, fill: 'rgba(24,22,20,.95)', stroke: '#9f9585', 'stroke-width': 2.6 }, g); mk('circle', { cx: x + 28, cy: GY - 100, r: 4, fill: '#9f9585' }, g); return g; });
+    const xs = DX.map(x => { const e = label(svg, x, GY - 220, '✗', { s: 40, c: '#e0a08c', font: 'Noto Serif SC', wt: 700 }); gsap.set(e, { opacity: 0 }); return e; });
+    const inside = glow(svg, LX, GY - 100, 120, { a: .95 });
+    const lastFrame = mk('rect', { x: LX - 50, y: GY - 210, width: 100, height: 210, rx: 3, fill: 'none', stroke: GOLD, 'stroke-width': 3 }, svg);
+    const lastLeaf = mk('rect', { x: LX - 50, y: GY - 210, width: 100, height: 210, rx: 3, fill: 'rgba(24,22,20,.97)', stroke: GOLD, 'stroke-width': 2.4 }, svg);
+    const man = person(svg, { x: 60, y: GY, h: 170, op: 0 }); man.face(tl, 0, 'worry', .01);
+    man.show(tl, t0, .6);
+    const step = Math.max(.32, (tLast - tTry - .2) / DX.length);
+    DX.forEach((x, i) => { const t = tTry + i * step; man.walk(tl, t - .05, x - 40, step * .55, { stride: 50 }); man.pose(tl, t + step * .5, 'reach', .15, { x: x - 40 });
+      tl.to(doors[i], { x: 3, duration: .05, yoyo: true, repeat: 3 }, t + step * .62); tl.to(xs[i], { opacity: 1, duration: .15 }, t + step * .7); });
+    man.walk(tl, tLast - .1, LX - 70, .5, { stride: 50 }); man.pose(tl, tLast + .4, 'reach', .2, { x: LX - 70 });
+    tl.to(lastLeaf, { scaleX: .08, svgOrigin: `${LX + 50} ${GY}`, duration: .7, ease: 'power2.out' }, tLast + .5); tl.to(inside, { opacity: 1, duration: .8 }, tLast + .6);
+    man.face(tl, tLast + .8, 'happy'); man.pose(tl, tLast + 1, 'open', .5, { x: LX - 70 });
+    svg.insertBefore(inside, lastFrame);
   };
 
   window.FIG = { person, baby, POSE, stroke, pen, shown, ground, glow, bubble, POP, UNPOP, hearts, zzz, haha, sparkle, label, HEART, rgba, figGlow, SKY, DIM, WARM, ROSE };
